@@ -1,3 +1,4 @@
+package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,12 +8,12 @@ import java.util.Map.Entry;
 
 public class Server{
 	
-	private final static int PORT = 2016;
-	private Map<String, Joueur> joueurs;
+	public static final int PORT = 2016;
+	private Map<String, Joueur> mapJoueurs;
 	private int nbJoueurs=0;
 	
 	public Server() {
-		joueurs = new HashMap<String, Joueur>();
+		mapJoueurs = new HashMap<String, Joueur>();
 		printWelcome();
 	}
 	
@@ -25,6 +26,7 @@ public class Server{
 			while (true) // attente en boucle de connexion (bloquant sur ss.accept)
 			{
 				Socket client = serverSocket.accept();
+				System.out.println("Ah, il y a un nouveau joueur !...");
 				new Joueur(client,this).start(); // un client se connecte, un nouveau thread client est lancé
 			}
 
@@ -48,20 +50,46 @@ public class Server{
 	}
 
 
-	synchronized public void sendAll(String message,String sLast)
+	synchronized public void sendAll(String message)
 	{
-		for (Entry<String, Joueur> onejoueur : joueurs.entrySet()) // parcours de la table des connectés
-		{
+		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
 			try {
-				onejoueur.getValue().sendToJoueur(message+sLast);
+				onejoueur.getValue().sendToJoueur(message);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	synchronized public void sendAllButThis(String message, Joueur toNotInclude)
+	{
+		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
+			try {
+				if( !onejoueur.getKey().equals(toNotInclude.getPseudo()) ){
+					onejoueur.getValue().sendToJoueur(message);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	synchronized public boolean addJoueur(Joueur joueur) {
+		if(this.mapJoueurs.containsKey(joueur.getPseudo())) return false;
+		mapJoueurs.put(joueur.getPseudo(), joueur);
+		nbJoueurs++;
+		return true;
+	}
+	
+	synchronized public boolean removeJoueur(Joueur joueur) {
+		if( !this.mapJoueurs.containsKey(joueur.getPseudo()) ) return false;
+		mapJoueurs.remove(joueur.getPseudo());
+		nbJoueurs--;
+		return true;
+	}
 
 	synchronized public int getNbJoueurs() {
-		return nbJoueurs; // retourne le nombre de clients connectés
+		return nbJoueurs;
 	}
 	
 
@@ -70,5 +98,6 @@ public class Server{
 		Server server = new Server(); // instance de la classe principale
 		server.start();
 	}
+
 
 }

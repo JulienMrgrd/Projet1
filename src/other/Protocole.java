@@ -1,14 +1,15 @@
+package other;
 
 public enum Protocole {
 	
 	// connexion
 	CONNEX("CONNEX"),
 	BIENVENUE("BIENVENUE"),
-	CONNECT("CONNECT"),
+	CONNECTE("CONNECTE"),
 	
 	// deconnexion
 	SORT("SORT"),
-	SORTI("CONNEX"),
+	SORTI("SORTI"),
 	
 	// debut partie
 	SESSION("SESSION"),
@@ -34,7 +35,13 @@ public enum Protocole {
 	BONNE("BONNE"),
 	MAUVAISE("MAUVAISE"),
 	FINRESO("FINRESO"),
-	TROPLONG("TROPLONG");
+	TROPLONG("TROPLONG"),
+	
+	// Autres : Protocole ajouté
+	USERNAME_ALREADY_USED("USERNAME_ALREADY_USED"),
+	UNKNOWN_CMD("UNKNOWN_CMD"),
+	BAD_PARAMETERS("BAD_PARAMETERS"), 
+	BYE("BYE");
 	
 	
 	public String title;
