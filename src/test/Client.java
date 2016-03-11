@@ -1,12 +1,13 @@
+package test;
 import java.net.*;
 import java.io.*;
 
-public class ChatClient
+public class Client
 {  private Socket socket              = null;
    private DataInputStream  console   = null;
    private DataOutputStream streamOut = null;
 
-   public ChatClient(String serverName, int serverPort)
+   public Client(String serverName, int serverPort)
    {  System.out.println("Establishing connection. Please wait ...");
       try
       {  socket = new Socket(serverName, serverPort);
@@ -47,6 +48,6 @@ public class ChatClient
    }
    
    public static void main(String args[]){
-	   ChatClient client = new ChatClient("localhost", 18000);
+	   Client client = new Client("localhost", 18000);
    }
 }
