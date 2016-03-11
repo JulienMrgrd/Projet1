@@ -11,6 +11,7 @@ public class Client
 	private Socket socket = null;
 	private Scanner  console = null;
 	private PrintWriter streamOut = null;
+	private boolean hasBeenStopped = false;
 
 	public Client(String serverName, int serverPort){  
 		System.out.println("Establishing connection. Please wait ...");
@@ -32,11 +33,11 @@ public class Client
 		String line = "";
 		
 		System.out.println("Vous pouvez parler au serveur.");
-		while (!line.equals(".bye")){  
-			line = console.nextLine();
+		while ( !hasBeenStopped && (line = console.nextLine())!="bye"){  
 			streamOut.println(line);
 			streamOut.flush();
 		}
+		System.out.println("bye bye.");
 	}
 
 	private void runThreadEcouteSocket() {
@@ -58,11 +59,9 @@ public class Client
 								if(str==null){
 									System.out.println("Serveur HS");
 									stop();
-									System.exit(0);
 									return;
 								} else if(str.equals(Protocole.BYE.title)){
 									stop();
-									System.exit(0);
 									return;
 								}
 								
@@ -81,6 +80,7 @@ public class Client
 	}
 
 	public void stop(){
+		hasBeenStopped = true;
 		try {  
 			if (console   != null)  console.close();
 			if (streamOut != null)  streamOut.close();
