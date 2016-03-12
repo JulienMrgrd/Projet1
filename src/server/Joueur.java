@@ -6,13 +6,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import other.Protocole;
+import other.ProtocoleCreator;
 
 
 public class Joueur extends Thread{
 
 	private String pseudo;
 	private int score;
-	private Socket client;
 	private PrintWriter ecriture;
 	private BufferedReader lecture;
 	private Server server;
@@ -21,7 +21,6 @@ public class Joueur extends Thread{
 
 	public Joueur(Socket socket, Server server) {
 		score = 0;
-		client = socket;
 		this.server = server;
 		hasQuit = false;
 
@@ -58,10 +57,11 @@ public class Joueur extends Thread{
 				readFromJoueur();
 			}
 		} catch (IOException e) {
-			System.out.println("(readFromJoueur) Le Joueur "+ pseudo +" est parti");
+			System.out.println("(Joueur run) Le Joueur "+ pseudo +" est parti");
 			server.removeJoueur(this);
+			server.sendAllButThis(ProtocoleCreator.create(Protocole.SORTI,pseudo), this);
 		} catch (Exception e) {
-			System.out.println("(readFromJoueur) Exception : "+e.getMessage());
+			System.out.println("(Joueur run) Exception : "+e.getMessage());
 		}
 	}
 
@@ -79,7 +79,6 @@ public class Joueur extends Thread{
 	 * 
 	 */
 	private void readFromJoueur() throws IOException {
-		System.out.println("(SERVER) ReadFromJoueur("+pseudo+") est en train de lire...");
 		String msg = "";
 		while(msg.isEmpty() || !msg.contains("/")){
 			msg = lecture.readLine();
@@ -93,34 +92,29 @@ public class Joueur extends Thread{
 		
 		if(cmd.startsWith(Protocole.CONNEX.title)){ // CONNEX/user/
 			
-			System.out.println("(SERVER) ReadFromJoueur traite \"CONNEX\": nbJoueur avant = "+server.getNbJoueurs());
 			String username = msgs[1];
 			this.setPseudo(username);
 			if(server.addJoueur(this)==false){
-				this.sendToJoueur(Protocole.USERNAME_ALREADY_USED+"/"+username+"/");
+				this.sendToJoueur(ProtocoleCreator.create(Protocole.USERNAME_ALREADY_USED, username));
 			} else {
-				server.sendAllButThis(Protocole.BIENVENUE.title+"/"+username+"/", this);
-				this.sendToJoueur(Protocole.CONNECTE.title+"/"+username+"/");
+				server.sendAllButThis(ProtocoleCreator.create(Protocole.BIENVENUE,username), this);
+				this.sendToJoueur(ProtocoleCreator.create(Protocole.CONNECTE,username));
 			}
 			
-			System.out.println("(SERVER) ReadFromJoueur traite \"CONNEX\": nbJoueur après = "+server.getNbJoueurs());
 			return;
 		
 		} else if(cmd.startsWith(Protocole.SORT.title)){ // SORT/user/
 			
-			System.out.println("(SERVER) ReadFromJoueur traite \"SORT\": nbJoueur avant = "+server.getNbJoueurs());
-			
 			String username = msgs[1];
 			if( !username.equals(pseudo) ){
-				this.sendToJoueur(Protocole.BAD_PARAMETERS.title);
+				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 			
 			} else if(server.removeJoueur(this)){
-				server.sendAllButThis(Protocole.SORTI.title+"/"+username+"/", this);
-				this.sendToJoueur(Protocole.BYE.title);
+				server.sendAllButThis(ProtocoleCreator.create(Protocole.SORTI,username), this);
+				this.sendToJoueur(ProtocoleCreator.create(Protocole.BYE));
 				hasQuit = true;
 			}
 			
-			System.out.println("(SERVER) ReadFromJoueur traite \"SORT\": nbJoueur après = "+server.getNbJoueurs());
 			return;
 			
 		} else if(cmd.startsWith(Protocole.TROUVE.title)){ // SORT/user/
@@ -141,6 +135,10 @@ public class Joueur extends Thread{
 	
 	public boolean hasQuit(){
 		return hasQuit;
+	}
+	
+	public String toString(){
+		return pseudo;
 	}
 
 

@@ -1,9 +1,7 @@
-package server;
+package plateau;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import other.Mur;
 
 public class Case {
 	public int x;

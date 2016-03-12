@@ -59,7 +59,7 @@ public class Client
 							String str;
 							try {
 								str = reader.readLine();
-								System.out.println("Le server répond : "+str);
+								System.out.println(str);
 								if(str==null){
 									serverHS();
 									return;
@@ -91,12 +91,12 @@ public class Client
 	public void stop(){
 		hasBeenStopped = true;
 		try {  
-			if (streamOut != null)  streamOut.close();
-			if (socket    != null)  socket.close();
 			PrintWriter pw = new PrintWriter(System.out);
 			pw.println("exit by press ENTER");
 			pw.flush();
 			pw.close();
+			if (streamOut != null)  streamOut.close();
+			if (socket    != null)  socket.close();
 		} catch(IOException ioe){  
 			System.out.println("Error closing ...");
 		}
@@ -108,6 +108,7 @@ public class Client
 	}
 
 	public static void main(String args[]){
+//		new Client("JulienM-HP", Server.PORT);
 		new Client("localhost", Server.PORT);
 	}
 }

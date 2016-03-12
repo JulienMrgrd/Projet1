@@ -38,12 +38,16 @@ public enum Protocole {
 	TROPLONG("TROPLONG"),
 	
 	// Autres : Protocole ajouté
-	USERNAME_ALREADY_USED("USERNAME_ALREADY_USED"),
-	UNKNOWN_CMD("UNKNOWN_CMD"),
+	USERNAME_ALREADY_USED("USERNAME_ALREADY_USED"), // Nom déjà utilisé
+	UNKNOWN_CMD("UNKNOWN_CMD"), // Commande inconnue
 	BAD_PARAMETERS("BAD_PARAMETERS"), 
 	BYE("BYE"), 
-	NOT_ENOUGH_PLAYERS("NOT_ENOUGH_PLAYERS");
-	
+	NOT_ENOUGH_PLAYERS("NOT_ENOUGH_PLAYERS"), // Pas assez de joueurs
+	WAIT("WAIT"), // indique au client d'attendre le prochain tour/lancement de la partie
+	SESSION_START_TIME("SESSION_START_TIME"), // indique au client que la partie va commencer dans X secondes
+	SESSION_START_CANCEL("SESSION_START_CANCEL"),
+	LE_SAVIEZ_VOUS("LE_SAVIEZ_VOUS"),
+	;
 	
 	public String title;
 	

@@ -1,6 +1,4 @@
-package server;
-
-import other.Mur;
+package plateau;
 
 public class Plateau {
 	
@@ -32,7 +30,7 @@ public class Plateau {
 			}
 		
 		// TODO Auto-generated method stub
-		// Initialisée la liste des murs et appeler update qui placera les robots et la cible
+		// Initialisï¿½e la liste des murs et appeler update qui placera les robots et la cible
 	}
 	
 	public void createPlateau(){
@@ -147,7 +145,7 @@ public class Plateau {
 	
 	public void init(String d) {
 		// TODO Auto-generated method stub
-		// Initialisée la liste des murs et appeler update qui placera les robots et la cible
+		// Initialisï¿½e la liste des murs et appeler update qui placera les robots et la cible
 	}
 	
 	public void update(/* parameters ?? */){
@@ -156,8 +154,8 @@ public class Plateau {
 	}
 	
 	public void display(){
-		for(int i=0;i<plat.length;i++){
-			for(int j=0;j<plat[i].length;j++){
+		for(int j=plat.length-1; j>=0; j--){
+			for(int i=0; i<plat[j].length; i++){
 				System.out.print(plat[i][j].getMur()+"\t");
 			}
 			System.out.println();

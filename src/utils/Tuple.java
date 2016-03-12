@@ -1,4 +1,4 @@
-package other;
+package utils;
 
 public class Tuple<X, Y> { 
 	public X left; 

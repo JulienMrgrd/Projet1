@@ -1,4 +1,4 @@
-package other;
+package plateau;
 
 public enum Mur {
 	H,
