@@ -33,21 +33,25 @@ public class Client
 		String line = "";
 		
 		System.out.println("Vous pouvez parler au serveur.");
-		while ( !hasBeenStopped && (line = console.nextLine())!="bye"){  
-			streamOut.println(line);
-			streamOut.flush();
+		try{
+			while ( !hasBeenStopped && (line = console.nextLine())!="exit."){  
+				streamOut.println(line);
+				streamOut.flush();
+			}
+		} catch (Exception exc){ }
+		finally{
+			if (console != null) console.close();
 		}
 		System.out.println("bye bye.");
 	}
 
 	private void runThreadEcouteSocket() {
 		new Thread(new Runnable() {
-			
 			@Override
 			public void run() {
 				if(socket!=null){
 					
-					BufferedReader reader;
+					BufferedReader reader = null;
 					try {
 						reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 						while(true){
@@ -57,8 +61,7 @@ public class Client
 								str = reader.readLine();
 								System.out.println("Le server répond : "+str);
 								if(str==null){
-									System.out.println("Serveur HS");
-									stop();
+									serverHS();
 									return;
 								} else if(str.equals(Protocole.BYE.title)){
 									stop();
@@ -66,28 +69,42 @@ public class Client
 								}
 								
 							} catch (IOException e) {
-								System.out.println("Problème d'écoute du server");
+								serverHS();
+								return;
 							}
 							
 						}
 					} catch (IOException e1) {
 						System.out.println("Problème de création du reader");
+					} finally {
+						try {
+							if(reader != null) reader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
-					
 				}
 			}
 		}).start();
 	}
-
+	
 	public void stop(){
 		hasBeenStopped = true;
 		try {  
-			if (console   != null)  console.close();
 			if (streamOut != null)  streamOut.close();
 			if (socket    != null)  socket.close();
+			PrintWriter pw = new PrintWriter(System.out);
+			pw.println("exit by press ENTER");
+			pw.flush();
+			pw.close();
 		} catch(IOException ioe){  
 			System.out.println("Error closing ...");
 		}
+	}
+	
+	private void serverHS() {
+		System.out.println("Serveur HS");
+		stop();
 	}
 
 	public static void main(String args[]){

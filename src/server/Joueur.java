@@ -69,14 +69,10 @@ public class Joueur extends Thread{
 	 * throws IOException si le client se déconnecte
 	 */
 	public void sendToJoueur(String msg) throws IOException{
-		System.out.println("(SERVER) sendToJoueur reçoit : "+msg);
-		
 		if(ecriture!=null){
 			ecriture.println(msg);
 			ecriture.flush();
 		}
-		
-		
 	}
 	
 	/**

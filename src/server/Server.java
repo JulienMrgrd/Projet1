@@ -11,10 +11,15 @@ public class Server{
 	public static final int PORT = 2016;
 	private Map<String, Joueur> mapJoueurs;
 	private int nbJoueurs=0;
+	private Session session;
 	
 	public Server() {
 		mapJoueurs = new HashMap<String, Joueur>();
-		printWelcome();
+		session = new Session(mapJoueurs, this);
+		
+		System.out.println("--------");
+		System.out.println("Serveur demarre sur le port : "+PORT);
+		System.out.println("--------\n");
 	}
 	
 	public void start() {
@@ -42,16 +47,15 @@ public class Server{
 			}
 		}
 	} 
-
-	static private void printWelcome() {
-		System.out.println("--------");
-		System.out.println("Serveur demarre sur le port : "+PORT);
-		System.out.println("--------\n");
+	
+	public void mapChange(){
+		if( !session.hasStarted() && nbJoueurs>1 ){
+			
+		}
 	}
 
 
-	synchronized public void sendAll(String message)
-	{
+	synchronized public void sendAll(String message) {
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
 			try {
 				onejoueur.getValue().sendToJoueur(message);
@@ -61,8 +65,7 @@ public class Server{
 		}
 	}
 	
-	synchronized public void sendAllButThis(String message, Joueur toNotInclude)
-	{
+	synchronized public void sendAllButThis(String message, Joueur toNotInclude) {
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
 			try {
 				if( !onejoueur.getKey().equals(toNotInclude.getPseudo()) ){
@@ -78,6 +81,7 @@ public class Server{
 		if(this.mapJoueurs.containsKey(joueur.getPseudo())) return false;
 		mapJoueurs.put(joueur.getPseudo(), joueur);
 		nbJoueurs++;
+		mapChange();
 		return true;
 	}
 	
@@ -85,6 +89,7 @@ public class Server{
 		if( !this.mapJoueurs.containsKey(joueur.getPseudo()) ) return false;
 		mapJoueurs.remove(joueur.getPseudo());
 		nbJoueurs--;
+		mapChange();
 		return true;
 	}
 
