@@ -41,16 +41,17 @@ public class Plateau {
 		plat[7][6].addMurInvisible(Mur.H);
 		plat[8][6].addMurInvisible(Mur.H);
 		
-		choosePlateau();
+		applyPlateau();
 		// appeler update qui placera les robots et la cible
 	}
 	
-	private void choosePlateau() {
+	private void applyPlateau() {
 		int plateauAlea = 1 + new Random().nextInt(PlateauChooser.NB_PLATEAU);
+		System.out.println("Plateau n°"+plateauAlea+"\n");
 		if(plateauAlea==1) PlateauChooser.applyPlateau1(plat);
-//		else if(plateauAlea==2) this.createPlateau2();
-//		else if(plateauAlea==3) this.createPlateau3();
-//		else if(plateauAlea==4) this.createPlateau4();
+		else if(plateauAlea==2) PlateauChooser.applyPlateau2(plat);
+//		else if(plateauAlea==3) PlateauChooser.applyPlateau3(plat);
+//		else if(plateauAlea==4) PlateauChooser.applyPlateau4(plat);
 	}
 
 	public void init(String d) {
