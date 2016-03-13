@@ -4,6 +4,7 @@ public abstract class PlateauChooser {
 
 	public static final int NB_PLATEAU = 2;
 
+	//http://www.vindjeu.eu/prd/wp-content/uploads/2012/03/419-Ricochet-Robot-2.jpg
 	public static void applyPlateau2(Case[][] plat) {
 		plat[0][1].addMur(Mur.H);
 		plat[0][2].addMur(Mur.B);
@@ -105,6 +106,7 @@ public abstract class PlateauChooser {
 		plat[15][13].addMur(Mur.B);
 	}
 	
+	// http://www.jeuxadeux.com/images/ricochet_robots_2_gd.jpg
 	public static void applyPlateau1(Case[][] plat) {
 		plat[0][2].addMur(Mur.H);
 		plat[0][3].addMur(Mur.B);
