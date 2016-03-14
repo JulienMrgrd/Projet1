@@ -1,6 +1,5 @@
 package server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,18 +59,21 @@ public class Session {
 			return;
 		}
 
-		for(Joueur joueur : allActifs){ // On préviens du début de la manche
-			System.out.println("(Session nextStep) forAll joueurs : "+joueur.getPseudo());
-			try {
-				joueur.sendToJoueur(ProtocoleCreator.create(Protocole.SESSION, plateau.toString()) );
-			} catch (IOException e) {
-				removeActif(joueur); // Un des joueurs du tour s'est déconnecté
-				if(getNbActifs()<=1){
-					sendVainqueur(allActifs.get(0));
-					stopSession();
-					return; // On arrete la partie puisque tout le monde a quitté
-				}
+		// On préviens du début de la manche
+		synchronized (allActifs) { // TODO: retirer
+			for(Joueur joueur : allActifs){ 
+				System.out.println("(Session nextStep) forAll joueurs : "+joueur.getPseudo());
 			}
+		}
+		try{
+			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.toString()), allActifs);
+		} catch (Exception e){
+			System.out.println(e);
+		}
+		if(getNbActifs()<=1){
+			sendVainqueur(allActifs.get(0));
+			stopSession();
+			return; // On arrete la partie puisque tout le monde a quitté
 		}
 
 		for(int i=1; i<=3; i++){
@@ -96,6 +98,8 @@ public class Session {
 		}
 
 		System.out.println("Vérification de fin du tour n°"+nbTours);
+		
+		updateActifs();
 		GameState state = shouldStop();
 		switch (state) {
 		case CanContinue:
@@ -118,12 +122,6 @@ public class Session {
 			stopSession();
 			break;
 		}
-	}
-
-	private void removeActif(Joueur joueur) {
-		server.removeJoueur(joueur); 
-		allActifs.remove(joueur);
-		server.sendAll(ProtocoleCreator.create(Protocole.SORTI, joueur.getPseudo()));
 	}
 
 	private void sendVainqueur(Joueur joueur) {
@@ -162,10 +160,6 @@ public class Session {
 		if(allActifs.contains(joueur)) allActifs.remove(joueur);
 	}
 	
-	public void addJoueur(Joueur joueur){
-		if(!allActifs.contains(joueur)) allActifs.add(joueur);
-	}
-
 	private synchronized List<Joueur> getAllJoueurs() {
 		return new ArrayList<>(mapPseudo_Joueur.values());
 	}
@@ -177,5 +171,14 @@ public class Session {
 	public int getNbJoueurs(){ return mapPseudo_Joueur.size(); }
 	
 	public int getNbActifs(){ return allActifs.size(); }
+	
+	/**
+	 * Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés
+	 */
+	public void updateActifs(){
+		synchronized (allActifs) {
+			server.sendToThem("", allActifs);
+		}
+	}
 
 }

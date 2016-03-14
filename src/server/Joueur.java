@@ -59,19 +59,20 @@ public class Joueur extends Thread{
 		} catch (IOException e) {
 			System.out.println("(Joueur run) Le Joueur "+ pseudo +" est parti");
 			server.removeJoueur(this);
-			server.sendAllButThis(ProtocoleCreator.create(Protocole.SORTI,pseudo), this);
 		} catch (Exception e) {
 			System.out.println("(Joueur run) Exception : "+e.getMessage());
 		}
 	}
 
-	/**
-	 * throws IOException si le client se déconnecte
+	/** throws IOException si le client se déconnecte
 	 */
 	public void sendToJoueur(String msg) throws IOException{
 		if(ecriture!=null){
 			ecriture.println(msg);
 			ecriture.flush();
+			if(ecriture.checkError()){
+				throw new IOException();
+			}
 		}
 	}
 	
@@ -94,13 +95,9 @@ public class Joueur extends Thread{
 			
 			String username = msgs[1];
 			this.setPseudo(username);
-			if(server.addJoueur(this)==false){
+			if(!server.addJoueur(this)){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.USERNAME_ALREADY_USED, username));
-			} else {
-				server.sendAllButThis(ProtocoleCreator.create(Protocole.BIENVENUE,username), this);
-				this.sendToJoueur(ProtocoleCreator.create(Protocole.CONNECTE,username));
 			}
-			
 			return;
 		
 		} else if(cmd.startsWith(Protocole.SORT.title)){ // SORT/user/
@@ -110,11 +107,9 @@ public class Joueur extends Thread{
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 			
 			} else if(server.removeJoueur(this)){
-				server.sendAllButThis(ProtocoleCreator.create(Protocole.SORTI,username), this);
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BYE));
 				hasQuit = true;
 			}
-			
 			return;
 			
 		} else if(cmd.startsWith(Protocole.TROUVE.title)){ // SORT/user/

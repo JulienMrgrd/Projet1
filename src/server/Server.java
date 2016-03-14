@@ -2,7 +2,9 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -35,8 +37,7 @@ public class Server{
 		try	{
 			serverSocket = new ServerSocket(PORT);
 			startSessionIfPossible();
-			while (true) // attente en boucle de connexion (bloquant sur ss.accept)
-			{
+			while (true){ // attente en boucle de connexion (bloquant sur ss.accept)
 				Socket client = serverSocket.accept();
 				System.out.println("Ah, il y a un nouveau joueur !...");
 				new Joueur(client,this).start(); // un client se connecte, un nouveau thread client est lancé
@@ -100,25 +101,53 @@ public class Server{
 		}).start();
 	}
 
-	synchronized public void sendAll(String message) {
+	public synchronized void sendAll(String message) {
+		List<Joueur> aSuppr = new ArrayList<>(mapJoueurs.size());
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
 			try {
 				onejoueur.getValue().sendToJoueur(message);
 			} catch (IOException e) {
+				aSuppr.add(onejoueur.getValue());
 				System.out.println("(sendAll) exception sur joueur "+onejoueur.getKey());
 			}
 		}
+		for(Joueur unASuppr : aSuppr){
+			removeJoueur(unASuppr);
+		}
 	}
 	
-	synchronized public void sendAllButThis(String message, Joueur toNotInclude) {
+	public void sendToThem(String message, List<Joueur> joueurs) {
+		if(joueurs == null) return;
+		List<Joueur> aSuppr = new ArrayList<>(joueurs.size());
+		synchronized (joueurs) {
+			for (Joueur onejoueur : joueurs){ // parcours tous les joueurs
+				try {
+					onejoueur.sendToJoueur(message);
+				} catch (IOException e) {
+					aSuppr.add(onejoueur);
+					System.out.println("(sendToThem) exception sur joueur "+onejoueur);
+				}
+			}
+		}
+		for(Joueur unASuppr : aSuppr){
+			removeJoueur(unASuppr);
+		}
+	}
+	
+	public synchronized void sendAllButThis(String message, Joueur toNotInclude) {
+		List<Joueur> aSuppr = new ArrayList<>(mapJoueurs.size());
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
 			try {
 				if( !onejoueur.getKey().equals(toNotInclude.getPseudo()) ){
 					onejoueur.getValue().sendToJoueur(message);
 				}
 			} catch (IOException e) {
+				aSuppr.add(onejoueur.getValue());
 				System.out.println("(sendAllButThis) exception sur joueur "+onejoueur.getKey());
 			}
+		}
+		for(Joueur unASuppr : aSuppr){
+			removeJoueur(unASuppr);
 		}
 	}
 	
@@ -126,7 +155,12 @@ public class Server{
 		if(this.mapJoueurs.containsKey(joueur.getPseudo())) return false;
 		mapJoueurs.put(joueur.getPseudo(), joueur);
 		nbJoueurs++;
-		session.addJoueur(joueur);
+		sendAllButThis(ProtocoleCreator.create(Protocole.BIENVENUE,joueur.getPseudo()), joueur);
+		try {
+			joueur.sendToJoueur(ProtocoleCreator.create(Protocole.CONNECTE));
+		} catch (IOException e1) {
+			removeJoueur(joueur);
+		}
 		if(session.hasStarted()){
 			try {
 				joueur.sendToJoueur(ProtocoleCreator.create(Protocole.WAIT));
@@ -138,7 +172,7 @@ public class Server{
 			} catch (IOException e) { removeJoueur(joueur); }
 		}
 		synchronized (sync) {
-			sync.notify();
+			sync.notify(); // Notify le server qu'un joueur a été ajouté (voir startSessionIfNeeded)
 		}
 		return true;
 	}
@@ -148,6 +182,7 @@ public class Server{
 		mapJoueurs.remove(joueur.getPseudo());
 		session.removeJoueur(joueur);
 		nbJoueurs--;
+		sendAll(ProtocoleCreator.create(Protocole.SORTI, joueur.getPseudo()));
 		return true;
 	}
 
