@@ -91,7 +91,7 @@ public class Joueur extends Thread{
 		String[] msgs = msg.split("/");
 		String cmd = msgs[0];
 		
-		if(cmd.startsWith(Protocole.CONNEX.title)){ // CONNEX/user/
+		if(cmd.startsWith(Protocole.CONNEX.name())){ // CONNEX/user/
 			
 			String username = msgs[1];
 			this.setPseudo(username);
@@ -100,7 +100,7 @@ public class Joueur extends Thread{
 			}
 			return;
 		
-		} else if(cmd.startsWith(Protocole.SORT.title)){ // SORT/user/
+		} else if(cmd.startsWith(Protocole.SORT.name())){ // SORT/user/
 			
 			String username = msgs[1];
 			if( !username.equals(pseudo) ){
@@ -112,17 +112,17 @@ public class Joueur extends Thread{
 			}
 			return;
 			
-		} else if(cmd.startsWith(Protocole.TROUVE.title)){ // SORT/user/
+		} else if(cmd.startsWith(Protocole.TROUVE.name())){ // SORT/user/
 
 
-		} else if(cmd.startsWith(Protocole.ENCHERE.title)){ // SORT/user/
+		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // SORT/user/
 
 
-		} else if(cmd.startsWith(Protocole.SOLUTION.title)){ // SORT/user/
+		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ // SORT/user/
 
 
 		} else {
-			this.sendToJoueur(Protocole.UNKNOWN_CMD.title);
+			this.sendToJoueur(Protocole.UNKNOWN_CMD.name());
 			return;
 		}
 

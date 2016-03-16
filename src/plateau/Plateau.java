@@ -22,24 +22,15 @@ public class Plateau {
 		for(int i=0; i<plat.length;i++){
 			for(int j=0; j<plat[i].length;j++){
 				plat[i][j]=new Case(i,j);
-				if(i==0) plat[i][j].addMur(Mur.G);//Ajout des mur a la bordure gauche
-				if(j==0) plat[i][j].addMur(Mur.B);//Ajout des mur a la bordure basse
-				if(i==plat.length-1) plat[i][j].addMur(Mur.D);//Ajout des mur a la bordure droite
-				if(j==plat[i].length-1) plat[i][j].addMur(Mur.H);//Ajout des mur a la bordure haute
+				if(i==0) plat[i][j].addMurDeBase(Mur.G);//Ajout des mur a la bordure gauche
+				if(j==0) plat[i][j].addMurDeBase(Mur.B);//Ajout des mur a la bordure basse
+				if(i==plat.length-1) plat[i][j].addMurDeBase(Mur.D);//Ajout des mur a la bordure droite
+				if(j==plat[i].length-1) plat[i][j].addMurDeBase(Mur.H);//Ajout des mur a la bordure haute
 			}
 		}
 		
 		// AJouter tous les murs du centre
-		plat[6][7].addMur(Mur.D);
-		plat[6][8].addMur(Mur.D);
-		plat[7][9].addMur(Mur.B);
-		plat[8][9].addMur(Mur.B);
-		plat[9][7].addMur(Mur.G);
-		plat[9][8].addMur(Mur.G);
-		plat[7][7].addMur(Mur.B);
-		plat[8][7].addMur(Mur.B);
-		plat[7][6].addMurInvisible(Mur.H);
-		plat[8][6].addMurInvisible(Mur.H);
+		addMursCentre();
 		
 		applyPlateau();
 		// appeler update qui placera les robots et la cible
@@ -47,16 +38,22 @@ public class Plateau {
 	
 	private void applyPlateau() {
 		int plateauAlea = 1 + new Random().nextInt(PlateauChooser.NB_PLATEAU);
-		System.out.println("Plateau n°"+plateauAlea+"\n");
-		if(plateauAlea==1) PlateauChooser.applyPlateau1(plat);
-		else if(plateauAlea==2) PlateauChooser.applyPlateau2(plat);
+		System.out.print("Plateau n°"+plateauAlea+": " );
+		if(plateauAlea==1){
+			PlateauChooser.applyPlateau1(plat);
+			System.out.println("76 murs\n");
+		}
+		else if(plateauAlea==2){
+			PlateauChooser.applyPlateau2(plat);
+			System.out.println("84 murs\n");
+		}
 //		else if(plateauAlea==3) PlateauChooser.applyPlateau3(plat);
 //		else if(plateauAlea==4) PlateauChooser.applyPlateau4(plat);
 	}
 
 	public void init(String d) {
 		// TODO Auto-generated method stub
-		// Initialis�e la liste des murs et appeler update qui placera les robots et la cible
+		// Initialise la liste des murs et appeler update qui placera les robots et la cible
 	}
 	
 	public void update(/* parameters ?? */){
@@ -77,10 +74,9 @@ public class Plateau {
 		System.out.println();
 		for(int j=plat.length-1; j>=0; j--){
 			for(int i=0; i<plat[j].length; i++){
-//				System.out.print(plat[i][j].getMur()+"\t");
-				if(i==0 && j<10) System.out.print(j+"  "+plat[i][j].toString());
-				else if(i==0 && j>=10) System.out.print(j+" "+plat[i][j].toString());
-				else System.out.print(plat[i][j].toString());
+				if(i==0 && j<10) System.out.print(j+"  "+plat[i][j].display());
+				else if(i==0 && j>=10) System.out.print(j+" "+plat[i][j].display());
+				else System.out.print(plat[i][j].display());
 			}
 			System.out.println();
 		}
@@ -92,13 +88,37 @@ public class Plateau {
 	}
 	
 	public String toString(){
-		return ""; // Chaine a envoyé aux clients
+		String res = "";
+		System.out.println("\n");
+		for(Case[] oneLine : plat){
+			for(Case oneCase : oneLine){
+				String disp = oneCase.toString();
+				if(disp.isEmpty()) continue;
+				else res += disp + ",";
+			}
+		}
+		if(res.endsWith(",")) return res.substring(0, res.length()-1);
+		else return res;
+	}
+	
+	private void addMursCentre() {
+		plat[6][7].addMurDeBase(Mur.D);
+		plat[6][8].addMurDeBase(Mur.D);
+		plat[7][9].addMurDeBase(Mur.B);
+		plat[8][9].addMurDeBase(Mur.B);
+		plat[9][7].addMurDeBase(Mur.G);
+		plat[9][8].addMurDeBase(Mur.G);
+		plat[7][7].addMurDeBase(Mur.B);
+		plat[8][7].addMurDeBase(Mur.B);
+		plat[7][6].addMurDeBase(Mur.H);
+		plat[8][6].addMurDeBase(Mur.H);
 	}
 	
 	public static void main(String[] args ){
 		Plateau plateau = new Plateau();
 		plateau.init();
 		plateau.display();
+		System.out.println("\n"+plateau.toString());
 	}
 
 }

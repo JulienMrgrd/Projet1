@@ -63,7 +63,7 @@ public class Client
 								if(str==null){
 									serverHS();
 									return;
-								} else if(str.equals(Protocole.BYE.title)){
+								} else if(str.equals(Protocole.BYE.name())){
 									stop();
 									return;
 								}
