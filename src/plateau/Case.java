@@ -9,6 +9,8 @@ public class Case {
 	private List<Mur> murs;
 	private List<Mur> mursInvisibles;
 	private List<Mur> mursDeBase;
+	private Couleur robot;
+	private Couleur cible;
 
 	public Case(int x, int y){
 		this.x=x;
@@ -50,6 +52,16 @@ public class Case {
 		}
 		return false;
 	}
+	
+	public void addRobot(Couleur robot){ this.robot = robot; }
+	public void removeRobot(){ this.robot = null; }
+	public Couleur getRobot(){ return robot;	}
+	public boolean containsRobot(){ return robot!=null; }
+	
+	public void addCible(Couleur cible){ this.cible = cible; }
+	public void removeCible(){ this.cible = null; }
+	public Couleur getCible(){ return cible;	}
+	public boolean containsCible(){ return cible!=null; }
 	
 	public String display(){
 		String gauche = " ";

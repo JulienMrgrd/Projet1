@@ -128,6 +128,15 @@ public class Joueur extends Thread{
 
 	}
 	
+	public boolean estEnVie(){
+		try{
+			sendToJoueur("");
+			return true;
+		} catch (IOException e){
+			return false;
+		}
+	}
+	
 	public boolean hasQuit(){
 		return hasQuit;
 	}

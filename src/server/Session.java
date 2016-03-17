@@ -8,6 +8,7 @@ import other.GameState;
 import other.Protocole;
 import other.ProtocoleCreator;
 import plateau.Plateau;
+import utils.StringUtils;
 import utils.Tuple;
 
 public class Session {
@@ -179,6 +180,22 @@ public class Session {
 		synchronized (allActifs) {
 			server.sendToThem("", allActifs);
 		}
+	}
+	
+	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */
+	public String bilan(){
+		String bilan = Integer.toString(nbTours);
+		if(allActifs != null){
+			List<Joueur> toRemove = new ArrayList<>(2); // Peu de joueurs se déconnectent
+			for(Joueur joueur : allActifs){
+				if(joueur.estEnVie()) bilan += "("+ joueur.getPseudo()+","+joueur.getScore()+"),";
+				else toRemove.add(joueur);
+			}
+			for(Joueur joueur : toRemove){
+				server.removeJoueur(joueur);
+			}
+		}
+		return StringUtils.deleteCommaIfExists(bilan);
 	}
 
 }

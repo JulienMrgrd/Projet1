@@ -1,11 +1,34 @@
 package plateau;
 
-public abstract class PlateauChooser {
+import java.util.Random;
+
+public class PlateauChooser {
 
 	public static final int NB_PLATEAU = 2;
-
+	private Case[][] plat;
+	private int chosenPlateau;
+	private Case[] casesAvecDeuxMursContigus;
+	
+	public PlateauChooser(Case[][]plat){
+		this.plat = plat;
+	}
+	
+	public int applyRandomPlateau(){
+		int plateauAlea = 1 + new Random().nextInt(PlateauChooser.NB_PLATEAU);
+		chosenPlateau = plateauAlea;
+		System.out.print("Plateau n°"+plateauAlea+": " );
+		if(plateauAlea==1){
+			applyPlateau1();
+			System.out.println("76 murs\n");
+		} else if(plateauAlea==2){
+			applyPlateau2();
+			System.out.println("84 murs\n");
+		}
+		return chosenPlateau;
+	}
+	
 	//http://www.vindjeu.eu/prd/wp-content/uploads/2012/03/419-Ricochet-Robot-2.jpg
-	public static void applyPlateau2(Case[][] plat) {
+	private void applyPlateau2() {
 		plat[0][1].addMur(Mur.H);
 		plat[0][2].addMur(Mur.B);
 		plat[0][4].addMurInvisible(Mur.D);
@@ -104,10 +127,29 @@ public abstract class PlateauChooser {
 		plat[15][4].addMur(Mur.B);
 		plat[15][12].addMur(Mur.H);
 		plat[15][13].addMur(Mur.B);
-	}
+		
+		casesAvecDeuxMursContigus = new Case[17];
+		casesAvecDeuxMursContigus[0] = plat[1][4];
+		casesAvecDeuxMursContigus[1] = plat[1][11];
+		casesAvecDeuxMursContigus[2] = plat[3][1];
+		casesAvecDeuxMursContigus[3] = plat[3][14];
+		casesAvecDeuxMursContigus[4] = plat[4][9];
+		casesAvecDeuxMursContigus[5] = plat[5][5];
+		casesAvecDeuxMursContigus[6] = plat[6][3];
+		casesAvecDeuxMursContigus[7] = plat[6][12];
+		casesAvecDeuxMursContigus[8] = plat[9][14];
+		casesAvecDeuxMursContigus[9] = plat[10][3];
+		casesAvecDeuxMursContigus[10] = plat[10][9];
+		casesAvecDeuxMursContigus[11] = plat[11][5];
+		casesAvecDeuxMursContigus[12] = plat[11][12];
+		casesAvecDeuxMursContigus[13] = plat[12][2];
+		casesAvecDeuxMursContigus[14] = plat[13][4];
+		casesAvecDeuxMursContigus[15] = plat[13][8];
+		casesAvecDeuxMursContigus[16] = plat[14][10];
+	} // fin plateau 2
 	
 	// http://www.jeuxadeux.com/images/ricochet_robots_2_gd.jpg
-	public static void applyPlateau1(Case[][] plat) {
+	private void applyPlateau1() {
 		plat[0][2].addMur(Mur.H);
 		plat[0][3].addMur(Mur.B);
 		plat[0][9].addMur(Mur.H);
@@ -198,5 +240,32 @@ public abstract class PlateauChooser {
 		plat[15][3].addMur(Mur.B);
 		plat[15][10].addMur(Mur.H);
 		plat[15][11].addMur(Mur.B);
+		
+		casesAvecDeuxMursContigus = new Case[17];
+		casesAvecDeuxMursContigus[0] = plat[1][12];
+		casesAvecDeuxMursContigus[1] = plat[2][5];
+		casesAvecDeuxMursContigus[2] = plat[2][6];
+		casesAvecDeuxMursContigus[3] = plat[2][9];
+		casesAvecDeuxMursContigus[4] = plat[3][9];
+		casesAvecDeuxMursContigus[5] = plat[5][1];
+		casesAvecDeuxMursContigus[6] = plat[6][11];
+		casesAvecDeuxMursContigus[7] = plat[7][4];
+		casesAvecDeuxMursContigus[8] = plat[8][10];
+		casesAvecDeuxMursContigus[9] = plat[9][2];
+		casesAvecDeuxMursContigus[10] = plat[10][6];
+		casesAvecDeuxMursContigus[11] = plat[10][14];
+		casesAvecDeuxMursContigus[12] = plat[12][4];
+		casesAvecDeuxMursContigus[13] = plat[12][12];
+		casesAvecDeuxMursContigus[14] = plat[12][13];
+		casesAvecDeuxMursContigus[15] = plat[13][4];
+		casesAvecDeuxMursContigus[16] = plat[13][9];
+	} // fin plateau 1
+	
+	public int getChosenPlateau(){
+		return chosenPlateau;
+	}
+	
+	public Case[] getCasesAvecDeuxMursContigus(int chosenPlateau){
+		return casesAvecDeuxMursContigus;
 	}
 }

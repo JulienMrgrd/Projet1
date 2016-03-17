@@ -2,21 +2,17 @@ package plateau;
 
 import java.util.Random;
 
+import utils.StringUtils;
+
 public class Plateau {
 	
-	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_BLACK = "\u001B[30m";
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_GREEN = "\u001B[32m";
-	public static final String ANSI_YELLOW = "\u001B[33m";
-	public static final String ANSI_BLUE = "\u001B[34m";
-	public static final String ANSI_PURPLE = "\u001B[35m";
-	public static final String ANSI_CYAN = "\u001B[36m";
-	public static final String ANSI_WHITE = "\u001B[37m";
+	private Case[][] plat = new Case[16][16];
+	private Couleur[] robots = new Couleur[4];
+	private PlateauChooser chooser;
+	private Case caseCible;
+	private Case[] caseRobots;
 	
-	public final Case[][] plat=new Case[16][16];
-	
-	public Plateau(){ }
+	public Plateau(){}
 	
 	public void init() {
 		for(int i=0; i<plat.length;i++){
@@ -29,36 +25,26 @@ public class Plateau {
 			}
 		}
 		
-		// AJouter tous les murs du centre
-		addMursCentre();
+		addMursCentre(); // AJouter tous les murs du centre
 		
-		applyPlateau();
-		// appeler update qui placera les robots et la cible
+		updatePlateau(); // Ajoute obstacles, robots et cible
 	}
 	
-	private void applyPlateau() {
-		int plateauAlea = 1 + new Random().nextInt(PlateauChooser.NB_PLATEAU);
-		System.out.print("Plateau n°"+plateauAlea+": " );
-		if(plateauAlea==1){
-			PlateauChooser.applyPlateau1(plat);
-			System.out.println("76 murs\n");
-		}
-		else if(plateauAlea==2){
-			PlateauChooser.applyPlateau2(plat);
-			System.out.println("84 murs\n");
-		}
-//		else if(plateauAlea==3) PlateauChooser.applyPlateau3(plat);
-//		else if(plateauAlea==4) PlateauChooser.applyPlateau4(plat);
-	}
+	public void updatePlateau(){
+		chooser = new PlateauChooser(plat);
+		int chosenPlateau = chooser.applyRandomPlateau(); // ajoute murs obstacles
+		Case[] mursContigus = chooser.getCasesAvecDeuxMursContigus(chosenPlateau);
 
-	public void init(String d) {
-		// TODO Auto-generated method stub
-		// Initialise la liste des murs et appeler update qui placera les robots et la cible
-	}
-	
-	public void update(/* parameters ?? */){
-		//TODO
-		// Mettre a jour la cible et la position des robots
+		int pos = new Random().nextInt(mursContigus.length);
+		mursContigus[pos].addCible(Couleur.randomCouleur()); // Ajoute la cible
+		caseCible = mursContigus[pos];
+		
+		robots[0] = Couleur.B;
+		robots[1] = Couleur.J;
+		robots[2] = Couleur.R;
+		robots[3] = Couleur.V;
+		
+		// TODO : ajouter les robots
 	}
 	
 	public void display(){
@@ -87,6 +73,7 @@ public class Plateau {
 		}
 	}
 	
+	/** Affiche "plateau" de l'énoncé (la suite des murs avec leurs positions) */
 	public String toString(){
 		String res = "";
 		System.out.println("\n");
@@ -97,8 +84,13 @@ public class Plateau {
 				else res += disp + ",";
 			}
 		}
-		if(res.endsWith(",")) return res.substring(0, res.length()-1);
-		else return res;
+		return StringUtils.deleteCommaIfExists(res);
+	}
+	
+	/** Affiche "enigme" de l'énoncé (la suite des robots et cible avec leurs positions) */
+	public String enigme(){
+		String enigme = "";
+		return enigme;
 	}
 	
 	private void addMursCentre() {
