@@ -27,13 +27,14 @@ public class Plateau {
 		
 		addMursCentre(); // AJouter tous les murs du centre
 		
+		chooser = new PlateauChooser(plat);
+		chooser.applyRandomPlateau(); // ajoute murs obstacles
 		updatePlateau(); // Ajoute obstacles, robots et cible
 	}
 	
 	public void updatePlateau(){
-		chooser = new PlateauChooser(plat);
-		int chosenPlateau = chooser.applyRandomPlateau(); // ajoute murs obstacles
-		Case[] mursContigus = chooser.getCasesAvecDeuxMursContigus(chosenPlateau);
+		if(chooser==null) init();
+		Case[] mursContigus = chooser.getCasesAvecDeuxMursContigus();
 
 		int pos = new Random().nextInt(mursContigus.length);
 		mursContigus[pos].addCible(Couleur.randomCouleur()); // Ajoute la cible
@@ -74,7 +75,7 @@ public class Plateau {
 	}
 	
 	/** Affiche "plateau" de l'énoncé (la suite des murs avec leurs positions) */
-	public String toString(){
+	public String plateau(){
 		String res = "";
 		System.out.println("\n");
 		for(Case[] oneLine : plat){
@@ -110,7 +111,7 @@ public class Plateau {
 		Plateau plateau = new Plateau();
 		plateau.init();
 		plateau.display();
-		System.out.println("\n"+plateau.toString());
+		System.out.println("\n"+plateau.plateau());
 	}
 
 }

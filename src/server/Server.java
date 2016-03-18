@@ -57,7 +57,7 @@ public class Server{
 	} 
 	
 	/** Démarre la session (ou en relance une) si il y a au moins 2 joueurs. */
-	public void startSessionIfPossible(){
+	private void startSessionIfPossible(){
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -134,6 +134,25 @@ public class Server{
 		}
 	}
 	
+	public synchronized void sendToThemButThis(String message, List<Joueur> joueurs, Joueur toNotInclude) {
+		if(joueurs == null) return;
+		List<Joueur> aSuppr = new ArrayList<>(joueurs.size());
+		synchronized (joueurs) {
+			for (Joueur onejoueur : joueurs){ // parcours tous les joueurs
+				if(onejoueur==toNotInclude) continue;
+				try {
+					onejoueur.sendToJoueur(message);
+				} catch (IOException e) {
+					aSuppr.add(onejoueur);
+					System.out.println("(sendToThem) exception sur joueur "+onejoueur);
+				}
+			}
+		}
+		for(Joueur unASuppr : aSuppr){
+			removeJoueur(unASuppr);
+		}
+	}
+	
 	public synchronized void sendAllButThis(String message, Joueur toNotInclude) {
 		List<Joueur> aSuppr = new ArrayList<>(mapJoueurs.size());
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
@@ -188,6 +207,10 @@ public class Server{
 
 	synchronized public int getNbJoueurs() {
 		return nbJoueurs;
+	}
+	
+	public Session getSession(){
+		return session;
 	}
 	
 

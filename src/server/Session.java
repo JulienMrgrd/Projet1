@@ -21,17 +21,21 @@ public class Session {
 	private Server server;
 	private Plateau plateau;
 	private Map<String, Joueur> mapPseudo_Joueur; // Référence tous les joueurs de la session, actif ou non
-	private List<Joueur> allActifs;
+	private List<Joueur> allPlaying;
 	
 	private int nbTours;
 	private Tuple<Integer, Joueur> bestJoueurAndScore;
 	private boolean hasStarted;
-
+	
+	// Reflexion
+	private Joueur vainqueurReflexion;
+	private int nbCoupsVainqueurReflexion;
+	
 	public Session(Map<String, Joueur> mapPseudo_Joueur, Server server) {
 		this.server = server;
 		this.mapPseudo_Joueur = mapPseudo_Joueur; // Passage par référence, pas par copie
 		plateau = new Plateau();
-		allActifs=new ArrayList<>();
+		allPlaying=new ArrayList<>();
 		hasStarted = false;
 	}
 
@@ -51,49 +55,54 @@ public class Session {
 
 	public void nextStep(){
 		nbTours ++;
-		allActifs = getAllJoueurs();
+		allPlaying = getAllJoueurs();
 
 		System.out.println("(nextStep) nbJoueurs="+getNbActifs());
 		if(getNbActifs()<=1){
-			sendVainqueur(allActifs.get(0));
+			sendVainqueur(allPlaying.get(0));
 			stopSession();
 			return;
 		}
 
 		// On préviens du début de la manche
-		synchronized (allActifs) { // TODO: retirer
-			for(Joueur joueur : allActifs){ 
+		synchronized (allPlaying) { // TODO: retirer
+			for(Joueur joueur : allPlaying){ 
 				System.out.println("(Session nextStep) forAll joueurs : "+joueur.getPseudo());
 			}
 		}
 		try{
-			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.toString()), allActifs);
+			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.toString()), allPlaying);
 		} catch (Exception e){
 			System.out.println(e);
 		}
 		if(getNbActifs()<=1){
-			sendVainqueur(allActifs.get(0));
+			sendVainqueur(allPlaying.get(0));
 			stopSession();
 			return; // On arrete la partie puisque tout le monde a quitté
 		}
 
 		for(int i=1; i<=3; i++){
+			boolean finDeTour = false;
 			switch (i) {
 			case STEP_REFLEXION:
-				startReflexion(allActifs);
+				finDeTour = startReflexion();
 				break;
 			case STEP_ENCHERES:
-				startEncheres(allActifs);
+				finDeTour = startEncheres();
 				break;
 			case STEP_RESOLUTION:
-				startResolution(allActifs);
+				finDeTour = startResolution();
+				break;
+			}
+			if(finDeTour || allPlaying.size()<2){
+				System.out.println("Fin d'une phase ("+i+"), finDeTour="+finDeTour+" et allPlaying.size="+allPlaying.size());
 				break;
 			}
 		}
 
 		System.out.println("Traitement du tour n°"+nbTours);
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -116,38 +125,41 @@ public class Session {
 
 		case NotEnoughPlayers:
 			System.out.println("case : not enough");
-			if(allActifs.size()==1){
-				System.out.println("Vainqueur : "+allActifs.get(0));
-				sendVainqueur(allActifs.get(0));
+			if(allPlaying.size()==1){
+				System.out.println("Vainqueur : "+allPlaying.get(0));
+				sendVainqueur(allPlaying.get(0));
 			}
 			stopSession();
 			break;
 		}
 	}
 
-	private void sendVainqueur(Joueur joueur) {
-		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
-	}
 
-	private void startResolution(List<Joueur> allActifs) {
-		// TODO Auto-generated method stub
+	private boolean startResolution() {
 		System.out.println("startResolution");
+		server.sendToThem(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()), allPlaying);
+		return true;
+		//TODO:
 	}
 
-	private void startEncheres(List<Joueur> allActifs) {
+	private boolean startEncheres() {
 		// TODO Auto-generated method stub
 		System.out.println("startEncheres");
+		return true;
+		//TODO:
 	}
 
-	private void startReflexion(List<Joueur> allActifs) {
+	private boolean startReflexion() {
 		// TODO Auto-generated method stub
 		System.out.println("startReflexion");
+		return true;
+		//TODO:
 	}
 
 	private GameState shouldStop(){
 		if(getNbActifs() <= 1) return GameState.NotEnoughPlayers;
 
-		for(Joueur joueur : allActifs){
+		for(Joueur joueur : allPlaying){
 			if(bestJoueurAndScore.left < joueur.getScore()){
 				bestJoueurAndScore = new Tuple<>(joueur.getScore(), joueur);
 			}
@@ -157,8 +169,47 @@ public class Session {
 		return GameState.CanContinue;
 	}
 	
+	private void sendVainqueur(Joueur joueur) {
+		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
+	}
+	
+	/**
+	 * Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés
+	 */
+	public void updateActifs(){
+		synchronized (allPlaying) {
+			server.sendToThem("", allPlaying);
+		}
+	}
+	
+	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */
+	public String bilan(){
+		String bilan = Integer.toString(nbTours);
+		if(allPlaying != null){
+			List<Joueur> toRemove = new ArrayList<>(2); // Peu de joueurs se déconnectent
+			for(Joueur joueur : allPlaying){
+				if(joueur.estEnVie()) bilan += "("+ joueur.getPseudo()+","+joueur.getScore()+"),";
+				else toRemove.add(joueur);
+			}
+			for(Joueur joueur : toRemove){
+				server.removeJoueur(joueur);
+			}
+		}
+		return StringUtils.deleteCommaIfExists(bilan);
+	}
+	
+	//==========  GETTERS // SETTERS =============//
+	
 	public void removeJoueur(Joueur joueur){
-		if(allActifs.contains(joueur)) allActifs.remove(joueur);
+		if(allPlaying.contains(joueur)) allPlaying.remove(joueur);
+	}
+	
+	public boolean isPlaying(Joueur joueur){
+		return allPlaying.contains(joueur);
+	}
+	
+	public List<Joueur> getAllPlaying(){
+		return allPlaying;
 	}
 	
 	private synchronized List<Joueur> getAllJoueurs() {
@@ -171,31 +222,22 @@ public class Session {
 
 	public int getNbJoueurs(){ return mapPseudo_Joueur.size(); }
 	
-	public int getNbActifs(){ return allActifs.size(); }
-	
-	/**
-	 * Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés
-	 */
-	public void updateActifs(){
-		synchronized (allActifs) {
-			server.sendToThem("", allActifs);
-		}
+	public int getNbActifs(){ return allPlaying.size(); }
+
+	public synchronized Joueur getVainqueurReflexion() {
+		return vainqueurReflexion;
 	}
-	
-	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */
-	public String bilan(){
-		String bilan = Integer.toString(nbTours);
-		if(allActifs != null){
-			List<Joueur> toRemove = new ArrayList<>(2); // Peu de joueurs se déconnectent
-			for(Joueur joueur : allActifs){
-				if(joueur.estEnVie()) bilan += "("+ joueur.getPseudo()+","+joueur.getScore()+"),";
-				else toRemove.add(joueur);
-			}
-			for(Joueur joueur : toRemove){
-				server.removeJoueur(joueur);
-			}
-		}
-		return StringUtils.deleteCommaIfExists(bilan);
+
+	public synchronized void setVainqueurReflexion(Joueur vainqueurReflexion) {
+		this.vainqueurReflexion = vainqueurReflexion;
+	}
+
+	public synchronized int getNbCoupsVainqueurReflexion() {
+		return nbCoupsVainqueurReflexion;
+	}
+
+	public synchronized void setNbCoupsVainqueurReflexion(int nbCoupsVainqueurReflexion) {
+		this.nbCoupsVainqueurReflexion = nbCoupsVainqueurReflexion;
 	}
 
 }

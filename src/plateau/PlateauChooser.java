@@ -265,7 +265,7 @@ public class PlateauChooser {
 		return chosenPlateau;
 	}
 	
-	public Case[] getCasesAvecDeuxMursContigus(int chosenPlateau){
+	public Case[] getCasesAvecDeuxMursContigus(){
 		return casesAvecDeuxMursContigus;
 	}
 }

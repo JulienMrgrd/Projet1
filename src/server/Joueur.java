@@ -112,8 +112,29 @@ public class Joueur extends Thread{
 			}
 			return;
 			
-		} else if(cmd.startsWith(Protocole.TROUVE.name())){ // SORT/user/
-
+		} else if(cmd.startsWith(Protocole.TROUVE.name())){ // TROUVE/user/coups/
+			Session session = server.getSession();
+			if(session.hasStarted() && session.isPlaying(this)){
+				boolean itIsTheFirst = false;
+				int nbCoups = -1;
+				try{
+					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups
+				} catch (NumberFormatException exc){
+					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				}
+				synchronized (session) {
+					if(session.getVainqueurReflexion()==null && nbCoups!=-1){
+						session.setVainqueurReflexion(this);
+						session.setNbCoupsVainqueurReflexion(nbCoups);
+						itIsTheFirst = true;
+					}
+				}
+				if(itIsTheFirst){
+					sendToJoueur(ProtocoleCreator.create(Protocole.TUASTROUVE));
+					String ilatrouve = ProtocoleCreator.create(Protocole.ILATROUVE, pseudo, Integer.toString(nbCoups));
+					server.sendToThemButThis(ilatrouve, session.getAllPlaying(), this);
+				}
+			}
 
 		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // SORT/user/
 
