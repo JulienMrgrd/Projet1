@@ -3,6 +3,7 @@ package server;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 import other.GameState;
 import other.Protocole;
@@ -29,7 +30,7 @@ public class Session {
 	
 	// Reflexion
 	private Joueur vainqueurReflexion;
-	private int nbCoupsVainqueurReflexion;
+	private Integer nbCoupsVainqueurReflexion;
 	
 	public Session(Map<String, Joueur> mapPseudo_Joueur, Server server) {
 		this.server = server;
@@ -54,6 +55,8 @@ public class Session {
 	}
 
 	public void nextStep(){
+		boolean hasAWinner = false;
+		
 		nbTours ++;
 		allPlaying = getAllJoueurs();
 
@@ -71,7 +74,7 @@ public class Session {
 			}
 		}
 		try{
-			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.toString()), allPlaying);
+			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()), allPlaying);
 		} catch (Exception e){
 			System.out.println(e);
 		}
@@ -82,27 +85,26 @@ public class Session {
 		}
 
 		for(int i=1; i<=3; i++){
-			boolean finDeTour = false;
 			switch (i) {
 			case STEP_REFLEXION:
-				finDeTour = startReflexion();
+				startReflexion();
 				break;
 			case STEP_ENCHERES:
-				finDeTour = startEncheres();
+				startEncheres();
 				break;
 			case STEP_RESOLUTION:
-				finDeTour = startResolution();
+				startResolution();
 				break;
 			}
-			if(finDeTour || allPlaying.size()<2){
-				System.out.println("Fin d'une phase ("+i+"), finDeTour="+finDeTour+" et allPlaying.size="+allPlaying.size());
+			if(allPlaying.size()<2){
+				System.out.println("Fin d'une phase ("+i+"), allPlaying.size="+allPlaying.size());
 				break;
 			}
 		}
 
 		System.out.println("Traitement du tour n°"+nbTours);
 		try {
-			Thread.sleep(4000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -134,12 +136,25 @@ public class Session {
 		}
 	}
 
-
 	private boolean startResolution() {
 		System.out.println("startResolution");
 		server.sendToThem(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()), allPlaying);
+		
+		System.out.println("Start waiting for solution 20 sec");
+		synchronized (this) {
+			try {
+				this.wait(20000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null) {
+			System.out.println(vainqueurReflexion.getPseudo() + "a une solution en "+nbCoupsVainqueurReflexion+" coups !");
+		} else {
+			System.out.println("Temps terminé, aucune solution");
+		}
+		
 		return true;
-		//TODO:
 	}
 
 	private boolean startEncheres() {
@@ -170,6 +185,7 @@ public class Session {
 	}
 	
 	private void sendVainqueur(Joueur joueur) {
+		System.out.println("Vainqueur : "+joueur.getPseudo());
 		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
 	}
 	

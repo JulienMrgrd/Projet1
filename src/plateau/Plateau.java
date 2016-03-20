@@ -27,6 +27,11 @@ public class Plateau {
 		
 		addMursCentre(); // AJouter tous les murs du centre
 		
+		robots[0] = Couleur.B;
+		robots[1] = Couleur.J;
+		robots[2] = Couleur.R;
+		robots[3] = Couleur.V;
+		
 		chooser = new PlateauChooser(plat);
 		chooser.applyRandomPlateau(); // ajoute murs obstacles
 		updatePlateau(); // Ajoute obstacles, robots et cible
@@ -40,12 +45,21 @@ public class Plateau {
 		mursContigus[pos].addCible(Couleur.randomCouleur()); // Ajoute la cible
 		caseCible = mursContigus[pos];
 		
-		robots[0] = Couleur.B;
-		robots[1] = Couleur.J;
-		robots[2] = Couleur.R;
-		robots[3] = Couleur.V;
-		
 		// TODO : ajouter les robots
+	}
+	
+	private boolean containsMursBetweenTwoAlignedCases(Case one, Case two){
+//		TODO: a finir !
+//		if(one.getX()==two.getX()){
+//			int nbCasesDistance;
+//			if(one.getX()>two.getX()) nbCasesDistance = one
+//			
+//			
+//		} else if (one.getY()==two.getY()){
+//			
+//		} else {
+			return true;
+//		}
 	}
 	
 	public void display(){
@@ -105,6 +119,10 @@ public class Plateau {
 		plat[8][7].addMurDeBase(Mur.B);
 		plat[7][6].addMurDeBase(Mur.H);
 		plat[8][6].addMurDeBase(Mur.H);
+		plat[7][7].setCanContainsRobotsOrCible(false);
+		plat[8][7].setCanContainsRobotsOrCible(false);
+		plat[7][8].setCanContainsRobotsOrCible(false);
+		plat[8][8].setCanContainsRobotsOrCible(false);
 	}
 	
 	public static void main(String[] args ){

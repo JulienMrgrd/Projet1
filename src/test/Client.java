@@ -59,11 +59,16 @@ public class Client
 							String str;
 							try {
 								str = reader.readLine();
-								System.out.println(str);
 								if(str==null){
 									serverHS();
 									return;
-								} else if(str.equals(Protocole.BYE.name())){
+								} else if(str.isEmpty()){
+									System.out.println("message vide du server");
+								} else {
+									System.out.println(str);
+								}
+								
+								if(str.equals(Protocole.BYE.name())){
 									stop();
 									return;
 								}

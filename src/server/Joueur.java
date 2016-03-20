@@ -127,12 +127,14 @@ public class Joueur extends Thread{
 						session.setVainqueurReflexion(this);
 						session.setNbCoupsVainqueurReflexion(nbCoups);
 						itIsTheFirst = true;
+						session.notify(); // session is waiting for a solution
 					}
 				}
 				if(itIsTheFirst){
 					sendToJoueur(ProtocoleCreator.create(Protocole.TUASTROUVE));
 					String ilatrouve = ProtocoleCreator.create(Protocole.ILATROUVE, pseudo, Integer.toString(nbCoups));
 					server.sendToThemButThis(ilatrouve, session.getAllPlaying(), this);
+					
 				}
 			}
 
