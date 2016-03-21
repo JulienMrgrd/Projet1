@@ -3,6 +3,7 @@ package plateau;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.AnsiColors;
 import utils.StringUtils;
 
 public class Case {
@@ -68,18 +69,22 @@ public class Case {
 		if(murs.contains(Mur.D) || mursDeBase.contains(Mur.D)) droite = "|";
 		
 		if(cible!=null){
-			if(bas.equals("_")) bas = "\u001B[4mC";
-			else bas = StringUtils.ANSI_CYAN+"C"+StringUtils.ANSI_RESET;
-//			System.out.println("Cible en "+x+","+y+" : "+bas);
+			if(bas.equals("_")) bas = StringUtils.underline("C");
+			else bas = "C";
+			
+			if(cible==Couleur.B) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_BLUE);
+			else if(cible==Couleur.R) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_RED);
+			else if(cible==Couleur.V) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_GREEN);
+			else bas = StringUtils.transformInto(bas, AnsiColors.ANSI_YELLOW);
 		
 		} else if(robot!=null){
-//			if(bas.equals("_")) bas = (char)27 + "[4 R"; // TODO : UNDERLINE
-			if(robot==Couleur.B) bas = StringUtils.ANSI_BLUE+"R"+StringUtils.ANSI_RESET;
-			else if(robot==Couleur.R) bas = StringUtils.ANSI_RED+"R"+StringUtils.ANSI_RESET;
-			else if(robot==Couleur.V) bas = StringUtils.ANSI_GREEN+"R"+StringUtils.ANSI_RESET;
-			else bas = StringUtils.ANSI_YELLOW+"R"+StringUtils.ANSI_RESET;
-//			}
-//			System.out.println("Robot en "+x+","+y+" : "+bas);
+			if(bas.equals("_")) bas = StringUtils.underline("R");
+			else bas = "R";
+			
+			if(robot==Couleur.B) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_BLUE);
+			else if(robot==Couleur.R) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_RED);
+			else if(robot==Couleur.V) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_GREEN);
+			else bas = StringUtils.transformInto(bas, AnsiColors.ANSI_YELLOW);
 		}
 		
 		return gauche+bas+droite;

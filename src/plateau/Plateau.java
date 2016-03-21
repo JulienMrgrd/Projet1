@@ -27,9 +27,9 @@ public class Plateau {
 		
 		addMursCentre(); // AJouter tous les murs du centre
 		
-		robots[0] = Couleur.B;
-		robots[1] = Couleur.J;
-		robots[2] = Couleur.R;
+		robots[0] = Couleur.R; // Conserver cette ordre pour respecter le protocole.
+		robots[1] = Couleur.B;
+		robots[2] = Couleur.J;
 		robots[3] = Couleur.V;
 		
 		chooser = new PlateauChooser(plat);
@@ -147,7 +147,19 @@ public class Plateau {
 	
 	/** Affiche "enigme" de l'énoncé (la suite des robots et cible avec leurs positions) */
 	public String enigme(){
-		String enigme = "";
+		String enigme = "(";
+		
+		if(caseRobots!=null){
+			for(Case c : caseRobots){
+				enigme += c.getX()+","+c.getY()+",";
+			}
+		}
+		
+		if(caseCible!=null){
+			enigme += caseCible.getX()+","+caseCible.getY()+","+caseCible.getCible();
+		}
+		
+		enigme+=")";
 		return enigme;
 	}
 	
@@ -173,6 +185,7 @@ public class Plateau {
 		plateau.init();
 		plateau.display();
 		System.out.println("\n"+plateau.plateau());
+		System.out.println("\n"+plateau.enigme());
 	}
 
 }
