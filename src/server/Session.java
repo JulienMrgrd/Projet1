@@ -282,7 +282,15 @@ public class Session {
 		this.nbCoupsVainqueurReflexion = nbCoupsVainqueurReflexion;
 	}
 
-	public synchronized void addEncheres(Enchere enchere) { EnchereUtils.addIfPossibleInGoodPosition(encheres, enchere); }
+	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups, ou si
+	 * la précédente enchère du Joueur est plus grande en nombre de coups. 
+	 * 
+	 * @return Le pseudo du joueur ayant déjà effectué une enchère du même type (ou son pseudo si supérieure), 
+	 * null si OK
+	 * */
+	public synchronized String addEncheres(Enchere enchere) { 
+		return EnchereUtils.addIfPossibleInGoodPosition(encheres, enchere); 
+	}
 
 	public boolean isInReflexion(){ return isInReflexion; }
 	public boolean isInEnchere(){ return isInEnchere; }

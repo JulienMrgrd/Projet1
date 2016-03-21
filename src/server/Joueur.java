@@ -137,7 +137,7 @@ public class Joueur extends Thread{
 					
 				}
 			}
-
+			
 		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // ENCHERE/user/coups/
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this) && session.isInEnchere()){
@@ -146,7 +146,13 @@ public class Joueur extends Thread{
 					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups
 				} catch (NumberFormatException exc){}
 				if(nbCoups>0){
-					session.addEncheres(new Enchere(this, nbCoups));
+					String pseudo = session.addEncheres(new Enchere(this, nbCoups));
+					if(pseudo!=null) sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
+					else {
+						sendToJoueur(ProtocoleCreator.create(Protocole.TUENCHERE));
+						String ilenchere = ProtocoleCreator.create(Protocole.ILENCHERE,this.getPseudo(),Integer.toString(nbCoups));
+						server.sendToThemButThis(ilenchere, session.getAllPlaying(), this);
+					}
 				} else {
 					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 				}

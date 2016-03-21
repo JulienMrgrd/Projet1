@@ -16,24 +16,40 @@ public abstract class EnchereUtils {
 		return null;
 	}
 	
-	public static void addIfPossibleInGoodPosition(List<Enchere> listEnch, Enchere ench){
+	public static Enchere getEnchereByNbCoups(List<Enchere> listEnch, int nbCoups){
+		for(Enchere ench : listEnch){
+			if(ench.getNbCoups()==nbCoups) return ench;
+		}
+		return null;
+	}
+	
+	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups, ou si
+	 * la précédente enchère du Joueur est plus grande en nombre de coups. 
+	 * 
+	 * @return Le pseudo du joueur ayant déjà effectué une enchère du même type (ou son pseudo si supérieure), 
+	 * null si OK
+	 * */
+	public static String addIfPossibleInGoodPosition(List<Enchere> listEnch, Enchere ench){
 		if(listEnch==null){
 			listEnch = new ArrayList<Enchere>();
 			listEnch.add(ench);
-			return;
+			return null;
 		}
 		
-		System.out.println("(addIfPossibleInGoodPosition) ajoute enchere de "+ench.getJoueur().toString()+","+ench.getNbCoups());
 		System.out.print("Liste existante avant : (");
 		for(Enchere oneEnch : listEnch){
 			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
 		}
 		System.out.println(")");
 		
-		Enchere enchExistante = getEnchereByJoueur(listEnch, ench.getJoueur());
-		if(enchExistante!=null){
-			if(enchExistante.getNbCoups()<=ench.getNbCoups()) return;
-			else enchExistante.setNbCoups(ench.getNbCoups());
+		Enchere enchExistanteDuJoueur = getEnchereByJoueur(listEnch, ench.getJoueur());
+		Enchere enchExistanteAvecCeNbCoups = getEnchereByNbCoups(listEnch, ench.getNbCoups());
+		if(enchExistanteAvecCeNbCoups!=null) return enchExistanteAvecCeNbCoups.getJoueur().getPseudo();
+		
+		if(enchExistanteDuJoueur!=null){
+			if(enchExistanteDuJoueur.getNbCoups()<=ench.getNbCoups()) return ench.getJoueur().getPseudo();
+			else enchExistanteDuJoueur.setNbCoups(ench.getNbCoups());
+		
 		} else {
 			listEnch.add(ench);
 		}
@@ -43,6 +59,7 @@ public abstract class EnchereUtils {
 			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
 		}
 		System.out.println(")");
+		return null;
 	}
 
 }
