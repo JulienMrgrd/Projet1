@@ -19,7 +19,6 @@ public class LeSaviezVousGenerator {
 		
 		Random r = new Random();
 		int valeur = r.nextInt(nbPhrases);
-		System.out.println("Le random est : "+valeur);
 		while(allAlreadyDisplayed.contains(valeur)){
 			valeur = r.nextInt(nbPhrases);
 		}

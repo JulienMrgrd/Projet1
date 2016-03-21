@@ -3,6 +3,8 @@ package plateau;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.StringUtils;
+
 public class Case {
 	private int x;
 	private int y;
@@ -22,13 +24,21 @@ public class Case {
 		mursDeBase = new ArrayList<>(2);
 	}
 	
-	
 	public boolean containsMur(){
 		if(murs.size()>0 || mursInvisibles.size()>0 || mursDeBase.size()>0){
 			return true;
 		}
 		return false;
 	}
+	
+	public boolean containsMurAtPosition(Mur m){
+		if(containsMur() && (murs.contains(m) || mursInvisibles.contains(m) || mursDeBase.contains(m))){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean containsOnlyMursDeBase(){
 		if(murs.isEmpty() && mursInvisibles.isEmpty() && mursDeBase.size()>0){
 			return true;
@@ -56,6 +66,21 @@ public class Case {
 		if(murs.contains(Mur.B) || mursDeBase.contains(Mur.B)) bas = "_";
 		if(murs.contains(Mur.G) || mursDeBase.contains(Mur.G)) gauche = "|";
 		if(murs.contains(Mur.D) || mursDeBase.contains(Mur.D)) droite = "|";
+		
+		if(cible!=null){
+			if(bas.equals("_")) bas = "\u001B[4mC";
+			else bas = StringUtils.ANSI_CYAN+"C"+StringUtils.ANSI_RESET;
+//			System.out.println("Cible en "+x+","+y+" : "+bas);
+		
+		} else if(robot!=null){
+//			if(bas.equals("_")) bas = (char)27 + "[4 R"; // TODO : UNDERLINE
+			if(robot==Couleur.B) bas = StringUtils.ANSI_BLUE+"R"+StringUtils.ANSI_RESET;
+			else if(robot==Couleur.R) bas = StringUtils.ANSI_RED+"R"+StringUtils.ANSI_RESET;
+			else if(robot==Couleur.V) bas = StringUtils.ANSI_GREEN+"R"+StringUtils.ANSI_RESET;
+			else bas = StringUtils.ANSI_YELLOW+"R"+StringUtils.ANSI_RESET;
+//			}
+//			System.out.println("Robot en "+x+","+y+" : "+bas);
+		}
 		
 		return gauche+bas+droite;
 	}

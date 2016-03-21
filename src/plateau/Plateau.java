@@ -10,7 +10,7 @@ public class Plateau {
 	private Couleur[] robots = new Couleur[4];
 	private PlateauChooser chooser;
 	private Case caseCible;
-	private Case[] caseRobots;
+	private Case[] caseRobots = new Case[4];
 	
 	public Plateau(){}
 	
@@ -45,21 +45,64 @@ public class Plateau {
 		mursContigus[pos].addCible(Couleur.randomCouleur()); // Ajoute la cible
 		caseCible = mursContigus[pos];
 		
-		// TODO : ajouter les robots
+		System.out.println("Ajout des 4 robots");
+		for(int i=0; i<robots.length; i++){  // Ajout des 4 robots
+			caseRobots[i] = getRandomCaseForRobots();
+			if((caseRobots[i].getX()==caseCible.getX() || caseRobots[i].getY()==caseCible.getY()) 
+					&& !containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
+				System.out.println("Robot "+i+" aligné avec la cible : robot=("+caseRobots[i].getX()+","
+					    +caseRobots[i].getY()+") et cible=("+caseCible.getX()+","+caseCible.getY()+")");
+				i--; // Si rien ne sépare le robot de la cible (coup en 1 coup), on retente de placer le robot
+			} else {
+				caseRobots[i].addRobot(robots[i]);
+			}
+		}
+		System.out.println("Fin d'ajout des 4 robots");
 	}
 	
+	private Case getRandomCaseForRobots() {
+		int xRand, yRand;
+		Random r = new Random();
+		do {
+			xRand = r.nextInt(plat.length);
+			yRand = r.nextInt(plat[plat.length-1].length);
+		} while( !plat[xRand][yRand].canContainRobotsOrCible() && !plat[xRand][yRand].containsCible() );
+		return plat[xRand][yRand];
+	}
+
 	private boolean containsMursBetweenTwoAlignedCases(Case one, Case two){
-//		TODO: a finir !
-//		if(one.getX()==two.getX()){
-//			int nbCasesDistance;
-//			if(one.getX()>two.getX()) nbCasesDistance = one
-//			
-//			
-//		} else if (one.getY()==two.getY()){
-//			
-//		} else {
-			return true;
-//		}
+		if(one.getX()==two.getX() && one.getY()==two.getY()) return false; // meme case
+		else if(one.getX()==two.getX()){ // Si alignés en x
+			int nbCasesBetween;
+			if(one.getY()>two.getY()){ // si one au dessus de two
+				if(one.containsMurAtPosition(Mur.B) || two.containsMurAtPosition(Mur.H)) return true;
+				nbCasesBetween = one.getY()-two.getY() - 1;
+			} else{
+				if(one.containsMurAtPosition(Mur.H) || two.containsMurAtPosition(Mur.B)) return true;
+				nbCasesBetween = two.getY()-one.getY() - 1;
+			}
+			
+			for(int i=1; i<=nbCasesBetween; i++){
+				if(one.getY()>two.getY() && plat[one.getX()][one.getY()-i].containsMurAtPosition(Mur.B)) return true;
+				else if (one.getY()<two.getY() && plat[one.getX()][one.getY()+i].containsMurAtPosition(Mur.H)) return true;
+			}
+			
+		} else if (one.getY()==two.getY()){
+			int nbCasesBetween;
+			if(one.getX()>two.getX()){ // si one au dessus de two
+				if(one.containsMurAtPosition(Mur.G) || two.containsMurAtPosition(Mur.D)) return true;
+				nbCasesBetween = one.getX()-two.getX() - 1;
+			} else{
+				if(one.containsMurAtPosition(Mur.D) || two.containsMurAtPosition(Mur.G)) return true;
+				nbCasesBetween = two.getX()-one.getX() - 1;
+			}
+			
+			for(int i=1; i<=nbCasesBetween; i++){
+				if(one.getX()>two.getX() && plat[one.getX()-i][one.getY()].containsMurAtPosition(Mur.G)) return true;
+				else if (one.getX()<two.getX() && plat[one.getX()+i][one.getY()].containsMurAtPosition(Mur.D)) return true;
+			}
+		}
+		return false;
 	}
 	
 	public void display(){
