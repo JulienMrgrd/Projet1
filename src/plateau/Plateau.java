@@ -45,19 +45,15 @@ public class Plateau {
 		mursContigus[pos].addCible(Couleur.randomCouleur()); // Ajoute la cible
 		caseCible = mursContigus[pos];
 		
-		System.out.println("Ajout des 4 robots");
 		for(int i=0; i<robots.length; i++){  // Ajout des 4 robots
 			caseRobots[i] = getRandomCaseForRobots();
 			if((caseRobots[i].getX()==caseCible.getX() || caseRobots[i].getY()==caseCible.getY()) 
 					&& !containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
-				System.out.println("Robot "+i+" aligné avec la cible : robot=("+caseRobots[i].getX()+","
-					    +caseRobots[i].getY()+") et cible=("+caseCible.getX()+","+caseCible.getY()+")");
 				i--; // Si rien ne sépare le robot de la cible (coup en 1 coup), on retente de placer le robot
 			} else {
 				caseRobots[i].addRobot(robots[i]);
 			}
 		}
-		System.out.println("Fin d'ajout des 4 robots");
 	}
 	
 	private Case getRandomCaseForRobots() {
@@ -185,7 +181,7 @@ public class Plateau {
 		plateau.init();
 		plateau.display();
 		System.out.println("\n"+plateau.plateau());
-		System.out.println("\n"+plateau.enigme());
+		System.out.println(plateau.enigme());
 	}
 
 }

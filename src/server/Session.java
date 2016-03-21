@@ -17,7 +17,7 @@ public class Session {
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 10;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
-	public static final int SECONDS_REFLEXION = 10;
+	public static final int SECONDS_REFLEXION = 20;
 	public static final int SECONDS_ENCHERES = 30;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
 
@@ -65,14 +65,13 @@ public class Session {
 		System.out.println("Fin de la partie");
 		hasStarted = false;
 	}
-
+	
 	public void nextStep(){
-		boolean hasAWinner = false;
+		resetAttributes();
 		
 		nbTours ++;
 		allPlaying = getAllJoueurs();
 
-		System.out.println("(nextStep) nbJoueurs="+getNbActifs());
 		if(getNbActifs()<=1){
 			sendVainqueur(allPlaying.get(0));
 			stopSession();
@@ -80,16 +79,17 @@ public class Session {
 		}
 
 		// On préviens du début de la manche
-		synchronized (allPlaying) { // TODO: retirer
-			for(Joueur joueur : allPlaying){ 
-				System.out.println("(Session nextStep) forAll joueurs : "+joueur.getPseudo());
+		System.out.println("\nDébut du tour "+nbTours);
+		System.out.print("Tous les joueurs : ");
+		synchronized (allPlaying) {
+			for(int i=0; i<allPlaying.size(); i++){ 
+				if(i==allPlaying.size()-1) System.out.print(allPlaying.get(i).getPseudo());
+				else System.out.print(allPlaying.get(i).getPseudo()+", ");
 			}
 		}
-		try{
-			server.sendToThem(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()), allPlaying);
-		} catch (Exception e){
-			System.out.println(e);
-		}
+
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
+		
 		if(getNbActifs()<=1){
 			if(getNbActifs()==1) sendVainqueur(allPlaying.get(0));
 			stopSession();
@@ -109,27 +109,25 @@ public class Session {
 				isInEnchere = false;
 				break;
 			case STEP_RESOLUTION:
-				isInEnchere = true;
+				if(encheres.size()==0 && nbCoupsVainqueurReflexion==null) break; // Pas de résolution
+				isInResolution = true;
 				startResolution();
-				isInEnchere = false;
+				isInResolution = false;
 				break;
 			}
 			
 			updateActifs();
 			if(allPlaying.size()<2){
-				System.out.println("Fin d'une phase ("+i+"), allPlaying.size="+allPlaying.size());
 				break;
 			}
 		}
 		
-		System.out.println("Traitement du tour n°"+nbTours);
+		System.out.println("Fin du tour n°"+nbTours);
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("Vérification de fin du tour n°"+nbTours);
 		
 		updateActifs();
 		GameState state = shouldStop();
@@ -148,7 +146,6 @@ public class Session {
 		case NotEnoughPlayers:
 			System.out.println("case : not enough");
 			if(allPlaying.size()==1){
-				System.out.println("Vainqueur : "+allPlaying.get(0));
 				sendVainqueur(allPlaying.get(0));
 			}
 			stopSession();
@@ -156,9 +153,13 @@ public class Session {
 		}
 	}
 
+	private void sendToAllPlaying(String message) {
+		server.sendToThem(message, allPlaying);
+	}
+
 	private boolean startReflexion() {
 		System.out.println("startReflexion");
-		server.sendToThem(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()), allPlaying);
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
 		System.out.println("Start waiting for solution "+SECONDS_REFLEXION+" sec"); // TODO: 5 min
 		synchronized (this) {
@@ -173,30 +174,45 @@ public class Session {
 		} else {
 			System.out.println("Temps terminé, aucune solution");
 		}
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.FINREFELXION));
 		return true;
 	}
 	
 	private boolean startEncheres() {
 		System.out.println("startEncheres durant "+SECONDS_ENCHERES+" sec");
-		encheres = new ArrayList<>();
 		try {
 			Thread.sleep(SECONDS_ENCHERES*1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println("fin enchères");
+		System.out.println("fin des enchères");
 		System.out.print("Liste enchères finale : (");
 		for(Enchere oneEnch : encheres){
 			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
 		}
 		System.out.println(")");
+		
+		if(encheres.size()>0) sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, 
+				encheres.get(0).getJoueur().getPseudo(), Integer.toString(encheres.get(0).getNbCoups())));
+		else sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE));
 		return true;
 	}
 	
 	private boolean startResolution() {
 		return true;
 		// TODO:
+	}
+	
+	private void resetAttributes(){
+		isInReflexion=false;
+		vainqueurReflexion=null;
+		nbCoupsVainqueurReflexion=null;
+		
+		isInEnchere=false;
+		encheres = new ArrayList<>();
+		
+		isInResolution=false;
 	}
 
 	private GameState shouldStop(){
@@ -220,7 +236,7 @@ public class Session {
 	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
 	public void updateActifs(){
 		synchronized (allPlaying) {
-			server.sendToThem("", allPlaying);
+			sendToAllPlaying("");
 		}
 	}
 	
@@ -282,13 +298,12 @@ public class Session {
 		this.nbCoupsVainqueurReflexion = nbCoupsVainqueurReflexion;
 	}
 
-	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups, ou si
+	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups ou moins, ou si
 	 * la précédente enchère du Joueur est plus grande en nombre de coups. 
-	 * 
 	 * @return Le pseudo du joueur ayant déjà effectué une enchère du même type (ou son pseudo si supérieure), 
-	 * null si OK
-	 * */
-	public synchronized String addEncheres(Enchere enchere) { 
+	 * null si OK */
+	public synchronized String addEncheres(Enchere enchere) {
+		if(nbCoupsVainqueurReflexion<=enchere.getNbCoups()) return vainqueurReflexion.getPseudo();
 		return EnchereUtils.addIfPossibleInGoodPosition(encheres, enchere); 
 	}
 

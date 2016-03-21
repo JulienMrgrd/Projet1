@@ -93,16 +93,27 @@ public class Joueur extends Thread{
 		
 		if(cmd.startsWith(Protocole.CONNEX.name())){ // CONNEX/user/
 			
-			String username = msgs[1];
+			String username;
+			try{
+				username = msgs[1];
+			} catch (ArrayIndexOutOfBoundsException exc){
+				sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				return;
+			}
 			this.setPseudo(username);
 			if(!server.addJoueur(this)){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.USERNAME_ALREADY_USED, username));
 			}
-			return;
 		
 		} else if(cmd.startsWith(Protocole.SORT.name())){ // SORT/user/
 			
-			String username = msgs[1];
+			String username;
+			try{
+				username = msgs[1];
+			} catch (ArrayIndexOutOfBoundsException exc){
+				sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				return;
+			}
 			if( !username.equals(pseudo) ){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 			
@@ -110,7 +121,6 @@ public class Joueur extends Thread{
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BYE));
 				hasQuit = true;
 			}
-			return;
 			
 		} else if(cmd.startsWith(Protocole.TROUVE.name())){ // TROUVE/user/coups/
 			Session session = server.getSession();
@@ -119,8 +129,9 @@ public class Joueur extends Thread{
 				int nbCoups = -1;
 				try{
 					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups
-				} catch (NumberFormatException exc){
+				} catch (NumberFormatException | ArrayIndexOutOfBoundsException exc){
 					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+					return;
 				}
 				synchronized (session) {
 					if(session.getVainqueurReflexion()==null && nbCoups!=-1){
@@ -144,7 +155,11 @@ public class Joueur extends Thread{
 				int nbCoups = -1;
 				try{
 					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups
-				} catch (NumberFormatException exc){}
+					System.out.println(pseudo+" enchéri en "+nbCoups+" coups.");
+				} catch (NumberFormatException | ArrayIndexOutOfBoundsException exc){
+					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+					return;
+				}
 				if(nbCoups>0){
 					String pseudo = session.addEncheres(new Enchere(this, nbCoups));
 					if(pseudo!=null) sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
@@ -158,12 +173,11 @@ public class Joueur extends Thread{
 				}
 			}
 
-		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ // SORT/user/
+		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ // 
 
 
 		} else {
 			this.sendToJoueur(Protocole.UNKNOWN_CMD.name());
-			return;
 		}
 
 	}

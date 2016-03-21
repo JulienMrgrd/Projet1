@@ -94,7 +94,6 @@ public class Server{
 					}
 					
 					session.startSession(); // Bloquant
-					System.out.println("(startSessionIfNeeded) after startSession");
 					
 				}
 			}
@@ -108,7 +107,6 @@ public class Server{
 				onejoueur.getValue().sendToJoueur(message);
 			} catch (IOException e) {
 				aSuppr.add(onejoueur.getValue());
-				System.out.println("(sendAll) exception sur joueur "+onejoueur.getKey());
 			}
 		}
 		for(Joueur unASuppr : aSuppr){
@@ -125,7 +123,6 @@ public class Server{
 					onejoueur.sendToJoueur(message);
 				} catch (IOException e) {
 					aSuppr.add(onejoueur);
-					System.out.println("(sendToThem) exception sur joueur "+onejoueur);
 				}
 			}
 		}
@@ -144,7 +141,6 @@ public class Server{
 					onejoueur.sendToJoueur(message);
 				} catch (IOException e) {
 					aSuppr.add(onejoueur);
-					System.out.println("(sendToThem) exception sur joueur "+onejoueur);
 				}
 			}
 		}
@@ -162,7 +158,6 @@ public class Server{
 				}
 			} catch (IOException e) {
 				aSuppr.add(onejoueur.getValue());
-				System.out.println("(sendAllButThis) exception sur joueur "+onejoueur.getKey());
 			}
 		}
 		for(Joueur unASuppr : aSuppr){
@@ -171,7 +166,7 @@ public class Server{
 	}
 	
 	synchronized public boolean addJoueur(Joueur joueur) {
-		if(this.mapJoueurs.containsKey(joueur.getPseudo())) return false;
+		if(containsJoueur(joueur.getPseudo())) return false;
 		mapJoueurs.put(joueur.getPseudo(), joueur);
 		nbJoueurs++;
 		sendAllButThis(ProtocoleCreator.create(Protocole.BIENVENUE,joueur.getPseudo()), joueur);
@@ -196,6 +191,13 @@ public class Server{
 		return true;
 	}
 	
+	private boolean containsJoueur(String pseudo) {
+		for(String key : mapJoueurs.keySet()){
+			if(key.equalsIgnoreCase(pseudo)) return true;
+		}
+		return false;
+	}
+
 	synchronized public boolean removeJoueur(Joueur joueur) {
 		if( !this.mapJoueurs.containsKey(joueur.getPseudo()) ) return false;
 		mapJoueurs.remove(joueur.getPseudo());

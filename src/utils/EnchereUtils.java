@@ -23,24 +23,16 @@ public abstract class EnchereUtils {
 		return null;
 	}
 	
-	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups, ou si
+	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups ou moins, ou si
 	 * la précédente enchère du Joueur est plus grande en nombre de coups. 
-	 * 
 	 * @return Le pseudo du joueur ayant déjà effectué une enchère du même type (ou son pseudo si supérieure), 
-	 * null si OK
-	 * */
+	 * null si OK */
 	public static String addIfPossibleInGoodPosition(List<Enchere> listEnch, Enchere ench){
 		if(listEnch==null){
 			listEnch = new ArrayList<Enchere>();
 			listEnch.add(ench);
 			return null;
 		}
-		
-		System.out.print("Liste existante avant : (");
-		for(Enchere oneEnch : listEnch){
-			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
-		}
-		System.out.println(")");
 		
 		Enchere enchExistanteDuJoueur = getEnchereByJoueur(listEnch, ench.getJoueur());
 		Enchere enchExistanteAvecCeNbCoups = getEnchereByNbCoups(listEnch, ench.getNbCoups());
@@ -54,11 +46,6 @@ public abstract class EnchereUtils {
 			listEnch.add(ench);
 		}
 		Collections.sort(listEnch);
-		System.out.print("Liste existante après : (");
-		for(Enchere oneEnch : listEnch){
-			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
-		}
-		System.out.println(")");
 		return null;
 	}
 
