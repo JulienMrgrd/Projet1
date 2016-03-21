@@ -67,7 +67,7 @@ public class Client
 									serverHS();
 									return;
 								} else if(str.isEmpty()){
-									System.out.println("message vide du server");
+//									System.out.println("message vide du server");
 								} else {
 									System.out.println(str);
 								}

@@ -114,7 +114,7 @@ public class Joueur extends Thread{
 			
 		} else if(cmd.startsWith(Protocole.TROUVE.name())){ // TROUVE/user/coups/
 			Session session = server.getSession();
-			if(session.hasStarted() && session.isPlaying(this)){
+			if(session.hasStarted() && session.isPlaying(this) && session.isInReflexion()){
 				boolean itIsTheFirst = false;
 				int nbCoups = -1;
 				try{
@@ -138,8 +138,19 @@ public class Joueur extends Thread{
 				}
 			}
 
-		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // SORT/user/
-
+		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // ENCHERE/user/coups/
+			Session session = server.getSession();
+			if(session.hasStarted() && session.isPlaying(this) && session.isInEnchere()){
+				int nbCoups = -1;
+				try{
+					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups
+				} catch (NumberFormatException exc){}
+				if(nbCoups>0){
+					session.addEncheres(new Enchere(this, nbCoups));
+				} else {
+					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				}
+			}
 
 		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ // SORT/user/
 

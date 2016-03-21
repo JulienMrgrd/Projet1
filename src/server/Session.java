@@ -8,14 +8,17 @@ import other.GameState;
 import other.Protocole;
 import other.ProtocoleCreator;
 import plateau.Plateau;
+import utils.EnchereUtils;
 import utils.StringUtils;
 import utils.Tuple;
 
 public class Session {
 
 	public static final int SCORE_MAX = 10;
-	public static final int SECONDS_BEFORE_START = 30;
+	public static final int SECONDS_BEFORE_START = 10;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
+	public static final int SECONDS_REFLEXION = 10;
+	public static final int SECONDS_ENCHERES = 30;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
 
 	private Server server;
@@ -28,8 +31,16 @@ public class Session {
 	private boolean hasStarted;
 	
 	// Reflexion
+	private boolean isInReflexion;
 	private Joueur vainqueurReflexion;
 	private Integer nbCoupsVainqueurReflexion;
+	
+	// Enchères
+	private boolean isInEnchere;
+	private List<Enchere> encheres;
+	
+	// Resolution
+	private boolean isInResolution;
 	
 	public Session(Map<String, Joueur> mapPseudo_Joueur, Server server) {
 		this.server = server;
@@ -37,6 +48,8 @@ public class Session {
 		plateau = new Plateau();
 		allPlaying=new ArrayList<>();
 		hasStarted = false;
+		isInReflexion = false;
+		isInEnchere = false;
 	}
 
 	public void startSession(){
@@ -78,7 +91,7 @@ public class Session {
 			System.out.println(e);
 		}
 		if(getNbActifs()<=1){
-			sendVainqueur(allPlaying.get(0));
+			if(getNbActifs()==1) sendVainqueur(allPlaying.get(0));
 			stopSession();
 			return; // On arrete la partie puisque tout le monde a quitté
 		}
@@ -86,21 +99,29 @@ public class Session {
 		for(int i=1; i<=3; i++){
 			switch (i) {
 			case STEP_REFLEXION:
+				isInReflexion = true;
 				startReflexion();
+				isInReflexion = false;
 				break;
 			case STEP_ENCHERES:
+				isInEnchere = true;
 				startEncheres();
+				isInEnchere = false;
 				break;
 			case STEP_RESOLUTION:
+				isInEnchere = true;
 				startResolution();
+				isInEnchere = false;
 				break;
 			}
+			
+			updateActifs();
 			if(allPlaying.size()<2){
 				System.out.println("Fin d'une phase ("+i+"), allPlaying.size="+allPlaying.size());
 				break;
 			}
 		}
-
+		
 		System.out.println("Traitement du tour n°"+nbTours);
 		try {
 			Thread.sleep(2000);
@@ -135,14 +156,14 @@ public class Session {
 		}
 	}
 
-	private boolean startResolution() {
-		System.out.println("startResolution");
+	private boolean startReflexion() {
+		System.out.println("startReflexion");
 		server.sendToThem(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()), allPlaying);
 		
-		System.out.println("Start waiting for solution 20 sec");
+		System.out.println("Start waiting for solution "+SECONDS_REFLEXION+" sec"); // TODO: 5 min
 		synchronized (this) {
 			try {
-				this.wait(20000);
+				this.wait(SECONDS_REFLEXION*1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -152,22 +173,30 @@ public class Session {
 		} else {
 			System.out.println("Temps terminé, aucune solution");
 		}
-		
 		return true;
 	}
-
+	
 	private boolean startEncheres() {
-		// TODO Auto-generated method stub
-		System.out.println("startEncheres");
+		System.out.println("startEncheres durant "+SECONDS_ENCHERES+" sec");
+		encheres = new ArrayList<>();
+		try {
+			Thread.sleep(SECONDS_ENCHERES*1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("fin enchères");
+		System.out.print("Liste enchères finale : (");
+		for(Enchere oneEnch : encheres){
+			System.out.print("("+oneEnch.getJoueur()+","+oneEnch.getNbCoups()+"),"); 
+		}
+		System.out.println(")");
 		return true;
-		//TODO:
 	}
-
-	private boolean startReflexion() {
-		// TODO Auto-generated method stub
-		System.out.println("startReflexion");
+	
+	private boolean startResolution() {
 		return true;
-		//TODO:
+		// TODO:
 	}
 
 	private GameState shouldStop(){
@@ -188,9 +217,7 @@ public class Session {
 		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
 	}
 	
-	/**
-	 * Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés
-	 */
+	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
 	public void updateActifs(){
 		synchronized (allPlaying) {
 			server.sendToThem("", allPlaying);
@@ -255,4 +282,9 @@ public class Session {
 		this.nbCoupsVainqueurReflexion = nbCoupsVainqueurReflexion;
 	}
 
+	public synchronized void addEncheres(Enchere enchere) { EnchereUtils.addIfPossibleInGoodPosition(encheres, enchere); }
+
+	public boolean isInReflexion(){ return isInReflexion; }
+	public boolean isInEnchere(){ return isInEnchere; }
+	public boolean isInResolution(){ return isInResolution; }
 }
