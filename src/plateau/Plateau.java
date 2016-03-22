@@ -1,7 +1,9 @@
 package plateau;
 
+import java.util.Arrays;
 import java.util.Random;
 
+import utils.ResolutionUtils;
 import utils.StringUtils;
 
 public class Plateau {
@@ -13,6 +15,28 @@ public class Plateau {
 	private Case[] caseRobots = new Case[4];
 	
 	public Plateau(){}
+	
+	/**
+	 * Constructeur par copie partielle
+	 * @param plateau à copier
+	 */
+	public Plateau(Plateau plateau){
+		this.plat=new Case[plateau.plat.length][plateau.plat[0].length];
+		for(int i=0;i<this.plat.length;i++){
+			for(int j=0;j<this.plat[0].length;j++){
+				this.plat[i][j]=new Case(plateau.plat[i][j]);
+			}
+		}
+		
+		this.robots=plateau.robots;
+		this.chooser=plateau.chooser;
+		this.caseCible=plateau.caseCible;
+		
+		this.caseRobots=new Case[plateau.caseRobots.length];
+		
+		for(int i=0;i<this.caseRobots.length;i++) this.caseRobots[i]=new Case(plateau.caseRobots[i]);
+		
+	}
 	
 	public void init() {
 		for(int i=0; i<plat.length;i++){
@@ -175,6 +199,44 @@ public class Plateau {
 		plat[7][8].setCanContainsRobotsOrCible(false);
 		plat[8][8].setCanContainsRobotsOrCible(false);
 	}
+
+	
+	public Case getCaseCible() {
+		return caseCible;
+	}
+
+	public Case getCaseRobotsByCouleur(Couleur coul) {
+		switch (coul) {
+		case R:
+			return caseRobots[0];
+		case B:
+			return caseRobots[1];
+		case J:
+			return caseRobots[2];
+		case V:
+			return caseRobots[3];
+		default:
+			return null;
+		}
+	}
+
+	public void setPositionRobots(Case caseRobots,Mur direction) {
+		switch (direction) {
+		case D:
+			caseRobots.setX(caseRobots.getX()+1);
+			break;
+		case G:
+			caseRobots.setX(caseRobots.getX()-1);
+			break;
+		case H:
+			caseRobots.setY(caseRobots.getY()+1);
+			break;
+		case B:
+			caseRobots.setY(caseRobots.getY()-1);
+			break;
+		default:
+		}
+	}
 	
 	public static void main(String[] args ){
 		Plateau plateau = new Plateau();
@@ -182,6 +244,8 @@ public class Plateau {
 		plateau.display();
 		System.out.println("\n"+plateau.plateau());
 		System.out.println(plateau.enigme());
+		System.out.println(ResolutionUtils.isGoodSolution("RDRHJB",plateau));
 	}
+
 
 }

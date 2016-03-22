@@ -19,4 +19,20 @@ public enum Couleur {
 	public static Couleur randomCouleur()  {
 		return VALUES.get(RANDOM.nextInt(SIZE));
 	}
+	
+	public static boolean isACouleur(String coul){
+		if(coul==null) return false;
+		for(Couleur c : values()){
+			if(c.name().equals(coul)) return true;
+		}
+		return false;	
+	}
+	
+	public static Couleur getCouleurByName(String coul){
+		if(coul==null) return null;
+		for(Couleur c : values()){
+			if(c.name().equals(coul)) return c;
+		}
+		return null;	
+	}
 }

@@ -25,6 +25,17 @@ public class Case {
 		mursDeBase = new ArrayList<>(2);
 	}
 	
+	public Case(Case c){
+		this.x=c.getX();
+		this.y=c.getY();
+		this.canContainRobotsOrCible=c.canContainRobotsOrCible();
+		this.murs=c.getMurs();
+		this.mursInvisibles=c.getMursInvisibles();
+		this.mursDeBase=c.mursDeBase;
+		this.robot=c.getRobot();
+		this.cible=c.getCible();		
+	}
+	
 	public boolean containsMur(){
 		if(murs.size()>0 || mursInvisibles.size()>0 || mursDeBase.size()>0){
 			return true;
