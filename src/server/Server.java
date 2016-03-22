@@ -1,14 +1,16 @@
 package server;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import other.LeSaviezVousGenerator;
 import other.Protocole;
 import other.ProtocoleCreator;
 
@@ -21,13 +23,13 @@ public class Server{
 	private Object sync;
 	private int secondsBeforeStartSession;
 	
-	public Server() {
+	public Server() throws UnknownHostException {
 		mapJoueurs = new HashMap<String, Joueur>();
 		session = new Session(mapJoueurs, this);
 		sync = new Object(); // Objet pour notification
 		
 		System.out.println("--------");
-		System.out.println("Serveur demarre sur le port : "+PORT);
+		System.out.println("Le serveur ("+InetAddress.getLocalHost().getHostAddress()+") demarre sur le port : "+PORT);
 		System.out.println("--------\n");
 	}
 	
@@ -36,6 +38,7 @@ public class Server{
 		ServerSocket serverSocket = null;
 		try	{
 			serverSocket = new ServerSocket(PORT);
+			
 			startSessionIfPossible();
 			while (true){ // attente en boucle de connexion (bloquant sur ss.accept)
 				Socket client = serverSocket.accept();
@@ -62,7 +65,7 @@ public class Server{
 			@Override
 			public void run() {
 				while(true){
-					System.out.println("(startSessionIfNeeded) avec nbJoueurs="+nbJoueurs+" et sessionHasStarted="+session.hasStarted());
+					System.out.println("NbJoueurs="+nbJoueurs+" et sessionHasStarted="+session.hasStarted());
 					synchronized (sync) {
 						while(nbJoueurs<2){ // Préconditions pour lancer une session
 							try {
@@ -216,7 +219,7 @@ public class Server{
 	}
 	
 
-	public static void main(String args[])
+	public static void main(String args[]) throws UnknownHostException
 	{
 		Server server = new Server(); // instance de la classe principale
 		server.start();
