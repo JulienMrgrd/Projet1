@@ -60,7 +60,8 @@ public class Joueur extends Thread{
 			System.out.println("(Joueur run) Le Joueur "+ pseudo +" est parti");
 			server.removeJoueur(this);
 		} catch (Exception e) {
-			System.out.println("(Joueur run) Exception : "+e.getMessage());
+			System.out.println("(Joueur run) Exception : "+e.toString());
+			e.printStackTrace();
 		}
 	}
 
@@ -91,33 +92,29 @@ public class Joueur extends Thread{
 		String[] msgs = msg.split("/");
 		String cmd = msgs[0];
 		
+		String username = null;
+		try{
+			username = msgs[1];
+		} catch (ArrayIndexOutOfBoundsException exc){ }
+		
 		if(cmd.startsWith(Protocole.CONNEX.name())){ // CONNEX/user/
 			
-			String username;
-			try{
-				username = msgs[1];
-			} catch (ArrayIndexOutOfBoundsException exc){
-				sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
-				return;
+			if(username==null){
+				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 			}
 			this.setPseudo(username);
 			if(!server.addJoueur(this)){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.USERNAME_ALREADY_USED, username));
 			}
+			return;
+		}
+		
+		if( username==null || !username.equals(pseudo) ){
+			this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 		
 		} else if(cmd.startsWith(Protocole.SORT.name())){ // SORT/user/
 			
-			String username;
-			try{
-				username = msgs[1];
-			} catch (ArrayIndexOutOfBoundsException exc){
-				sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
-				return;
-			}
-			if( !username.equals(pseudo) ){
-				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
-			
-			} else if(server.removeJoueur(this)){
+			if(server.removeJoueur(this)){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BYE));
 				hasQuit = true;
 			}
@@ -150,6 +147,7 @@ public class Joueur extends Thread{
 			}
 			
 		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // ENCHERE/user/coups/
+			System.out.println("Rentre dans encheres");
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this) && session.isInEnchere()){
 				int nbCoups = -1;
@@ -162,8 +160,12 @@ public class Joueur extends Thread{
 				}
 				if(nbCoups>0){
 					String pseudo = session.addEncheres(new Enchere(this, nbCoups));
-					if(pseudo!=null) sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
+					if(pseudo!=null){
+						System.out.println("Pseudo not null");
+						sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
+					}
 					else {
+						System.out.println("Pseudo null");
 						sendToJoueur(ProtocoleCreator.create(Protocole.TUENCHERE));
 						String ilenchere = ProtocoleCreator.create(Protocole.ILENCHERE,this.getPseudo(),Integer.toString(nbCoups));
 						server.sendToThemButThis(ilenchere, session.getAllPlaying(), this);
@@ -173,8 +175,21 @@ public class Joueur extends Thread{
 				}
 			}
 
-		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ // 
-
+		} else if(cmd.startsWith(Protocole.SOLUTION.name())){ //SOLUTION/user/deplacement 
+			Session session = server.getSession();
+			if(session.hasStarted() && session.isPlaying(this) 
+					&& session.isInResolution() && session.isJoueurActifResolution(this)){
+				String deplacements = null;
+				try{
+					deplacements = msgs[2]; // msgs[2] = nbCoups
+					System.out.println(pseudo+" propose sa solution : "+deplacements);
+				} catch (ArrayIndexOutOfBoundsException exc){}
+				if(deplacements==null){
+					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				} else {
+					session.addDeplacement(deplacements);
+				}
+			}
 
 		} else {
 			this.sendToJoueur(Protocole.UNKNOWN_CMD.name());

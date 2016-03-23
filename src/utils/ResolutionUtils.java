@@ -34,7 +34,7 @@ public class ResolutionUtils {
 				Mur direction=Mur.getADirByName(direct);
 				
 				//recuperation de la case du plateau ou se trouve le robot
-				Case caseRobot=plateauCopy.getCaseRobotsByCouleur(couleur);
+				Case caseRobot=plateauCopy.getCaseRobotByCouleur(couleur);
 				
 				//Deplacement du robot jusqu'à tomber sur un mur
 				while(!caseRobot.containsMurAtPosition(direction)){
@@ -45,12 +45,12 @@ public class ResolutionUtils {
 			Couleur couleurCible = caseCible.getCible();
 			
 			//Recuperation des coordonnees du robot devant aller à la cible
-			int posRobotsCibleX = plateauCopy.getCaseRobotsByCouleur(couleurCible).getX();
-			int posRobotsCibleY=plateauCopy.getCaseRobotsByCouleur(couleurCible).getY();
+			Case robot = plateauCopy.getCaseRobotByCouleur(couleurCible);
+			int posRobotsCibleX = robot.getX();
+			int posRobotsCibleY = robot.getY();
 			
-			if(posRobotsCibleX==caseCible.getX()&&
-				posRobotsCibleY==caseCible.getY()) return true;
-			else return false;	
-		}else return false;
+			if(posRobotsCibleX==caseCible.getX() && posRobotsCibleY==caseCible.getY()) return true;
+		}
+		return false;
 	}
 }

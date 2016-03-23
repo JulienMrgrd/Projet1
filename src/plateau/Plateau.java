@@ -1,6 +1,5 @@
 package plateau;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import utils.ResolutionUtils;
@@ -205,22 +204,14 @@ public class Plateau {
 		return caseCible;
 	}
 
-	public Case getCaseRobotsByCouleur(Couleur coul) {
-		switch (coul) {
-		case R:
-			return caseRobots[0];
-		case B:
-			return caseRobots[1];
-		case J:
-			return caseRobots[2];
-		case V:
-			return caseRobots[3];
-		default:
-			return null;
+	public Case getCaseRobotByCouleur(Couleur coul) {
+		for(Case robotCouleur : caseRobots){
+			if(robotCouleur.getRobot()==coul) return robotCouleur;
 		}
+		return null;
 	}
 
-	public void setPositionRobots(Case caseRobots,Mur direction) {
+	public void setPositionRobots(Case caseRobots, Mur direction) {
 		switch (direction) {
 		case D:
 			caseRobots.setX(caseRobots.getX()+1);

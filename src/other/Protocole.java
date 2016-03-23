@@ -20,7 +20,7 @@ public enum Protocole {
 	TROUVE,
 	TUASTROUVE,
 	ILATROUVE,
-	FINREFELXION,
+	FINREFLEXION,
 	
 	// Phase d'enchere
 	ENCHERE,

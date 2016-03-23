@@ -18,9 +18,10 @@ public class Session {
 	public static final int SECONDS_BEFORE_START = 10;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
 	public static final int SECONDS_REFLEXION = 20;
-	public static final int SECONDS_ENCHERES = 30;
+	public static final int SECONDS_ENCHERES = 40;
+	public static final int SECONDS_RESOLUTION = 10;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
-
+	
 	private Server server;
 	private Plateau plateau;
 	private Map<String, Joueur> mapPseudo_Joueur; // Référence tous les joueurs de la session, actif ou non
@@ -41,6 +42,9 @@ public class Session {
 	
 	// Resolution
 	private boolean isInResolution;
+	private int indexEnch;
+	private Joueur actif;
+	private String deplacement;
 	
 	public Session(Map<String, Joueur> mapPseudo_Joueur, Server server) {
 		this.server = server;
@@ -157,7 +161,7 @@ public class Session {
 		server.sendToThem(message, allPlaying);
 	}
 
-	private boolean startReflexion() {
+	private void startReflexion() {
 		System.out.println("startReflexion");
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
@@ -174,11 +178,10 @@ public class Session {
 		} else {
 			System.out.println("Temps terminé, aucune solution");
 		}
-		sendToAllPlaying(ProtocoleCreator.create(Protocole.FINREFELXION));
-		return true;
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.FINREFLEXION));
 	}
 	
-	private boolean startEncheres() {
+	private void startEncheres() {
 		System.out.println("startEncheres durant "+SECONDS_ENCHERES+" sec");
 		try {
 			Thread.sleep(SECONDS_ENCHERES*1000);
@@ -196,12 +199,37 @@ public class Session {
 		if(encheres.size()>0) sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, 
 				encheres.get(0).getJoueur().getPseudo(), Integer.toString(encheres.get(0).getNbCoups())));
 		else sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE));
-		return true;
 	}
 	
-	private boolean startResolution() {
-		return true;
-		// TODO:
+	private void startResolution() {
+		actif = encheres.get(indexEnch).getJoueur();
+		if(actif==null){
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
+			return;
+		}
+		
+		System.out.println("startResolution avec "+actif);
+		synchronized (this) {
+			try {
+				this.wait(SECONDS_RESOLUTION*1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(deplacement==null){
+			if(indexEnch+1>=encheres.size()){
+				sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG));
+				return;
+			} else {
+				String joueurSuivant = encheres.get(indexEnch+1).getJoueur().getPseudo();
+				sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG, joueurSuivant));
+				indexEnch++;
+				startResolution(); // Refais résolution avec enchère suivante
+			}
+			
+		} else {
+			// SASOLUTION, BONNE, MAUVAISE
+		}
 	}
 	
 	private void resetAttributes(){
@@ -213,6 +241,9 @@ public class Session {
 		encheres = new ArrayList<>();
 		
 		isInResolution=false;
+		actif=null;
+		indexEnch = 0;
+		deplacement=null;
 	}
 
 	private GameState shouldStop(){
@@ -297,15 +328,20 @@ public class Session {
 	public synchronized void setNbCoupsVainqueurReflexion(int nbCoupsVainqueurReflexion) {
 		this.nbCoupsVainqueurReflexion = nbCoupsVainqueurReflexion;
 	}
+	
+	public boolean isJoueurActifResolution(Joueur j){ return actif==j; } 
 
 	/** Ajoute l'enchère si elle n'existe pas, si aucune autre n'existe avec ce nombre de coups ou moins, ou si
 	 * la précédente enchère du Joueur est plus grande en nombre de coups. 
 	 * @return Le pseudo du joueur ayant déjà effectué une enchère du même type (ou son pseudo si supérieure), 
 	 * null si OK */
 	public synchronized String addEncheres(Enchere enchere) {
-		if(nbCoupsVainqueurReflexion<=enchere.getNbCoups()) return vainqueurReflexion.getPseudo();
+		if(nbCoupsVainqueurReflexion!=null && vainqueurReflexion!=null &&
+				nbCoupsVainqueurReflexion<=enchere.getNbCoups()) return vainqueurReflexion.getPseudo();
 		return EnchereUtils.addIfPossibleInGoodPosition(encheres, enchere); 
 	}
+	
+	public void addDeplacement(String deplacement){ this.deplacement = deplacement; }
 
 	public boolean isInReflexion(){ return isInReflexion; }
 	public boolean isInEnchere(){ return isInEnchere; }
