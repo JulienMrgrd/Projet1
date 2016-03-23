@@ -196,7 +196,9 @@ public class Session {
 	}
 	
 	private void startResolution() {
-		actif = encheres.get(indexEnch).getJoueur();
+		if(encheres != null && encheres.size()>0) actif = encheres.get(indexEnch).getJoueur();
+		else actif = vainqueurReflexion;
+		
 		if(actif==null){
 			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
 			return;

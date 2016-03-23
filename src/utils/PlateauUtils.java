@@ -89,9 +89,38 @@ public abstract class PlateauUtils {
 						&& !plat[i+1][j].containsObstacleAtPosition(Mur.B)
 						&& !plat[i+1][j].containsObstacleAtPosition(Mur.H)){
 						
-						if(plat[i][j].containsObstacleAtPosition(Mur.B)) System.out.print(" _ ");
-						else System.out.print("   ");
-						
+						if(plat[i][j].containsObstacleAtPosition(Mur.B)){
+							if(plat[i][j].containsRobot() && !plat[i][j].containsCible()){
+								String r = "R";
+								Couleur cible = plat[i][j].getRobot();
+								if(cible==Couleur.B) r = StringUtils.transformInto(r, AnsiColors.ANSI_BLUE);
+								else if(cible==Couleur.R) r = StringUtils.transformInto(r, AnsiColors.ANSI_RED);
+								else if(cible==Couleur.V) r = StringUtils.transformInto(r, AnsiColors.ANSI_GREEN);
+								else r = StringUtils.transformInto(r, AnsiColors.ANSI_YELLOW);
+								System.out.print(" "+StringUtils.underline(r)+" ");
+							} else if (plat[i][j].containsCible() && !plat[i][j].containsRobot()){
+								String c = "C";
+								Couleur cible = plat[i][j].getRobot();
+								if(cible==Couleur.B) c = StringUtils.transformInto(c, AnsiColors.ANSI_BLUE);
+								else if(cible==Couleur.R) c = StringUtils.transformInto(c, AnsiColors.ANSI_RED);
+								else if(cible==Couleur.V) c = StringUtils.transformInto(c, AnsiColors.ANSI_GREEN);
+								else c = StringUtils.transformInto(c, AnsiColors.ANSI_YELLOW);
+								System.out.print(" "+StringUtils.underline(c)+" ");
+							} else if (plat[i][j].containsCible() && plat[i][j].containsRobot()){
+								String v = "V";
+								Couleur cible = plat[i][j].getRobot();
+								if(cible==Couleur.B) v = StringUtils.transformInto( v, AnsiColors.ANSI_BLUE);
+								else if(cible==Couleur.R) v = StringUtils.transformInto(v, AnsiColors.ANSI_RED);
+								else if(cible==Couleur.V) v = StringUtils.transformInto(v, AnsiColors.ANSI_GREEN);
+								else v = StringUtils.transformInto(v, AnsiColors.ANSI_YELLOW);
+								System.out.print(" "+StringUtils.underline(v)+" ");
+							} else {
+								System.out.print(" _ ");
+							}
+						} else {
+							System.out.print("   ");
+						}
+
 					} else if(plat[i][j].containsObstacleAtPosition(Mur.D) && i+1<plat.length
 							&& plat[i+1][j].containsObstacleAtPosition(Mur.G)
 							&& plat[i+1][j].containsObstacleAtPosition(Mur.B)){
