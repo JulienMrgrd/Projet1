@@ -31,7 +31,7 @@ public class Case {
 		this.canContainRobotsOrCible=c.canContainRobotsOrCible();
 		this.murs=c.getMurs();
 		this.mursInvisibles=c.getMursInvisibles();
-		this.mursDeBase=c.mursDeBase;
+		this.mursDeBase=c.getMursDeBase();
 		this.robot=c.getRobot();
 		this.cible=c.getCible();		
 	}
@@ -58,6 +58,24 @@ public class Case {
 		return false;
 	}
 	
+	public void addAllMurFromCase(Case c){
+		if(c.murs != null){
+			for(Mur m : c.murs){
+				this.addMur(m);
+			}
+		}
+		if(c.mursDeBase != null){
+			for(Mur m : c.mursDeBase){
+				this.addMurDeBase(m);
+			}
+		}
+		if(c.mursInvisibles != null){
+			for(Mur m : c.mursInvisibles){
+				this.addMurInvisible(m);
+			}
+		}
+	}
+	
 	public void addMur(Mur posMur){
 		if(!murs.contains(posMur)) murs.add(posMur);
 	}
@@ -68,6 +86,12 @@ public class Case {
 	
 	public void addMurDeBase(Mur posMur){
 		if(!mursDeBase.contains(posMur)) mursDeBase.add(posMur);
+	}
+	
+	public void removeAllMur(){
+		if(this.murs!=null) this.murs=new ArrayList<>(2);
+		if(this.mursDeBase!=null) this.mursDeBase=new ArrayList<>(2);
+		if(this.mursInvisibles!=null) this.mursInvisibles=new ArrayList<>(2);
 	}
 	
 	public String display(){
@@ -123,6 +147,7 @@ public class Case {
 	
 	public List<Mur> getMurs(){ return murs; }
 	public List<Mur> getMursInvisibles(){ return mursInvisibles; }
+	public List<Mur> getMursDeBase(){ return mursDeBase; }
 	
 	public void addRobot(Couleur robot){ this.robot = robot; }
 	public void removeRobot(){ this.robot = null; }

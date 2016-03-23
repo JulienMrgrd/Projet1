@@ -1,6 +1,7 @@
 package plateau;
 
 import java.util.Random;
+import java.util.Scanner;
 
 import utils.ResolutionUtils;
 import utils.StringUtils;
@@ -204,6 +205,10 @@ public class Plateau {
 		return caseCible;
 	}
 
+	public Case[][] getPlat() {
+		return plat;
+	}
+	
 	public Case getCaseRobotByCouleur(Couleur coul) {
 		for(Case robotCouleur : caseRobots){
 			if(robotCouleur.getRobot()==coul) return robotCouleur;
@@ -212,18 +217,36 @@ public class Plateau {
 	}
 
 	public void setPositionRobots(Case caseRobots, Mur direction) {
+		int x=caseRobots.getX();
+		int y=caseRobots.getY();
 		switch (direction) {
 		case D:
+			plat[x][y].removeRobot();
+			caseRobots.removeAllMur();
 			caseRobots.setX(caseRobots.getX()+1);
+			plat[x+1][y].addRobot(caseRobots.getRobot());	
+			caseRobots.addAllMurFromCase(plat[x+1][y]);
 			break;
 		case G:
+			plat[x][y].removeRobot();
+			caseRobots.removeAllMur();
 			caseRobots.setX(caseRobots.getX()-1);
+			plat[x-1][y].addRobot(caseRobots.getRobot());
+			caseRobots.addAllMurFromCase(plat[x-1][y]);
 			break;
 		case H:
+			plat[x][y].removeRobot();
+			caseRobots.removeAllMur();
 			caseRobots.setY(caseRobots.getY()+1);
+			plat[x][y+1].addRobot(caseRobots.getRobot());
+			caseRobots.addAllMurFromCase(plat[x][y+1]);
 			break;
 		case B:
+			plat[x][y].removeRobot();
+			caseRobots.removeAllMur();
 			caseRobots.setY(caseRobots.getY()-1);
+			plat[x][y-1].addRobot(caseRobots.getRobot());
+			caseRobots.addAllMurFromCase(plat[x][y-1]);
 			break;
 		default:
 		}
@@ -235,7 +258,18 @@ public class Plateau {
 		plateau.display();
 		System.out.println("\n"+plateau.plateau());
 		System.out.println(plateau.enigme());
-		System.out.println(ResolutionUtils.isGoodSolution("RDRHJB",plateau));
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Votre solution :");
+		String str = sc.nextLine();
+		System.out.println(ResolutionUtils.isGoodSolution(str,plateau));
+		
+		
+		plateau.display();
+		
+		sc = new Scanner(System.in);
+		System.out.println("\nVotre solution :");
+		str = sc.nextLine();
+		System.out.println(ResolutionUtils.isGoodSolution(str,plateau));
 	}
 
 

@@ -17,6 +17,22 @@ public class ResolutionUtils {
 		return true;
 	}
 	
+	private static boolean hasARobotNextCase(Plateau plateau, Mur direction,Case caseRobots){
+			int x=caseRobots.getX();
+			int y=caseRobots.getY();
+			switch (direction) {
+			case D:
+				return plateau.getPlat()[x+1][y].containsRobot();
+			case G:
+				return plateau.getPlat()[x-1][y].containsRobot();
+			case H:
+				return plateau.getPlat()[x][y+1].containsRobot();
+			case B:
+				return plateau.getPlat()[x][y-1].containsRobot();
+			default:
+				return false;
+			}
+	}
 
 	public static boolean isGoodSolution(String mouv,Plateau plateau){
 		
@@ -36,8 +52,10 @@ public class ResolutionUtils {
 				//recuperation de la case du plateau ou se trouve le robot
 				Case caseRobot=plateauCopy.getCaseRobotByCouleur(couleur);
 				
+				
+				
 				//Deplacement du robot jusqu'à tomber sur un mur
-				while(!caseRobot.containsMurAtPosition(direction)){
+				while(!caseRobot.containsMurAtPosition(direction)&&!hasARobotNextCase(plateauCopy, direction, caseRobot)){
 					plateauCopy.setPositionRobots(caseRobot, direction);
 				}
 			}
@@ -48,7 +66,7 @@ public class ResolutionUtils {
 			Case robot = plateauCopy.getCaseRobotByCouleur(couleurCible);
 			int posRobotsCibleX = robot.getX();
 			int posRobotsCibleY = robot.getY();
-			
+			plateauCopy.display();
 			if(posRobotsCibleX==caseCible.getX() && posRobotsCibleY==caseCible.getY()) return true;
 		}
 		return false;
