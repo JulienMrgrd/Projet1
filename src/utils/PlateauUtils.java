@@ -1,5 +1,8 @@
 package utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import plateau.Case;
 import plateau.Couleur;
 import plateau.Mur;
@@ -44,29 +47,6 @@ public abstract class PlateauUtils {
 		return new Plateau(plat, robots);
 	}
 
-	public static void display(Plateau plateauDeBase, String plateau, String enigme) {
-		plateau = plateau.substring(1, plateau.length()); // retire première parenthese
-		plateau = plateau.substring(0, plateau.length()-1); // dernière parenthèse
-		plateau = plateau.replaceAll("\\)", "");
-		System.out.println("Le plateau devient : "+plateau);
-		String[] mursObstacles = plateau.split("\\(");
-		enigme = enigme.replaceAll("\\(", "");
-		enigme = enigme.replaceAll("\\)", "");
-		String[] enigmeTab = enigme.split(",");
-		
-		Case[][] cases = plateauDeBase.getPlat();
-		for(int i=0; i<mursObstacles.length; i++){
-			String[] strs = mursObstacles[i].split(",");
-			cases[Integer.parseInt(strs[0])][Integer.parseInt(strs[1])].addMur(Mur.getADirByName(strs[2]));
-		}
-		cases[Integer.parseInt(enigmeTab[0])][Integer.parseInt(enigmeTab[1])].addRobot(Couleur.R);
-		cases[Integer.parseInt(enigmeTab[2])][Integer.parseInt(enigmeTab[3])].addRobot(Couleur.B);
-		cases[Integer.parseInt(enigmeTab[4])][Integer.parseInt(enigmeTab[5])].addRobot(Couleur.J);
-		cases[Integer.parseInt(enigmeTab[6])][Integer.parseInt(enigmeTab[7])].addRobot(Couleur.V);
-		cases[Integer.parseInt(enigmeTab[8])][Integer.parseInt(enigmeTab[9])].addCible(Couleur.getCouleurByName(enigmeTab[10]));
-		
-		PlateauUtils.display(plateauDeBase.getPlat());
-	}
 	
 	public static void display(Case[][] plat){
 		System.out.print("    ");
@@ -83,57 +63,7 @@ public abstract class PlateauUtils {
 			for(int i=0; i<plat[j].length; i++){
 				if(i==0 && j<10) System.out.print(j+"  "+plat[i][j].display());
 				else if(i==0 && j>=10) System.out.print(j+" "+plat[i][j].display());
-				else{
-					if(plat[i][j].containsObstacleAtPosition(Mur.D) && i+1<plat.length
-						&& plat[i+1][j].containsObstacleAtPosition(Mur.G)
-						&& !plat[i+1][j].containsObstacleAtPosition(Mur.B)
-						&& !plat[i+1][j].containsObstacleAtPosition(Mur.H)){
-						
-						if(plat[i][j].containsObstacleAtPosition(Mur.B)){
-							if(plat[i][j].containsRobot() && !plat[i][j].containsCible()){
-								String r = "R";
-								Couleur cible = plat[i][j].getRobot();
-								if(cible==Couleur.B) r = StringUtils.transformInto(r, AnsiColors.ANSI_BLUE);
-								else if(cible==Couleur.R) r = StringUtils.transformInto(r, AnsiColors.ANSI_RED);
-								else if(cible==Couleur.V) r = StringUtils.transformInto(r, AnsiColors.ANSI_GREEN);
-								else r = StringUtils.transformInto(r, AnsiColors.ANSI_YELLOW);
-								System.out.print(" "+StringUtils.underline(r)+" ");
-							} else if (plat[i][j].containsCible() && !plat[i][j].containsRobot()){
-								String c = "C";
-								Couleur cible = plat[i][j].getRobot();
-								if(cible==Couleur.B) c = StringUtils.transformInto(c, AnsiColors.ANSI_BLUE);
-								else if(cible==Couleur.R) c = StringUtils.transformInto(c, AnsiColors.ANSI_RED);
-								else if(cible==Couleur.V) c = StringUtils.transformInto(c, AnsiColors.ANSI_GREEN);
-								else c = StringUtils.transformInto(c, AnsiColors.ANSI_YELLOW);
-								System.out.print(" "+StringUtils.underline(c)+" ");
-							} else if (plat[i][j].containsCible() && plat[i][j].containsRobot()){
-								String v = "V";
-								Couleur cible = plat[i][j].getRobot();
-								if(cible==Couleur.B) v = StringUtils.transformInto( v, AnsiColors.ANSI_BLUE);
-								else if(cible==Couleur.R) v = StringUtils.transformInto(v, AnsiColors.ANSI_RED);
-								else if(cible==Couleur.V) v = StringUtils.transformInto(v, AnsiColors.ANSI_GREEN);
-								else v = StringUtils.transformInto(v, AnsiColors.ANSI_YELLOW);
-								System.out.print(" "+StringUtils.underline(v)+" ");
-							} else {
-								System.out.print(" _ ");
-							}
-						} else {
-							System.out.print("   ");
-						}
-
-					} else if(plat[i][j].containsObstacleAtPosition(Mur.D) && i+1<plat.length
-							&& plat[i+1][j].containsObstacleAtPosition(Mur.G)
-							&& plat[i+1][j].containsObstacleAtPosition(Mur.B)){
-							
-							if(plat[i][j].containsObstacleAtPosition(Mur.B)
-								&& plat[i][j].containsObstacleAtPosition(Mur.G)) System.out.print("|_ ");
-							else if(plat[i][j].containsObstacleAtPosition(Mur.B)) System.out.print(" _ ");
-							else System.out.print("   ");
-							
-					} else {
-						System.out.print(plat[i][j].display());
-					}
-				}
+				else System.out.print(plat[i][j].display());
 			}
 			System.out.println();
 		}
@@ -142,7 +72,71 @@ public abstract class PlateauUtils {
 			if(i<10) System.out.print(i+"  ");
 			else System.out.print(i+" ");
 		}
-		System.out.println("\n");
 	}
-
+	
+	public static void display(Plateau plateauDeBase, String plateau, String enigme) {
+		plateau = plateau.substring(1, plateau.length()); // retire première parenthese
+		plateau = plateau.substring(0, plateau.length()-1); // dernière parenthèse
+		plateau = plateau.replaceAll("\\)", "");
+		String[] mursObstacles = plateau.split("\\(");
+		
+		enigme = enigme.replaceAll("\\(", "");
+		enigme = enigme.replaceAll("\\)", "");
+		String[] enigmeTab = enigme.split(",");
+		
+		Case[][] cases = plateauDeBase.getPlat();
+		for(int i=0; i<mursObstacles.length; i++){
+			String[] strs = mursObstacles[i].split(",");
+			int x = Integer.parseInt(strs[0]);
+			int y = Integer.parseInt(strs[1]);
+			Mur monMur = Mur.getADirByName(strs[2]);
+			if(strs[2].equals("D")){
+				List<Mur> getMursVoisinDroite = getMurs(mursObstacles, cases[x+1][y].getMursDeBase(), x+1, y);
+				if( getMursVoisinDroite.contains(Mur.H) || getMursVoisinDroite.contains(Mur.B) ){
+					cases[x][y].addMurInvisible(monMur);
+				} else {
+					cases[x][y].addMur(monMur);
+				}
+			} else if(strs[2].equals("G")){
+				List<Mur> mursVoisinGauche = getMurs(mursObstacles, cases[x-1][y].getMursDeBase(), x-1, y);
+				List<Mur> mesMurs = getMurs(mursObstacles, cases[x][y].getMursDeBase(), x, y);
+				if( (mursVoisinGauche.contains(Mur.H) || mursVoisinGauche.contains(Mur.B)) 
+						&& (!mesMurs.contains(Mur.H) && !mesMurs.contains(Mur.B)) ){
+					cases[x][y].addMurInvisible(monMur);
+				} else {
+					cases[x][y].addMur(monMur);
+				}
+			} else {
+				cases[Integer.parseInt(strs[0])][Integer.parseInt(strs[1])].addMur(monMur);
+			}
+			
+		}
+		cases[Integer.parseInt(enigmeTab[0])][Integer.parseInt(enigmeTab[1])].addRobot(Couleur.R);
+		cases[Integer.parseInt(enigmeTab[2])][Integer.parseInt(enigmeTab[3])].addRobot(Couleur.B);
+		cases[Integer.parseInt(enigmeTab[4])][Integer.parseInt(enigmeTab[5])].addRobot(Couleur.J);
+		cases[Integer.parseInt(enigmeTab[6])][Integer.parseInt(enigmeTab[7])].addRobot(Couleur.V);
+		cases[Integer.parseInt(enigmeTab[8])][Integer.parseInt(enigmeTab[9])].addCible(Couleur.getCouleurByName(enigmeTab[10]));
+		
+		PlateauUtils.display(plateauDeBase.getPlat());
+	}
+	
+	private static List<Mur> getMurs(String[] mursObstacles, List<Mur> mursDeBaseDeCaseXY, int x, int y){
+		List<Mur> allMurs = new ArrayList<>();
+		for(String obst : mursObstacles){
+			String[] strs = obst.split(",");
+			if(Integer.parseInt(strs[0])==x && Integer.parseInt(strs[1])==y){
+				allMurs.add(Mur.getADirByName(strs[2]));
+			}
+		}
+		allMurs.addAll(mursDeBaseDeCaseXY);
+		return allMurs;
+	}
+	
+	public static void main(String[] args) {
+		Plateau plateau = getPlateauDeBase();
+		Plateau plateauAlea = new Plateau();
+		plateauAlea.init();
+		
+		PlateauUtils.display(plateau, plateauAlea.plateau(), plateauAlea.enigme());
+	}
 }

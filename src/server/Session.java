@@ -70,6 +70,7 @@ public class Session {
 	
 	public void nextStep(){
 		resetAttributes();
+		if(nbTours>1) plateau.updatePlateau();
 		
 		nbTours ++;
 		allPlaying = getAllJoueurs();
@@ -168,7 +169,7 @@ public class Session {
 			}
 		}
 		if(vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null) {
-			System.out.println(vainqueurReflexion.getPseudo() + "a une solution en "+nbCoupsVainqueurReflexion+" coups !");
+			System.out.println(vainqueurReflexion.getPseudo() + " a une solution en "+nbCoupsVainqueurReflexion+" coups !");
 		} else {
 			System.out.println("Temps terminé, aucune solution");
 		}
@@ -192,7 +193,11 @@ public class Session {
 		
 		if(encheres.size()>0) sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, 
 				encheres.get(0).getJoueur().getPseudo(), Integer.toString(encheres.get(0).getNbCoups())));
-		else sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE));
+		else if (vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null){
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, vainqueurReflexion.getPseudo(), nbCoupsVainqueurReflexion.toString()));
+		} else {
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE));
+		}
 	}
 	
 	private void startResolution() {

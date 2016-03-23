@@ -19,10 +19,10 @@ public class PlateauChooser {
 		System.out.print("Plateau n°"+plateauAlea+": " );
 		if(plateauAlea==1){
 			applyPlateau1();
-			System.out.println("76 murs\n");
+			System.out.println("76 murs");
 		} else if(plateauAlea==2){
 			applyPlateau2();
-			System.out.println("84 murs\n");
+			System.out.println("84 murs");
 		}
 		return chosenPlateau;
 	}

@@ -192,6 +192,9 @@ public class Joueur extends Thread{
 				} else {
 					session.addDeplacement(deplacements.toUpperCase());
 					session.sendToAllPlaying(ProtocoleCreator.create(Protocole.SASOLUTION,pseudo,deplacements));
+					synchronized (session) {
+						session.notify();
+					}
 				}
 			}
 

@@ -3,7 +3,6 @@ package plateau;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.AnsiColors;
 import utils.StringUtils;
 
 public class Case {
@@ -128,25 +127,47 @@ public class Case {
 		if(murs.contains(Mur.D) || mursDeBase.contains(Mur.D)) droite = "|";
 		
 		if(cible!=null && robot!=null){
-			if(bas.equals("_")) bas = StringUtils.underline("V");
+			if(bas.equals("_")){
+				if(gauche.equals(" ") && droite.equals(" ")){
+					gauche="_";
+					droite="_";
+				} else if(gauche.equals(" ")){
+					gauche="_";
+				} else if (droite.equals(" ")){
+					droite="_";
+				}
+				bas = StringUtils.underline("V");
+			}
 			else bas = "V";
 		} else if(cible!=null){
-			if(bas.equals("_")) bas = StringUtils.underline("C");
+			if(bas.equals("_")){
+				if(gauche.equals(" ") && droite.equals(" ")){
+					gauche="_";
+					droite="_";
+				} else if(gauche.equals(" ")){
+					gauche="_";
+				} else if (droite.equals(" ")){
+					droite="_";
+				}
+				bas = StringUtils.underline("C");
+			}
 			else bas = "C";
+			bas = StringUtils.transformInto(bas, cible);
 			
-			if(cible==Couleur.B) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_BLUE);
-			else if(cible==Couleur.R) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_RED);
-			else if(cible==Couleur.V) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_GREEN);
-			else bas = StringUtils.transformInto(bas, AnsiColors.ANSI_YELLOW);
-		
 		} else if(robot!=null){
-			if(bas.equals("_")) bas = StringUtils.underline("R");
+			if(bas.equals("_")){
+				if(gauche.equals(" ") && droite.equals(" ")){
+					gauche="_";
+					droite="_";
+				} else if(gauche.equals(" ")){
+					gauche="_";
+				} else if (droite.equals(" ")){
+					droite="_";
+				}
+				bas = StringUtils.underline("R");
+			}
 			else bas = "R";
-			
-			if(robot==Couleur.B) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_BLUE);
-			else if(robot==Couleur.R) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_RED);
-			else if(robot==Couleur.V) bas = StringUtils.transformInto(bas, AnsiColors.ANSI_GREEN);
-			else bas = StringUtils.transformInto(bas, AnsiColors.ANSI_YELLOW);
+			bas = StringUtils.transformInto(bas, robot);
 		}
 		
 		return gauche+bas+droite;

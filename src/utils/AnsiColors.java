@@ -1,5 +1,7 @@
 package utils;
 
+import plateau.Couleur;
+
 public enum AnsiColors {
 	
 	ANSI_RESET("\u001B[0m"),
@@ -22,5 +24,12 @@ public enum AnsiColors {
     public String toString() {
         return code;
     }
+	
+	public static AnsiColors getAnsiByCouleur(Couleur coul){
+		if(coul==Couleur.B) return AnsiColors.ANSI_BLUE;
+		else if(coul==Couleur.R) return AnsiColors.ANSI_RED;
+		else if(coul==Couleur.V) return AnsiColors.ANSI_GREEN;
+		else return AnsiColors.ANSI_YELLOW;
+	}
 	
 }
