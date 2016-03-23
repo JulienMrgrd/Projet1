@@ -118,6 +118,7 @@ public class Client
 
 	public static void main(String args[]){
 //		new Client("JulienM-HP", Server.PORT);
-		new Client("localhost", Server.PORT);
+//		new Client("localhost", Server.PORT);
+		new Client("192.168.42.91", Server.PORT);
 	}
 }

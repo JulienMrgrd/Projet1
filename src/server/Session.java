@@ -9,14 +9,14 @@ import other.Protocole;
 import other.ProtocoleCreator;
 import plateau.Plateau;
 import utils.EnchereUtils;
+import utils.ResolutionUtils;
 import utils.StringUtils;
-import utils.Tuple;
 
 public class Session {
 
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 10;
-	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
+	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
 	public static final int SECONDS_REFLEXION = 20;
 	public static final int SECONDS_ENCHERES = 40;
 	public static final int SECONDS_RESOLUTION = 10;
@@ -28,7 +28,6 @@ public class Session {
 	private List<Joueur> allPlaying;
 	
 	private int nbTours;
-	private Tuple<Integer, Joueur> bestJoueurAndScore;
 	private boolean hasStarted;
 	
 	// Reflexion
@@ -58,7 +57,6 @@ public class Session {
 
 	public void startSession(){
 		System.out.println("Nouvelle partie");
-		bestJoueurAndScore = new Tuple<>(0, null);
 		plateau.init();
 		nbTours = 0;
 		hasStarted = true;
@@ -121,7 +119,7 @@ public class Session {
 			}
 			
 			updateActifs();
-			if(allPlaying.size()<2){
+			if(allPlaying.size()<2 || (actif!=null && actif.getScore()>=SCORE_MAX)){
 				break;
 			}
 		}
@@ -143,7 +141,7 @@ public class Session {
 
 		case MaxScoreReached:
 			System.out.println("case : Max score reached");
-			server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR,bestJoueurAndScore.right.getPseudo()));
+			server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, actif.getPseudo()));
 			stopSession();
 			break;
 
@@ -157,15 +155,11 @@ public class Session {
 		}
 	}
 
-	private void sendToAllPlaying(String message) {
-		server.sendToThem(message, allPlaying);
-	}
-
 	private void startReflexion() {
 		System.out.println("startReflexion");
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
-		System.out.println("Start waiting for solution "+SECONDS_REFLEXION+" sec"); // TODO: 5 min
+		System.out.println("Start waiting for solution "+SECONDS_REFLEXION+" sec");
 		synchronized (this) {
 			try {
 				this.wait(SECONDS_REFLEXION*1000);
@@ -216,19 +210,20 @@ public class Session {
 				e.printStackTrace();
 			}
 		}
-		if(deplacement==null){
+		if(deplacement!=null && ResolutionUtils.isGoodSolution(deplacement, plateau)){
+			actif.addOnePoint();
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.BONNE, actif.getPseudo(), deplacement));
+		} else {
 			if(indexEnch+1>=encheres.size()){
-				sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG));
+				sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
 				return;
 			} else {
 				String joueurSuivant = encheres.get(indexEnch+1).getJoueur().getPseudo();
-				sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG, joueurSuivant));
-				indexEnch++;
+				if(deplacement==null) sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG, joueurSuivant));
+				else sendToAllPlaying(ProtocoleCreator.create(Protocole.MAUVAISE, joueurSuivant));
+				indexEnch++; // enchere suivante
 				startResolution(); // Refais résolution avec enchère suivante
 			}
-			
-		} else {
-			// SASOLUTION, BONNE, MAUVAISE
 		}
 	}
 	
@@ -249,12 +244,9 @@ public class Session {
 	private GameState shouldStop(){
 		if(getNbActifs() <= 1) return GameState.NotEnoughPlayers;
 
-		for(Joueur joueur : allPlaying){
-			if(bestJoueurAndScore.left < joueur.getScore()){
-				bestJoueurAndScore = new Tuple<>(joueur.getScore(), joueur);
-			}
+		if(actif != null && actif.getScore()>=SCORE_MAX){
+			return GameState.MaxScoreReached;
 		}
-		if(bestJoueurAndScore.left >= SCORE_MAX) return GameState.MaxScoreReached;
 
 		return GameState.CanContinue;
 	}
@@ -262,13 +254,6 @@ public class Session {
 	private void sendVainqueur(Joueur joueur) {
 		System.out.println("Vainqueur : "+joueur.getPseudo());
 		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
-	}
-	
-	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
-	public void updateActifs(){
-		synchronized (allPlaying) {
-			sendToAllPlaying("");
-		}
 	}
 	
 	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */
@@ -285,6 +270,17 @@ public class Session {
 			}
 		}
 		return StringUtils.deleteCommaIfExists(bilan);
+	}
+	
+	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
+	public void updateActifs(){
+		synchronized (allPlaying) {
+			sendToAllPlaying("\n");
+		}
+	}
+	
+	public void sendToAllPlaying(String message) {
+		server.sendToThem(message, allPlaying);
 	}
 	
 	//==========  GETTERS // SETTERS =============//

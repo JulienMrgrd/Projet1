@@ -35,7 +35,6 @@ public class ResolutionUtils {
 	}
 
 	public static boolean isGoodSolution(String mouv,Plateau plateau){
-		
 		if(solutionIsGoodFormed(mouv)){
 			
 			Plateau plateauCopy=new Plateau(plateau);
@@ -52,8 +51,6 @@ public class ResolutionUtils {
 				//recuperation de la case du plateau ou se trouve le robot
 				Case caseRobot=plateauCopy.getCaseRobotByCouleur(couleur);
 				
-				
-				
 				//Deplacement du robot jusqu'à tomber sur un mur
 				while(!caseRobot.containsMurAtPosition(direction)&&!hasARobotNextCase(plateauCopy, direction, caseRobot)){
 					plateauCopy.setPositionRobots(caseRobot, direction);
@@ -66,7 +63,7 @@ public class ResolutionUtils {
 			Case robot = plateauCopy.getCaseRobotByCouleur(couleurCible);
 			int posRobotsCibleX = robot.getX();
 			int posRobotsCibleY = robot.getY();
-			plateauCopy.display();
+			
 			if(posRobotsCibleX==caseCible.getX() && posRobotsCibleY==caseCible.getY()) return true;
 		}
 		return false;

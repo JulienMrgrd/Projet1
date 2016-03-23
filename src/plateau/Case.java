@@ -37,14 +37,19 @@ public class Case {
 	}
 	
 	public boolean containsMur(){
-		if(murs.size()>0 || mursInvisibles.size()>0 || mursDeBase.size()>0){
+		if( (murs!=null && murs.size()>0) 
+				|| (mursInvisibles!=null && mursInvisibles.size()>0) 
+				|| (mursDeBase!=null && mursDeBase.size()>0)){
 			return true;
 		}
 		return false;
 	}
 	
 	public boolean containsMurAtPosition(Mur m){
-		if(containsMur() && (murs.contains(m) || mursInvisibles.contains(m) || mursDeBase.contains(m))){
+		if(containsMur() && 
+				( (murs!=null && murs.contains(m)) 
+				  || (mursInvisibles!=null && mursInvisibles.contains(m)) 
+				  || (mursDeBase!=null && mursDeBase.contains(m)) ) ){
 			return true;
 		} else {
 			return false;
@@ -52,7 +57,8 @@ public class Case {
 	}
 	
 	public boolean containsOnlyMursDeBase(){
-		if(murs.isEmpty() && mursInvisibles.isEmpty() && mursDeBase.size()>0){
+		if( (murs==null || murs.isEmpty()) && (mursInvisibles==null || mursInvisibles.isEmpty())
+				&& (mursDeBase!=null && mursDeBase.size()>0) ){
 			return true;
 		}
 		return false;
@@ -77,15 +83,24 @@ public class Case {
 	}
 	
 	public void addMur(Mur posMur){
-		if(!murs.contains(posMur)) murs.add(posMur);
+		if(murs==null){
+			murs = new ArrayList<>(2);
+			murs.add(posMur);
+		} else if(!murs.contains(posMur)) murs.add(posMur);
 	}
 	
 	public void addMurInvisible(Mur posMur){
-		if(!mursInvisibles.contains(posMur)) mursInvisibles.add(posMur);
+		if(mursInvisibles==null){
+			mursInvisibles = new ArrayList<>(2);
+			mursInvisibles.add(posMur);
+		} else if(!mursInvisibles.contains(posMur)) mursInvisibles.add(posMur);
 	}
 	
 	public void addMurDeBase(Mur posMur){
-		if(!mursDeBase.contains(posMur)) mursDeBase.add(posMur);
+		if(mursDeBase==null){
+			mursDeBase = new ArrayList<>(2);
+			mursDeBase.add(posMur);
+		} else if(!mursDeBase.contains(posMur)) mursDeBase.add(posMur);
 	}
 	
 	public void removeAllMur(){
@@ -103,7 +118,10 @@ public class Case {
 		if(murs.contains(Mur.G) || mursDeBase.contains(Mur.G)) gauche = "|";
 		if(murs.contains(Mur.D) || mursDeBase.contains(Mur.D)) droite = "|";
 		
-		if(cible!=null){
+		if(cible!=null && robot!=null){
+			if(bas.equals("_")) bas = StringUtils.underline("V");
+			else bas = "V";
+		} else if(cible!=null){
 			if(bas.equals("_")) bas = StringUtils.underline("C");
 			else bas = "C";
 			

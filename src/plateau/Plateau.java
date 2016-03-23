@@ -255,21 +255,28 @@ public class Plateau {
 	public static void main(String[] args ){
 		Plateau plateau = new Plateau();
 		plateau.init();
+		System.out.println("\nPlateau avant ...");
 		plateau.display();
 		System.out.println("\n"+plateau.plateau());
 		System.out.println(plateau.enigme());
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Votre solution :");
+		System.out.print("Votre solution : ");
 		String str = sc.nextLine();
-		System.out.println(ResolutionUtils.isGoodSolution(str,plateau));
 		
+		boolean solution = ResolutionUtils.isGoodSolution(str,plateau);
+		System.out.println("Votre solution est : "+solution+"\n");
 		
+		System.out.println("\nPlateau après ...");
 		plateau.display();
 		
-		sc = new Scanner(System.in);
-		System.out.println("\nVotre solution :");
-		str = sc.nextLine();
-		System.out.println(ResolutionUtils.isGoodSolution(str,plateau));
+		while(!solution){
+			System.out.print("\n\nRedonnez une solution : ");
+			str = sc.nextLine();
+			solution = ResolutionUtils.isGoodSolution(str,plateau);
+			System.out.println("Votre solution est : "+solution+"\n\n");
+		}
+		
+		sc.close();
 	}
 
 

@@ -49,6 +49,10 @@ public class Joueur extends Thread{
 	public void setScore(int score) {
 		this.score = score;
 	}
+	
+	public void addOnePoint() {
+		score++;
+	}
 
 	@Override
 	public void run() {
@@ -187,7 +191,8 @@ public class Joueur extends Thread{
 				if(deplacements==null){
 					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 				} else {
-					session.addDeplacement(deplacements);
+					session.addDeplacement(deplacements.toUpperCase());
+					session.sendToAllPlaying(ProtocoleCreator.create(Protocole.SASOLUTION,pseudo,deplacements));
 				}
 			}
 
@@ -213,6 +218,7 @@ public class Joueur extends Thread{
 	public String toString(){
 		return pseudo;
 	}
+
 
 
 }
