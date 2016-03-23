@@ -3,7 +3,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -19,7 +18,7 @@ public class Client
 	private PrintWriter streamOut = null;
 	private boolean hasBeenStopped = false;
 
-	public Client(InetAddress serverName, int serverPort){  
+	public Client(String serverName, int serverPort){  
 		System.out.println("Establishing connection. Please wait ...");
 		try {  
 			socket = new Socket(serverName, serverPort);
@@ -131,7 +130,6 @@ public class Client
 
 	public static void main(String args[]) throws UnknownHostException{
 //		new Client("JulienM-HP", Server.PORT);
-		InetAddress adr = InetAddress.getLocalHost();
-		new Client(adr, Server.PORT);
+		new Client("localhost", Server.PORT);
 	}
 }

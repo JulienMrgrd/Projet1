@@ -15,7 +15,7 @@ import other.ProtocoleCreator;
 
 public class Server{
 	
-	public static final int PORT = 8080;
+	public static final int PORT = 2016;
 	private Map<String, Joueur> mapJoueurs;
 	private int nbJoueurs=0;
 	private Session session;
