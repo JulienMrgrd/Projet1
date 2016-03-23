@@ -56,6 +56,15 @@ public class Case {
 		}
 	}
 	
+	public boolean containsObstacleAtPosition(Mur m){
+		if(!containsOnlyMursDeBase() && 
+			murs!=null && murs.contains(m) ){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean containsOnlyMursDeBase(){
 		if( (murs==null || murs.isEmpty()) && (mursInvisibles==null || mursInvisibles.isEmpty())
 				&& (mursDeBase!=null && mursDeBase.size()>0) ){

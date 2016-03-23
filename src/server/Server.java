@@ -15,7 +15,7 @@ import other.ProtocoleCreator;
 
 public class Server{
 	
-	public static final int PORT = 2016;
+	public static final int PORT = 8080;
 	private Map<String, Joueur> mapJoueurs;
 	private int nbJoueurs=0;
 	private Session session;
@@ -76,7 +76,7 @@ public class Server{
 					}
 					
 					secondsBeforeStartSession = Session.SECONDS_BEFORE_START;
-					sendAll(ProtocoleCreator.create(Protocole.SESSION_START_TIME, Integer.toString(Session.SECONDS_BEFORE_START)));
+					sendAll(ProtocoleCreator.create(Protocole.START_TIME_SESSION, Integer.toString(Session.SECONDS_BEFORE_START)));
 					System.out.println("Début de partie dans "+Session.SECONDS_BEFORE_START+" secondes");
 					try { // TODO: décommenter avant soumission !
 //						LeSaviezVousGenerator gen = new LeSaviezVousGenerator();
@@ -91,7 +91,7 @@ public class Server{
 					secondsBeforeStartSession=0;
 					
 					if(nbJoueurs<2){ // Un ou plusieurs joueurs ont quittés
-						sendAll(ProtocoleCreator.create(Protocole.SESSION_START_CANCEL));
+						sendAll(ProtocoleCreator.create(Protocole.START_CANCEL_SESSION));
 						continue;
 					}
 					
@@ -184,7 +184,7 @@ public class Server{
 		} else {
 			try {
 				if(secondsBeforeStartSession!=0)
-					joueur.sendToJoueur(ProtocoleCreator.create(Protocole.SESSION_START_TIME, Integer.toString(secondsBeforeStartSession)));
+					joueur.sendToJoueur(ProtocoleCreator.create(Protocole.START_TIME_SESSION, Integer.toString(secondsBeforeStartSession)));
 			} catch (IOException e) { removeJoueur(joueur); }
 		}
 		synchronized (sync) {

@@ -3,12 +3,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import other.Protocole;
 import server.Server;
+import utils.PlateauUtils;
 
 public class Client
 {  
@@ -17,7 +19,7 @@ public class Client
 	private PrintWriter streamOut = null;
 	private boolean hasBeenStopped = false;
 
-	public Client(String serverName, int serverPort){  
+	public Client(InetAddress serverName, int serverPort){  
 		System.out.println("Establishing connection. Please wait ...");
 		try {  
 			socket = new Socket(serverName, serverPort);
@@ -56,6 +58,8 @@ public class Client
 				if(socket!=null){
 					
 					BufferedReader reader = null;
+					String plateau = "";
+					String enigme = "";
 					try {
 						reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 						while(true){
@@ -70,6 +74,15 @@ public class Client
 //									System.out.println("message vide du server");
 								} else {
 									System.out.println(str);
+								}
+								
+								if(str.startsWith(Protocole.SESSION.name())){
+									plateau = str.split("/")[1];
+								}
+								
+								if(str.startsWith(Protocole.TOUR.name())){
+									enigme = str.split("/")[1];
+									PlateauUtils.display(PlateauUtils.getPlateauDeBase(), plateau, enigme);
 								}
 								
 								if(str.equals(Protocole.BYE.name())){
@@ -116,9 +129,9 @@ public class Client
 		stop();
 	}
 
-	public static void main(String args[]){
+	public static void main(String args[]) throws UnknownHostException{
 //		new Client("JulienM-HP", Server.PORT);
-//		new Client("localhost", Server.PORT);
-		new Client("192.168.42.91", Server.PORT);
+		InetAddress adr = InetAddress.getLocalHost();
+		new Client(adr, Server.PORT);
 	}
 }

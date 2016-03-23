@@ -15,11 +15,11 @@ import utils.StringUtils;
 public class Session {
 
 	public static final int SCORE_MAX = 10;
-	public static final int SECONDS_BEFORE_START = 10;
+	public static final int SECONDS_BEFORE_START = 5;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
-	public static final int SECONDS_REFLEXION = 20;
+	public static final int SECONDS_REFLEXION = 120;
 	public static final int SECONDS_ENCHERES = 40;
-	public static final int SECONDS_RESOLUTION = 10;
+	public static final int SECONDS_RESOLUTION = 60;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
 	
 	private Server server;

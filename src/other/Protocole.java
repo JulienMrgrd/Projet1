@@ -44,8 +44,8 @@ public enum Protocole {
 	BYE, 
 	NOT_ENOUGH_PLAYERS, // Pas assez de joueurs
 	WAIT, // indique au client d'attendre le prochain tour/lancement de la partie
-	SESSION_START_TIME, // indique au client que la partie va commencer dans X secondes
-	SESSION_START_CANCEL,
+	START_TIME_SESSION, // indique au client que la partie va commencer dans X secondes
+	START_CANCEL_SESSION,
 	LE_SAVIEZ_VOUS,
 	;
 	

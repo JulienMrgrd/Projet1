@@ -146,7 +146,6 @@ public class Joueur extends Thread{
 					sendToJoueur(ProtocoleCreator.create(Protocole.TUASTROUVE));
 					String ilatrouve = ProtocoleCreator.create(Protocole.ILATROUVE, pseudo, Integer.toString(nbCoups));
 					server.sendToThemButThis(ilatrouve, session.getAllPlaying(), this);
-					
 				}
 			}
 			

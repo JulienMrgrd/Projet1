@@ -3,6 +3,7 @@ package plateau;
 import java.util.Random;
 import java.util.Scanner;
 
+import utils.PlateauUtils;
 import utils.ResolutionUtils;
 import utils.StringUtils;
 
@@ -35,9 +36,13 @@ public class Plateau {
 		this.caseRobots=new Case[plateau.caseRobots.length];
 		
 		for(int i=0;i<this.caseRobots.length;i++) this.caseRobots[i]=new Case(plateau.caseRobots[i]);
-		
 	}
 	
+	public Plateau(Case[][] plat, Couleur[] robots) {
+		this.plat = plat;
+		this.robots = robots;
+	}
+
 	public void init() {
 		for(int i=0; i<plat.length;i++){
 			for(int j=0; j<plat[i].length;j++){
@@ -125,32 +130,6 @@ public class Plateau {
 		return false;
 	}
 	
-	public void display(){
-		System.out.print("    ");
-		for(int i=0; i<plat.length; i++){
-			if(i<10) System.out.print(i+"  ");
-			else System.out.print(i+" ");
-		}
-		System.out.print("\n    ");
-		for(int i=0; i<plat.length; i++){
-			System.out.print("_  ");
-		}
-		System.out.println();
-		for(int j=plat.length-1; j>=0; j--){
-			for(int i=0; i<plat[j].length; i++){
-				if(i==0 && j<10) System.out.print(j+"  "+plat[i][j].display());
-				else if(i==0 && j>=10) System.out.print(j+" "+plat[i][j].display());
-				else System.out.print(plat[i][j].display());
-			}
-			System.out.println();
-		}
-		System.out.print("    ");
-		for(int i=0; i<plat.length; i++){
-			if(i<10) System.out.print(i+"  ");
-			else System.out.print(i+" ");
-		}
-	}
-	
 	/** Affiche "plateau" de l'énoncé (la suite des murs avec leurs positions) */
 	public String plateau(){
 		String res = "";
@@ -159,7 +138,7 @@ public class Plateau {
 			for(Case oneCase : oneLine){
 				String disp = oneCase.toString();
 				if(disp.isEmpty()) continue;
-				else res += disp + ",";
+				else res += disp;
 			}
 		}
 		return StringUtils.deleteCommaIfExists(res);
@@ -256,7 +235,7 @@ public class Plateau {
 		Plateau plateau = new Plateau();
 		plateau.init();
 		System.out.println("\nPlateau avant ...");
-		plateau.display();
+		PlateauUtils.display(plateau.getPlat());
 		System.out.println("\n"+plateau.plateau());
 		System.out.println(plateau.enigme());
 		Scanner sc = new Scanner(System.in);
@@ -267,7 +246,7 @@ public class Plateau {
 		System.out.println("Votre solution est : "+solution+"\n");
 		
 		System.out.println("\nPlateau après ...");
-		plateau.display();
+		PlateauUtils.display(plateau.getPlat());
 		
 		while(!solution){
 			System.out.print("\n\nRedonnez une solution : ");
