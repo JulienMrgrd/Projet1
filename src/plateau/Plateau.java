@@ -78,8 +78,7 @@ public class Plateau {
 		
 		for(int i=0; i<robots.length; i++){  // Ajout des 4 robots
 			caseRobots[i] = getRandomCaseForRobots();
-			if((caseRobots[i].getX()==caseCible.getX() || caseRobots[i].getY()==caseCible.getY()) 
-					&& !containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
+			if(!containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
 				i--; // Si rien ne sépare le robot de la cible (coup en 1 coup), on retente de placer le robot
 			} else {
 				caseRobots[i].addRobot(robots[i]);
