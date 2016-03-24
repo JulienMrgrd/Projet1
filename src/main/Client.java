@@ -1,4 +1,4 @@
-package test;
+package main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,7 +81,9 @@ public class Client
 								
 								if(str.startsWith(Protocole.TOUR.name())){
 									enigme = str.split("/")[1];
+									System.out.println();
 									PlateauUtils.display(PlateauUtils.getPlateauDeBase(), plateau, enigme);
+									System.out.println("\n");
 								}
 								
 								if(str.equals(Protocole.BYE.name())){
@@ -130,6 +132,6 @@ public class Client
 
 	public static void main(String args[]) throws UnknownHostException{
 //		new Client("JulienM-HP", Server.PORT);
-		new Client("localhost", Server.PORT);
+		new Client("localhost", MainServer.PORT);
 	}
 }

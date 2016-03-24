@@ -164,11 +164,9 @@ public class Joueur extends Thread{
 				if(nbCoups>0){
 					String pseudo = session.addEncheres(new Enchere(this, nbCoups));
 					if(pseudo!=null){
-						System.out.println("Pseudo not null");
 						sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
 					}
 					else {
-						System.out.println("Pseudo null");
 						sendToJoueur(ProtocoleCreator.create(Protocole.TUENCHERE));
 						String ilenchere = ProtocoleCreator.create(Protocole.ILENCHERE,this.getPseudo(),Integer.toString(nbCoups));
 						server.sendToThemButThis(ilenchere, session.getAllPlaying(), this);

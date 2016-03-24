@@ -1,8 +1,8 @@
 package server;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,20 +15,21 @@ import other.ProtocoleCreator;
 
 public class Server{
 	
-	public static final int PORT = 2016;
+	private int port;
 	private Map<String, Joueur> mapJoueurs;
 	private int nbJoueurs=0;
 	private Session session;
 	private Object sync;
 	private int secondsBeforeStartSession;
 	
-	public Server() throws UnknownHostException {
+	public Server(int port) throws UnknownHostException, SocketException {
+		this.port = port;
 		mapJoueurs = new HashMap<String, Joueur>();
 		session = new Session(mapJoueurs, this);
 		sync = new Object(); // Objet pour notification
 		
 		System.out.println("--------");
-		System.out.println("Le serveur ("+InetAddress.getLocalHost().getHostAddress()+") demarre sur le port : "+PORT);
+		System.out.println("Le serveur demarre sur le port : "+port);
 		System.out.println("--------\n");
 	}
 	
@@ -36,7 +37,7 @@ public class Server{
 		
 		ServerSocket serverSocket = null;
 		try	{
-			serverSocket = new ServerSocket(PORT);
+			serverSocket = new ServerSocket(port);
 			
 			startSessionIfPossible();
 			while (true){ // attente en boucle de connexion (bloquant sur ss.accept)
@@ -215,13 +216,6 @@ public class Server{
 	
 	public Session getSession(){
 		return session;
-	}
-	
-
-	public static void main(String args[]) throws UnknownHostException
-	{
-		Server server = new Server(); // instance de la classe principale
-		server.start();
 	}
 
 
