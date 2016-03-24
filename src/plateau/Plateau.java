@@ -35,7 +35,9 @@ public class Plateau {
 		
 		this.caseRobots=new Case[plateau.caseRobots.length];
 		
-		for(int i=0;i<this.caseRobots.length;i++) this.caseRobots[i]=new Case(plateau.caseRobots[i]);
+		for(int i=0;i<this.caseRobots.length;i++){
+			this.caseRobots[i]=new Case(plateau.caseRobots[i]);
+		}
 	}
 	
 	public Plateau(Case[][] plat, Couleur[] robots) {
@@ -182,6 +184,10 @@ public class Plateau {
 	
 	public Case getCaseCible() {
 		return caseCible;
+	}
+	
+	public Case[] getCasesRobots(){
+		return caseRobots;
 	}
 
 	public Case[][] getPlat() {

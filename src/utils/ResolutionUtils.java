@@ -38,7 +38,7 @@ public class ResolutionUtils {
 		if(solutionIsGoodFormed(mouv)){
 			
 			Plateau plateauCopy=new Plateau(plateau);
-			//Copier le plateau pour garder en memoire au cas ou l'utilisateur c'est tromper.
+			//Copier le plateau pour garder en memoire au cas ou l'utilisateur s'est trompé.
 			Case caseCible = plateauCopy.getCaseCible();
 			
 			for(int i=0;i<mouv.length();i+=2){
