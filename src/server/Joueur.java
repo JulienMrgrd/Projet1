@@ -73,7 +73,7 @@ public class Joueur extends Thread{
 	 */
 	public void sendToJoueur(String msg) throws IOException{
 		if(ecriture!=null){
-			ecriture.println(msg);
+			ecriture.print(msg);
 			ecriture.flush();
 			if(ecriture.checkError()){
 				throw new IOException();

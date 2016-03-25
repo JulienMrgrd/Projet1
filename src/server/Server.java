@@ -169,12 +169,13 @@ public class Server{
 	}
 	
 	synchronized public boolean addJoueur(Joueur joueur) {
-		if(containsJoueur(joueur.getPseudo())) return false;
-		mapJoueurs.put(joueur.getPseudo(), joueur);
+		String pseudo = joueur.getPseudo();
+		if(containsJoueur(pseudo)) return false;
+		mapJoueurs.put(pseudo, joueur);
 		nbJoueurs++;
-		sendAllButThis(ProtocoleCreator.create(Protocole.BIENVENUE,joueur.getPseudo()), joueur);
+		sendAllButThis(ProtocoleCreator.create(Protocole.CONNECTE,pseudo), joueur);
 		try {
-			joueur.sendToJoueur(ProtocoleCreator.create(Protocole.CONNECTE));
+			joueur.sendToJoueur(ProtocoleCreator.create(Protocole.BIENVENUE, pseudo));
 		} catch (IOException e1) {
 			removeJoueur(joueur);
 		}
@@ -202,11 +203,12 @@ public class Server{
 	}
 
 	synchronized public boolean removeJoueur(Joueur joueur) {
-		if( !this.mapJoueurs.containsKey(joueur.getPseudo()) ) return false;
-		mapJoueurs.remove(joueur.getPseudo());
+		String pseudo = joueur.getPseudo();
+		if( !this.mapJoueurs.containsKey(pseudo) ) return false;
+		mapJoueurs.remove(pseudo);
 		session.removeJoueur(joueur);
 		nbJoueurs--;
-		sendAll(ProtocoleCreator.create(Protocole.SORTI, joueur.getPseudo()));
+		sendAll(ProtocoleCreator.create(Protocole.SORTI, pseudo));
 		return true;
 	}
 

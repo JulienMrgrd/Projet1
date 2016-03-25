@@ -218,15 +218,32 @@ public class Session {
 				e.printStackTrace();
 			}
 		}
-		if(deplacement!=null && (deplacement.length()/2)<=nbCoups && ResolutionUtils.isGoodSolution(deplacement, plateau)){
-			System.out.println(actif.getPseudo()+" gagne 1 point ! (Nb Points = "+actif.getScore()+1+")");
-			actif.addOnePoint();
-			sendToAllPlaying(ProtocoleCreator.create(Protocole.BONNE));
+		if(deplacement!=null && (deplacement.length()/2)<=nbCoups){
+			System.out.println("Deplacement correctement formé");
+			if(ResolutionUtils.isGoodSolution(deplacement, plateau)){
+				System.out.println(actif.getPseudo()+" gagne 1 point ! (Nb Points = "+actif.getScore()+1+")");
+				actif.addOnePoint();
+				sendToAllPlaying(ProtocoleCreator.create(Protocole.BONNE));
+			} else {
+				System.out.println("Mauvaise solution");
+				if(indexEnch+1>=encheres.size()){
+					sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
+					return;
+				} else {
+					String joueurSuivant = encheres.get(indexEnch+1).getJoueur().getPseudo();
+					sendToAllPlaying(ProtocoleCreator.create(Protocole.MAUVAISE, joueurSuivant));
+					indexEnch++; // enchere suivante
+					startResolution(); // Refais résolution avec enchère suivante
+				}
+			}
 		} else {
+			System.out.printf("Erreur deplacement (%s), (length=%s)",deplacement, deplacement.length());
 			if(indexEnch+1>=encheres.size()){
+				System.out.println("Plus assez de joueurs, on passe au tour suivant.");
 				sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
 				return;
 			} else {
+				System.out.println("TROPLONG ou MAUVAIS, joueur suivant.");
 				String joueurSuivant = encheres.get(indexEnch+1).getJoueur().getPseudo();
 				if(deplacement==null) sendToAllPlaying(ProtocoleCreator.create(Protocole.TROPLONG, joueurSuivant));
 				else sendToAllPlaying(ProtocoleCreator.create(Protocole.MAUVAISE, joueurSuivant));
