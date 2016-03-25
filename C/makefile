@@ -1,6 +1,6 @@
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 
-all: client2  server
+all: clean client2 server
 
 client: pagePrincipal.h 
 	gcc -c client.c pagePrincipal.c  $(GTKFLAGS) -lpthread

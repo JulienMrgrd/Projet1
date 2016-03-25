@@ -6,7 +6,8 @@
 //#define FALSE 0 
 //#define TRUE 1 
  
-int sock; 
+typedef int SOCKET;
+SOCKET sock;
 char user[255];
 int connecte;
 
@@ -27,36 +28,38 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
 	char buffer[1024];
 	char messageEnvoye[255];
 	char connexionReussi[255];
-    char fin[2];
-    strcpy(fin,"/");
-    strcpy(messageEnvoye,"CONNEX/");    
-    
-    //User prend la valeur entre par l'utilisateur
-    strcpy(user, gtk_entry_get_text(entry));
-    
-    strcpy(connexionReussi,"BIENVENUE/");
-	strcat(connexionReussi,user);
-	strcat(connexionReussi,fin);
+    char fin[8], name[50];
+    // strcpy(fin,"\0\r\n");
+    // strcpy(messageEnvoye,"CONNEX/");
+    sprintf(name, "%s",  gtk_entry_get_text(entry));
+    sprintf(messageEnvoye, "CONNEX/%s/\n", name);
 
-    puts("juste avant le cat du messageEnvoye");
-    strcat(messageEnvoye, gtk_entry_get_text(entry));
-    strcat(messageEnvoye, fin);
-    puts("juste avant le send sock");
-    send(sock, messageEnvoye, strlen(messageEnvoye), 0);
     
-	int n = 0;
-    if((n = recv(sock, buffer, sizeof buffer - 1, 0)) < 0)
+    puts("juste avant le send sock");
+    if(send(sock, messageEnvoye, strlen(messageEnvoye), 0) < 0)
+    {
+        perror("send(pseudo)");
+        return;
+    }
+    puts("juste apres le send sock");
+
+    int n = 0;
+	if((n = recv(sock, buffer, 255, 0)) < 0)
     {
         perror("recv()");
     }
+	buffer[n] = '\0';
+	//printf("on passe le recv\n");
+   printf("buffer = %s taille %d, n: %d\n",buffer, strlen(buffer), n);
 
+	sprintf(connexionReussi, "BIENVENUE/%s/\n", name);
+    printf("connexionReussi = %s \n",connexionReussi);
 	//puts(strcmp(connexionReussi,buffer));
     if(strcmp(connexionReussi,buffer)==0){
-    	puts("entre dans le if");
+    	printf("entre dans le if");
 	    affichagePrincipale(user);
     }
 
-    puts(buffer);    
     //OnDestroy(p_wid, p_data);
     puts("Connected\n");
 } 
@@ -74,30 +77,28 @@ int main(int argc , char *argv[])
     
     sock = socket(AF_INET , SOCK_STREAM , 0);
 
-    if (sock == -1){
+    if (sock == INVALID_SOCKET){
         printf("Could not create socket");
     }
     puts("Socket created");
      
     server.sin_addr.s_addr = inet_addr(argv[1]);
     server.sin_family = AF_INET;
-    server.sin_port = htons(8888);
+    server.sin_port = htons(2016);
     //puts(server.sin_addr.s_addr);
     
-	if (bind(sock, (struct sockaddr *)&server, sizeof (server))){
-		perror("bind");
-		/* Handle this error somehow */
-    }
+//	if (bind(sock, (struct sockaddr *)&server, sizeof (server))){
+//		perror("bind");
+//		/* Handle this error somehow */
+//    }
     
     //Connect to remote server
-    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0){
-        perror("connect failed. Error");
-        return 1;
+    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR){
+    	perror("connect()");
+    	return;
+    	//exit(errno);
     }
 
-
-	//instanciation de connecte a 0 pour dire qu'il est pas encore connecter
-	connecte = 0;	
 	
     /* Initialisation de la librairie Gtk. */
     gtk_init(&argc, &argv);
