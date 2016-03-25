@@ -50,7 +50,7 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
     }
 	buffer[n] = '\0';
 	//printf("on passe le recv\n");
-   printf("buffer = %s taille %d, n: %d\n",buffer, strlen(buffer), n);
+    printf("buffer = %s taille %d, n: %d\n",buffer, strlen(buffer), n);
 
 	sprintf(connexionReussi, "BIENVENUE/%s/\n", name);
     printf("connexionReussi = %s \n",connexionReussi);
