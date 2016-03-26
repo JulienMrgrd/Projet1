@@ -1,10 +1,7 @@
 package plateau;
 
 import java.util.Random;
-import java.util.Scanner;
 
-import utils.PlateauUtils;
-import utils.ResolutionUtils;
 import utils.StringUtils;
 
 public class Plateau {
@@ -16,29 +13,6 @@ public class Plateau {
 	private Case[] caseRobots = new Case[4];
 	
 	public Plateau(){}
-	
-	/**
-	 * Constructeur par copie partielle
-	 * @param plateau à copier
-	 */
-	public Plateau(Plateau plateau){
-		this.plat=new Case[plateau.plat.length][plateau.plat[0].length];
-		for(int i=0;i<this.plat.length;i++){
-			for(int j=0;j<this.plat[0].length;j++){
-				this.plat[i][j]=new Case(plateau.plat[i][j]);
-			}
-		}
-		
-		this.robots=plateau.robots;
-		this.chooser=plateau.chooser;
-		this.caseCible=plateau.caseCible;
-		
-		this.caseRobots=new Case[plateau.caseRobots.length];
-		
-		for(int i=0;i<this.caseRobots.length;i++){
-			this.caseRobots[i]=new Case(plateau.caseRobots[i]);
-		}
-	}
 	
 	public Plateau(Case[][] plat, Couleur[] robots) {
 		this.plat = plat;
@@ -78,8 +52,9 @@ public class Plateau {
 		
 		for(int i=0; i<robots.length; i++){  // Ajout des 4 robots
 			caseRobots[i] = getRandomCaseForRobots();
-			if(!containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
-				i--; // Si rien ne sépare le robot de la cible (coup en 1 coup), on retente de placer le robot
+			if((caseRobots[i].getX()==caseCible.getX() || caseRobots[i].getY()==caseCible.getY()) 
+					&& !containsMursBetweenTwoAlignedCases(caseRobots[i], caseCible)){
+				i--; // Si rien ne sépare le robot de la cible (coup en 1 coup), ou qu'il y a déjà un robot on retente de placer le robot
 			} else {
 				caseRobots[i].addRobot(robots[i]);
 			}
@@ -92,7 +67,8 @@ public class Plateau {
 		do {
 			xRand = r.nextInt(plat.length);
 			yRand = r.nextInt(plat[plat.length-1].length);
-		} while( !plat[xRand][yRand].canContainRobotsOrCible() && !plat[xRand][yRand].containsCible() );
+		} while( !plat[xRand][yRand].canContainRobotsOrCible() 
+				|| plat[xRand][yRand].containsCible() || plat[xRand][yRand].containsRobot() );
 		return plat[xRand][yRand];
 	}
 
@@ -199,69 +175,46 @@ public class Plateau {
 		}
 		return null;
 	}
+	
+	public void setCaseRobot(Case oldRobot, Case newRobot){
+		for(int i=0; i<caseRobots.length; i++){
+			if(caseRobots[i]==oldRobot){
+				caseRobots[i]=newRobot;
+				return;
+			}
+		}
+	}
 
-	public void setPositionRobots(Case caseRobots, Mur direction) {
-		int x=caseRobots.getX();
-		int y=caseRobots.getY();
+	/**
+	 * Déplace le robot dans cette direction
+	 * @return la nouvelle case
+	 */
+	public Case setPositionRobot(Case caseRobot, Mur direction) {
+		int x=caseRobot.getX();
+		int y=caseRobot.getY();
+		Couleur robot = caseRobot.getRobot();
+		plat[x][y].removeRobot();
 		switch (direction) {
 		case D:
-			plat[x][y].removeRobot();
-			caseRobots.removeAllMur();
-			caseRobots.setX(caseRobots.getX()+1);
-			plat[x+1][y].addRobot(caseRobots.getRobot());	
-			caseRobots.addAllMurFromCase(plat[x+1][y]);
+			plat[x+1][y].addRobot(robot);
+			caseRobot = plat[x+1][y];
 			break;
 		case G:
-			plat[x][y].removeRobot();
-			caseRobots.removeAllMur();
-			caseRobots.setX(caseRobots.getX()-1);
-			plat[x-1][y].addRobot(caseRobots.getRobot());
-			caseRobots.addAllMurFromCase(plat[x-1][y]);
+			plat[x-1][y].addRobot(robot);
+			caseRobot = plat[x-1][y];
 			break;
 		case H:
-			plat[x][y].removeRobot();
-			caseRobots.removeAllMur();
-			caseRobots.setY(caseRobots.getY()+1);
-			plat[x][y+1].addRobot(caseRobots.getRobot());
-			caseRobots.addAllMurFromCase(plat[x][y+1]);
+			plat[x][y+1].addRobot(robot);
+			caseRobot = plat[x][y+1];
 			break;
 		case B:
-			plat[x][y].removeRobot();
-			caseRobots.removeAllMur();
-			caseRobots.setY(caseRobots.getY()-1);
-			plat[x][y-1].addRobot(caseRobots.getRobot());
-			caseRobots.addAllMurFromCase(plat[x][y-1]);
+			plat[x][y-1].addRobot(robot);
+			caseRobot = plat[x][y-1];
 			break;
-		default:
 		}
+		setCaseRobot(plat[x][y], caseRobot);
+		return caseRobot;
+		
 	}
 	
-	public static void main(String[] args ){
-		Plateau plateau = new Plateau();
-		plateau.init();
-		System.out.println("\nPlateau avant ...");
-		PlateauUtils.display(plateau.getPlat());
-		System.out.println("\n"+plateau.plateau());
-		System.out.println(plateau.enigme());
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Votre solution : ");
-		String str = sc.nextLine();
-		
-		boolean solution = ResolutionUtils.isGoodSolution(str,plateau);
-		System.out.println("Votre solution est : "+solution+"\n");
-		
-		System.out.println("\nPlateau après ...");
-		PlateauUtils.display(plateau.getPlat());
-		
-		while(!solution){
-			System.out.print("\n\nRedonnez une solution : ");
-			str = sc.nextLine();
-			solution = ResolutionUtils.isGoodSolution(str,plateau);
-			System.out.println("Votre solution est : "+solution+"\n\n");
-		}
-		
-		sc.close();
-	}
-
-
 }

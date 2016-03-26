@@ -36,10 +36,16 @@ public class ResolutionUtils {
 
 	public static boolean isGoodSolution(String mouv,Plateau plateau){
 		if(solutionIsGoodFormed(mouv)){
+			int[] xPositionsForReset = new int[4];
+			int[] yPositionsForReset = new int[4];
+			Case[] allRobots = plateau.getCasesRobots();
+			for(int i=0; i<allRobots.length; i++){
+				System.out.printf("(before isGoodSolution) Robot %s en %s,%s.\n", allRobots[i].getRobot().name(), allRobots[i].getX(), allRobots[i].getY());
+				xPositionsForReset[i] = allRobots[i].getX();
+				yPositionsForReset[i] = allRobots[i].getY();
+			}
 			
-			Plateau plateauCopy=new Plateau(plateau);
-			//Copier le plateau pour garder en memoire au cas ou l'utilisateur s'est trompé.
-			Case caseCible = plateauCopy.getCaseCible();
+			Case caseCible = plateau.getCaseCible();
 			
 			for(int i=0;i<mouv.length();i+=2){
 				String coul=mouv.substring(i, i+1);
@@ -49,22 +55,49 @@ public class ResolutionUtils {
 				Mur direction=Mur.getADirByName(direct);
 				
 				//recuperation de la case du plateau ou se trouve le robot
-				Case caseRobot=plateauCopy.getCaseRobotByCouleur(couleur);
+				Case caseRobot = plateau.getCaseRobotByCouleur(couleur);
 				
 				//Deplacement du robot jusqu'à tomber sur un mur
-				while(!caseRobot.containsMurAtPosition(direction)&&!hasARobotNextCase(plateauCopy, direction, caseRobot)){
-					plateauCopy.setPositionRobots(caseRobot, direction);
+				while(!caseRobot.containsMurAtPosition(direction)&&!hasARobotNextCase(plateau, direction, caseRobot)){
+					caseRobot = plateau.setPositionRobot(caseRobot, direction);
 				}
 			}
 			//Recuperation de la couleur du robots voulu dans la cible
 			Couleur couleurCible = caseCible.getCible();
 			
 			//Recuperation des coordonnees du robot devant aller à la cible
-			Case robot = plateauCopy.getCaseRobotByCouleur(couleurCible);
+			Case robot = plateau.getCaseRobotByCouleur(couleurCible);
 			int posRobotsCibleX = robot.getX();
 			int posRobotsCibleY = robot.getY();
 			
-			if(posRobotsCibleX==caseCible.getX() && posRobotsCibleY==caseCible.getY()) return true;
+			if(posRobotsCibleX==caseCible.getX() && posRobotsCibleY==caseCible.getY()){
+				System.out.println("Bonne solution");
+				allRobots = plateau.getCasesRobots();
+				for(int i=0; i<allRobots.length; i++){
+					System.out.printf("(after isGoodSolution) Robot %s en %s,%s.\n", allRobots[i].getRobot().name(), allRobots[i].getX(), allRobots[i].getY());
+					xPositionsForReset[i] = allRobots[i].getX();
+					yPositionsForReset[i] = allRobots[i].getY();
+				}
+				return true;
+			} else {
+				System.out.println("Mauvaise solution");
+				allRobots = plateau.getCasesRobots();
+				for(int i=0; i<allRobots.length; i++){
+					System.out.printf("(after isGoodSolution, before reset) Robot %s en %s,%s.\n", allRobots[i].getRobot().name(), allRobots[i].getX(), allRobots[i].getY());
+				}
+				Couleur[] allCouleurs = Couleur.values();
+				for(int i=0; i<allCouleurs.length; i++){
+					Case oldCaseRobotByCouleur = plateau.getCaseRobotByCouleur(allCouleurs[i]);
+					Case originCase = plateau.getPlat()[xPositionsForReset[i]][yPositionsForReset[i]];
+					oldCaseRobotByCouleur.removeRobot();
+					plateau.setCaseRobot(oldCaseRobotByCouleur, originCase);
+					originCase.addRobot(allCouleurs[i]);
+				}
+				allRobots = plateau.getCasesRobots();
+				for(int i=0; i<allRobots.length; i++){
+					System.out.printf("(after isGoodSolution, after reset) Robot %s en %s,%s.\n", allRobots[i].getRobot().name(), allRobots[i].getX(), allRobots[i].getY());
+				}
+			}
 		}
 		return false;
 	}

@@ -221,7 +221,7 @@ public class Session {
 		if(deplacement!=null && (deplacement.length()/2)<=nbCoups){
 			System.out.println("Deplacement correctement formé");
 			if(ResolutionUtils.isGoodSolution(deplacement, plateau)){
-				System.out.println(actif.getPseudo()+" gagne 1 point ! (Nb Points = "+actif.getScore()+1+")");
+				System.out.println(actif.getPseudo()+" gagne 1 point ! (nb Points = "+(actif.getScore()+1)+")");
 				actif.addOnePoint();
 				sendToAllPlaying(ProtocoleCreator.create(Protocole.BONNE));
 			} else {
@@ -237,7 +237,8 @@ public class Session {
 				}
 			}
 		} else {
-			System.out.printf("Erreur deplacement (%s), (length=%s)",deplacement, deplacement.length());
+			if(deplacement!=null) System.out.printf("Erreur deplacement (%s), (length=%s)",deplacement, deplacement.length());
+			else System.out.println("Pas de déplacements");
 			if(indexEnch+1>=encheres.size()){
 				System.out.println("Plus assez de joueurs, on passe au tour suivant.");
 				sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));

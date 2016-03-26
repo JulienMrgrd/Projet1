@@ -16,8 +16,6 @@ public class MainServer {
 
 	public static void main(String args[]) throws UnknownHostException, SocketException
 	{
-		InetAddress adr = InetAddress.getLocalHost();
-		adr = InetAddress.getLoopbackAddress();
 		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 		for (NetworkInterface netint : Collections.list(nets)){
 	        displayInterfaceInformation(netint);
@@ -27,10 +25,9 @@ public class MainServer {
 	}
 	
 	static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
-	    System.out.print(netint.getDisplayName());
 	    Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
 	    for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-	        if(inetAddress instanceof Inet4Address) System.out.println(" : "+inetAddress);
+	        if(inetAddress instanceof Inet4Address) System.out.println("IP="+inetAddress+" : "+netint.getDisplayName());
 	    }
 	 }
 	

@@ -8,7 +8,6 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import other.Protocole;
-import server.Server;
 import utils.PlateauUtils;
 
 public class Client
