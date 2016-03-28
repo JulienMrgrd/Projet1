@@ -79,7 +79,6 @@ char ** splitWithString(char *str, char* separator) {
 }
 
 char **splitWithChar(char *str, char separator) {
-	printf("Split : str= %s , separator = %c\n", str, separator);
 	char **res = NULL;
 	int  nbstr = 1;
 	int  len;
