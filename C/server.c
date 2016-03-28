@@ -61,10 +61,10 @@ int main(int argc , char *argv[])
         printf("Message recu par le client %s \n",client_message);
         //Send the message back to client
         puts("avant le write");
-        char *bienv="BIENVENUE/fefe/";
+        char *bienv="BIENVENUE/fefe/\n";
         int len=strlen(bienv);
         
-        write(client_sock , bienv,strlen("BIENVENUE/fefe/"));
+        write(client_sock , bienv,strlen("BIENVENUE/fefe/\n"));
         puts("apres le write");
         strcpy(client_message, "");
     }

@@ -1,18 +1,25 @@
+CC=gcc
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 
-all: clean client2 server
+all: clean utils client
 
-client: pagePrincipal.h 
-	gcc -c client.c pagePrincipal.c  $(GTKFLAGS) -lpthread
-
+utils:
+	gcc -w -c utils.c -o utils.o
 	
-client2: client
-	gcc -o client client.o pagePrincipal.o $(GTKFLAGS) -lpthread
+connexion: pagePrincipal
+	gcc -w -c connexion.c -o connexion.o $(GTKFLAGS)
 	
+pageConnexion: connexion
+	gcc -w -c pageConnexion.c -o pageConnexion.o $(GTKFLAGS)
 	
-server: 
-	gcc -o server server.c
+pagePrincipal:
+	gcc -w -c pagePrincipal.c -o pagePrincipal.o $(GTKFLAGS)
 	
+client2: pageConnexion
+	gcc -w -c client.c -o client.o $(GTKFLAGS)
+	
+client: client2
+	gcc -w -o client connexion.o pageConnexion.o pagePrincipal.o client.o utils.o $(GTKFLAGS)
 
 clean:
 	rm -rf *.o client server

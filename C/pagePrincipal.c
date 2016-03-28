@@ -1,6 +1,3 @@
-/*
-    C ECHO client example using sockets
-*/
 #include"pagePrincipal.h"
  
 int sock; 

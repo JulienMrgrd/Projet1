@@ -1,8 +1,8 @@
-#include <stdio.h> //printf
-#include <string.h>    //strlen
-#include <sys/socket.h>    //socket
-#include <arpa/inet.h> //inet_addr
-#include <gtk/gtk.h>
+#include<stdio.h> //printf
+#include<string.h>    //strlen
+#include<sys/socket.h>    //socket
+#include<arpa/inet.h> //inet_addr
+#include<gtk/gtk.h>
 #include <pthread.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -11,5 +11,5 @@
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 struct sockaddr_in server;
-    int affichagePrincipale(char* usr);
+int affichageConnexion();
  
