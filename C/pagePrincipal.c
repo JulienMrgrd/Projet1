@@ -73,6 +73,7 @@ void* ecouteThread(){
 
 int affichagePrincipale(char* usr)
 {
+
           
     strcpy(user,usr);
 
@@ -85,7 +86,8 @@ int affichagePrincipale(char* usr)
     /* Création du chemin complet pour accéder au fichier test.glade. */
     /* g_build_filename(); construit le chemin complet en fonction du système */
     /* d'exploitation. ( / pour Linux et \ pour Windows) */
-    filename2 =  g_build_filename ("pagePrincipale.glade", NULL);
+    filename2 =  g_build_filename ("pageJeu.glade", NULL);
+    printf("avant le for");
 
     /* Chargement du fichier test.glade. */
     gtk_builder_add_from_file (builder2, filename2, &error2);
@@ -97,19 +99,46 @@ int affichagePrincipale(char* usr)
     g_error_free (error2);
     return code;
     }
-
     /* Récupération du pointeur de la fenêtre principale */
     fenetre_principale2 = GTK_WIDGET(gtk_builder_get_object (builder2, "window1"));
 
+    GtkWidget *pTable;
+    GtkWidget *pLabel[16][16];
+    pTable=gtk_table_new(20,20,TRUE);
+   gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder2, "vpaned13")), GTK_WIDGET(pTable));
+   printf("avant le for");
+   int i=0;
+    int j=0;
+    for(i=0;i<16;i++){
+    	for(j=0;j<16;j++){
+    		printf("i = %d j=%d\n",i,j);
+    		if(j==0||j==15){
+    			pLabel[i][j]= gtk_label_new("_");
+    			gtk_table_attach(GTK_TABLE(pTable), pLabel[i][j],
+    			    		          i,i+1, j, j+1,
+    			    		          GTK_EXPAND,  GTK_EXPAND,
+    			    		          0, 0);
+    		}
+    		if((i==0||i==15) && j!=0 && j!=15){
+    			pLabel[i][j]= gtk_label_new("|");
+    			gtk_table_attach(GTK_TABLE(pTable), pLabel[i][j],
+    			    		          i,i+1, j, j+1,
+    			    		          GTK_EXPAND,  GTK_EXPAND,
+    			    		          0, 0);
+    		}
+
+    	}
+
+    }
 
     //ASSIGNATION DES TACHES POUR CHAQUE BOUTON
-    g_signal_connect (gtk_builder_get_object (builder2, "Solution"), "clicked", G_CALLBACK (enchere),(gpointer)(gtk_builder_get_object(builder2, "entry1")));
+   // g_signal_connect (gtk_builder_get_object (builder2, "Solution"), "clicked", G_CALLBACK (enchere),(gpointer)(gtk_builder_get_object(builder2, "entry1")));
 
-    g_signal_connect (gtk_builder_get_object (builder2, "Deconnexion"), "clicked", G_CALLBACK (deconnex),NULL);
+  //  g_signal_connect (gtk_builder_get_object (builder2, "Deconnexion"), "clicked", G_CALLBACK (deconnex),NULL);
 
-    pthread_t thread1;
+    //pthread_t thread1;
 
-    pthread_create(&thread1, NULL, ecouteThread, NULL);    
+    //pthread_create(&thread1, NULL, ecouteThread, NULL);
 
     // printf("lll %s",gtk_entry_get_text(GTK_ENTRY (gtk_builder_get_object(builder, "entry1"))));
 

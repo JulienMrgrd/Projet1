@@ -30,10 +30,15 @@
                     <property name="can_focus">True</property>
                     <property name="position">470</property>
                     <child>
-                      <object class="GtkTextView" id="plateau">
+                      <object class="GtkVPaned" id="vpaned13">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="buffer">textbuffer1</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                       </object>
                       <packing>
                         <property name="resize">False</property>
