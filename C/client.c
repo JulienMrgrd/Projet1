@@ -6,88 +6,106 @@ typedef int SOCKET;
 SOCKET sock;
 
 pthread_t threadEcoute;
-pthread_t threadFenetre;
+pthread_t threadFenetreConnexion;
+pthread_t threadFenetreWait;
 
 void *fctThreadEcoute(void *arg){
 	int i=0;
-	int sizeMessageServer = 0;
+	int sizeMessageServer;
 	char* affich[512];
 	char* recvBuffer[2000];
 
 	printf("C'est parti pour le while true d'écoute ;)\n");
 	while(1){
-		if((sizeMessageServer = recv(sock, recvBuffer, 255, 0)) <= 0)
-		{
-			puts("Serveur déconnecté ...");
+		sizeMessageServer=0;
+		memset(affich, 0, sizeof affich);
+		memset(recvBuffer, 0, sizeof recvBuffer);
+		if((sizeMessageServer = recv(sock, recvBuffer, 255, 0)) <= 0){
+			puts("Serveur déconnecté ...\n");
 			break;
+		} else {
+			printf("Message reçu\n");
 		}
-		recvBuffer[sizeMessageServer] = '\0';
 
-		char** res = splitWithChar(recvBuffer, '/');
-		for (i=0; res[i] != NULL; i++) {
-			printf("Resultat %d = %s\n", i, res[i]);
+		printf("size message : %d\n", sizeMessageServer);
+
+		char** split = splitWithChar(recvBuffer, '/');
+		if(sizeMessageServer==2){
+			printf("Message reçu vide\n");
+			continue;
 		}
-		res[0];
 
-		if(!strcmp(res[0],"BIENVENUE")){
-			sprintf(affich,"Bienvenue %s",res[1]);
-		}else if(!strcmp(res[0],"CONNECTE")){
-			sprintf(affich,"%s vient de se connecter",res[1]);
+		for (i=0; (split[i] != NULL) ; i++) {
+			printf("Resultat %d = %s\n", i, split[i]);
+		}
+
+		char* prot = split[0];
+
+		if(!strcmp(prot,"BIENVENUE")){
+			sprintf(affich,"Bienvenue %s",split[1]);
+			printf("Fermeture de la fenetre de connexion dans client.c\n");
+			destroyPageConnexion();
+			printf("Fermeture de connexion effectuée dans client.c\n");
+			//TODO: Afficher Wainting dans un thread
+		}else if(!strcmp(prot,"CONNECTE")){
+			sprintf(affich,"%s vient de se connecter",split[1]);
 
 			//DECONNEXION
-		}else if(!strcmp(res[0],"SORTI")){
-			sprintf(affich,"Nous avons un rage quit de la part de : %s",res[1]);
+		}else if(!strcmp(prot,"SORTI")){
+			sprintf(affich,"Nous avons un rage quit de la part de : %s",split[1]);
 
 			//SESSION
-		}else if(!strcmp(res[0],"SESSION")){
+		}else if(!strcmp(prot,"SESSION")){
 			//TODO:
 			//Appel a la methode qui affiche le plateau sur la page
-		}else if(!strcmp(res[0],"VAINQUEUR")){
-			sprintf(affich,"Félicitation a %s vainqueur de cette session",res[1]);
+		}else if(!strcmp(prot,"VAINQUEUR")){
+			sprintf(affich,"Félicitation a %s vainqueur de cette session",split[1]);
 
 			//REFLEXION
-		}else if(!strcmp(res[0],"TOUR")){
+		}else if(!strcmp(prot,"TOUR")){
 			//TODO:
 			//PLACEMENT DE ROBOTS
-		}else if(!strcmp(res[0],"TUASTROUVE")){
+		}else if(!strcmp(prot,"TUASTROUVE")){
 			sprintf(affich,"Tu es le premier a avoir trouve !");
-		}else if(!strcmp(res[0],"ILATROUVE")){
-			sprintf(affich,"%s a trouve une solution en %s coups",res[1],res[2]); // ???? en X coups
-		}else if(!strcmp(res[0],"FINREFLEXION")){
+		}else if(!strcmp(prot,"ILATROUVE")){
+			sprintf(affich,"%s a trouve une solution en %s coups",split[1],split[2]); // ???? en X coups
+		}else if(!strcmp(prot,"FINREFLEXION")){
 			sprintf(affich,"Temps imparti finit, fin de la phase de reflexion !");
 
 			//ENCHERE
-		}else if(!strcmp(res[0],"TUENCHERE")){
+		}else if(!strcmp(prot,"TUENCHERE")){
 			sprintf(affich,"Enchere accepte !");
-		}else if(!strcmp(res[0],"ECHECENCHERE")){
-			sprintf(affich,"Votre enchere est incoherente a cause de celle de %s qui a encherit en %s",res[1],res[2]);// ???? en X coups
-		}else if(!strcmp(res[0],"ILENCHERE")){
-			sprintf(affich,"%s a effectuer une enchere en %s coups.",res[1],res[2]);// ???? en X coups
-		}else if(!strcmp(res[0],"FINENCHERE")){
-			if(res[1]!=NULL){
-				sprintf(affich,"Les encheres sont finit le vainqueur est %s en %s coups.",res[1],res[2]); // ???? en X coups
+		}else if(!strcmp(prot,"ECHECENCHERE")){
+			sprintf(affich,"Votre enchere est incoherente a cause de celle de %s qui a encherit en %s",split[1],split[2]);// ???? en X coups
+		}else if(!strcmp(prot,"ILENCHERE")){
+			sprintf(affich,"%s a effectuer une enchere en %s coups.",split[1],split[2]);// ???? en X coups
+		}else if(!strcmp(prot,"FINENCHERE")){
+			if(split[1]!=NULL){
+				sprintf(affich,"Les enchesplit sont finit le vainqueur est %s en %s coups.",split[1],split[2]); // ???? en X coups
 			}else{
-				sprintf(affich,"Les encheres sont finit il n'y a aucun vainqueur !");
+				sprintf(affich,"Les enchesplit sont finit il n'y a aucun vainqueur !");
 			}
 			//RESOLUTION
-		}else if(!strcmp(res[0],"SASOLUTION")){
-			sprintf(affich,"La solution de %s est : %s",res[1],res[2]);
-		}else if(!strcmp(res[0],"BONNE")){
+		}else if(!strcmp(prot,"SASOLUTION")){
+			sprintf(affich,"La solution de %s est : %s",split[1],split[2]);
+		}else if(!strcmp(prot,"BONNE")){
 			sprintf(affich,"La solution est bonne, préparez-vous aux prochains tour !");
-		}else if(!strcmp(res[0],"MAUVAISE")){
-			if(res[1]!=NULL){
-				sprintf(affich,"La solution est mauvaise, au tour de %s" ,res[1]);
+		}else if(!strcmp(prot,"MAUVAISE")){
+			if(split[1]!=NULL){
+				sprintf(affich,"La solution est mauvaise, au tour de %s" ,split[1]);
 			}else{
 				sprintf(affich,"La solution est mauvaise !");
 			}
-		}else if(!strcmp(res[0],"FINRESO")){
-			sprintf(affich,"Phase de resolution finit !");
-		}else if(!strcmp(res[0],"TROPLONG")){
-			if(res[1]!=NULL){
-				sprintf(affich,"Temps de resolution finit, au tour de %s" ,res[1]);
+		}else if(!strcmp(prot,"FINRESO")){
+			sprintf(affich,"Phase de splitolution finit !");
+		}else if(!strcmp(prot,"TROPLONG")){
+			if(split[1]!=NULL){
+				sprintf(affich,"Temps de splitolution finit, au tour de %s" ,split[1]);
 			}else{
-				sprintf(affich,"Temps de resolution finit !");
+				sprintf(affich,"Temps de splitolution finit !");
 			}
+		} else {
+			sprintf(affich,"Commande \"%s\" inconnue.", prot);
 		}
 
 		puts(affich);
@@ -99,7 +117,8 @@ void *fctThreadEcoute(void *arg){
 }
 
 void *fctThreadFenetre(void *arg){
-	affichageConnexion();
+	startPageConnexion();
+	printf("Fin affichage connexion");
 	(void) arg; //Pour enlever le warning
 	pthread_exit(NULL);
 }
@@ -128,25 +147,18 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	if(pthread_create(&threadFenetre, NULL, fctThreadFenetre, NULL)) {
+	if(pthread_create(&threadFenetreConnexion, NULL, fctThreadFenetre, NULL)) {
 		perror("pthread_create");
-		return EXIT_FAILURE;
 	}
 
+	printf("Before join.\n");
 	if (pthread_join(threadEcoute, NULL)) {
-		perror("pthread_join\n");
+		perror("pthread_join");
 		return EXIT_FAILURE;
-	} else {
-		printf("Le thread d'écoute s'est fini.\n");
 	}
+	printf("After join.\n");
 
-	if (pthread_join(threadFenetre, NULL)) {
-		perror("pthread_join\n");
-		return EXIT_FAILURE;
-	} else {
-		printf("Le thread de la fenetre s'est fini.\n");
-	}
-	printf("\nFin du client ... Bye bye ;)");
+	printf("\nFin du client ... Bye bye ;)\n");
 
 	return 0;
 }

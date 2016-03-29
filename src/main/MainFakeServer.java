@@ -1,6 +1,8 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -24,6 +26,7 @@ public class MainFakeServer {
 
 	public static void main(String args[]) throws UnknownHostException, SocketException
 	{
+		System.out.println("Démarrage du serveur ...\n");
 		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 		for (NetworkInterface netint : Collections.list(nets)){
 			displayInterfaceInformation(netint);
@@ -48,10 +51,8 @@ public class MainFakeServer {
 								all.wait();
 							}
 						}
-						System.out.print("Votre message : ");
 						while ( !hasBeenStopped && !(line = console.nextLine()).equals("exit.")){  
 							sendAll(line);
-							System.out.print("Votre message : ");
 						}
 					} catch (Exception exc){ }
 					finally{
@@ -68,9 +69,35 @@ public class MainFakeServer {
 
 			while (!hasBeenStopped){ // acceptation des nouveaux clients
 				System.out.println("Attente de nouveaux clients");
-				Socket client = serverSocket.accept();
+				final Socket client = serverSocket.accept();
 				System.out.println("Ah, il y a un nouveau client !...");
-				
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						BufferedReader reader = null;
+						try {
+							reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							return;
+						}
+						while(true){
+							String str;
+							try {
+								str = reader.readLine();
+								if(str==null){
+									return;
+								} else {
+									System.out.println(str);
+								}
+								
+							} catch (IOException e) {
+								return;
+							}
+						}
+					}
+				}).start();
 				synchronized (all) {
 					all.add(client);
 					all.notify();

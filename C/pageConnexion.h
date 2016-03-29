@@ -11,5 +11,7 @@
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 struct sockaddr_in server;
-int affichageConnexion();
+
+void startPageConnexion();
+void destroyPageConnexion();
  
