@@ -1,4 +1,4 @@
-#include"pagePrincipal.h"
+#include"pagePrincipale.h"
  
 int sock; 
 char user[255];
@@ -71,7 +71,7 @@ void* ecouteThread(){
 
 }
 
-int affichagePrincipale(char* usr)
+int startPageJeu(char* usr)
 {
 
           

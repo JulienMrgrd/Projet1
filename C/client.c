@@ -117,7 +117,7 @@ void *fctThreadEcoute(void *arg){
 }
 
 void *fctThreadFenetre(void *arg){
-	startPageConnexion();
+	startPageJeu("eeee");
 	printf("Fin affichage connexion");
 	(void) arg; //Pour enlever le warning
 	pthread_exit(NULL);

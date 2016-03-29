@@ -5,56 +5,34 @@
   <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window1">
     <property name="width_request">650</property>
-    <property name="height_request">650</property>
+    <property name="height_request">500</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Rasende-Roboter</property>
     <property name="window_position">center</property>
     <child>
-      <object class="GtkVPaned" id="vpaned1">
+      <object class="GtkHPaned" id="hpaned1">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="position">600</property>
+        <property name="position">350</property>
         <child>
-          <object class="GtkHPaned" id="hpaned1">
+          <object class="GtkVPaned" id="vpaned2">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="position">440</property>
+            <property name="position">500</property>
             <child>
-              <object class="GtkVPaned" id="vpaned2">
+              <object class="GtkVPaned" id="vpaned6">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="position">500</property>
+                <property name="position">370</property>
                 <child>
-                  <object class="GtkVPaned" id="vpaned6">
+                  <object class="GtkVPaned" id="vpaned13">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="position">470</property>
                     <child>
-                      <object class="GtkVPaned" id="vpaned13">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="resize">False</property>
-                        <property name="shrink">True</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="recapPartie">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Recapitulatif score de la partie :</property>
-                      </object>
-                      <packing>
-                        <property name="resize">True</property>
-                        <property name="shrink">True</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>
@@ -63,59 +41,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkVPaned" id="vpaned3">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="position">30</property>
-                    <child>
-                      <object class="GtkLabel" id="monScore">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Mon Score :</property>
-                      </object>
-                      <packing>
-                        <property name="resize">False</property>
-                        <property name="shrink">True</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkVPaned" id="vpaned4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="position">30</property>
-                        <child>
-                          <object class="GtkLabel" id="meilleurPropositon">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Meilleur Propositon :</property>
-                          </object>
-                          <packing>
-                            <property name="resize">False</property>
-                            <property name="shrink">True</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="maProposition">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Ma Proposition :</property>
-                          </object>
-                          <packing>
-                            <property name="resize">True</property>
-                            <property name="shrink">True</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="resize">True</property>
-                        <property name="shrink">True</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="resize">True</property>
-                    <property name="shrink">True</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -124,21 +50,46 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVPaned" id="vpaned5">
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="resize">False</property>
+            <property name="shrink">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkVPaned" id="vpaned5">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="position">450</property>
+            <child>
+              <object class="GtkVPaned" id="vpaned7">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="position">570</property>
+                <property name="position">30</property>
                 <child>
-                  <object class="GtkVPaned" id="vpaned7">
+                  <object class="GtkButton" id="deconnexion">
+                    <property name="label" translatable="yes">Deconnexion</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="resize">False</property>
+                    <property name="shrink">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkVPaned" id="vpaned8">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="position">30</property>
                     <child>
-                      <object class="GtkButton" id="deconnexion">
-                        <property name="label" translatable="yes">Deconnexion</property>
+                      <object class="GtkLabel" id="monScore">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Mon Socre :</property>
                       </object>
                       <packing>
                         <property name="resize">False</property>
@@ -146,31 +97,52 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVPaned" id="vpaned8">
+                      <object class="GtkVPaned" id="vpaned9">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="position">50</property>
+                        <property name="position">30</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkLabel" id="meilleurProposition">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Meilleur Proposition :</property>
+                          </object>
+                          <packing>
+                            <property name="resize">False</property>
+                            <property name="shrink">True</property>
+                          </packing>
                         </child>
                         <child>
-                          <object class="GtkVPaned" id="vpaned9">
+                          <object class="GtkVPaned" id="vpaned10">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="position">60</property>
+                            <property name="position">30</property>
                             <child>
-                              <placeholder/>
+                              <object class="GtkLabel" id="phase">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Phase de ???</property>
+                              </object>
+                              <packing>
+                                <property name="resize">False</property>
+                                <property name="shrink">True</property>
+                              </packing>
                             </child>
                             <child>
-                              <object class="GtkVPaned" id="vpaned10">
+                              <object class="GtkVPaned" id="vpaned11">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="position">45</property>
                                 <child>
-                                  <object class="GtkLabel" id="phase">
+                                  <object class="GtkEntry" id="proposition">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">Phase de ???</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">●</property>
+                                    <property name="text" translatable="yes">proposition</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="primary_icon_sensitive">True</property>
+                                    <property name="secondary_icon_sensitive">True</property>
                                   </object>
                                   <packing>
                                     <property name="resize">False</property>
@@ -178,20 +150,16 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkVPaned" id="vpaned11">
+                                  <object class="GtkVPaned" id="vpaned12">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="position">45</property>
+                                    <property name="position">30</property>
                                     <child>
-                                      <object class="GtkEntry" id="proposition">
+                                      <object class="GtkButton" id="soumission">
+                                        <property name="label" translatable="yes">Soumettre proposition</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="invisible_char">●</property>
-                                        <property name="text" translatable="yes">proposition</property>
-                                        <property name="primary_icon_activatable">False</property>
-                                        <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
+                                        <property name="receives_default">True</property>
                                       </object>
                                       <packing>
                                         <property name="resize">False</property>
@@ -199,16 +167,16 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkVPaned" id="vpaned12">
+                                      <object class="GtkVPaned" id="vpaned1">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="position">40</property>
                                         <child>
-                                          <object class="GtkButton" id="soumission">
-                                            <property name="label" translatable="yes">Soumettre proposition</property>
+                                          <object class="GtkLabel" id="recapPartie">
                                             <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
-                                            <property name="receives_default">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Recapitulatif de la partie :</property>
+                                            <property name="wrap">True</property>
+                                            <property name="ellipsize">start</property>
                                           </object>
                                           <packing>
                                             <property name="resize">False</property>
@@ -216,9 +184,11 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkTextView" id="messageCha">
+                                          <object class="GtkLabel" id="messageServeur">
                                             <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Message du Serveur :</property>
+                                            <property name="ellipsize">end</property>
                                           </object>
                                           <packing>
                                             <property name="resize">True</property>
@@ -257,42 +227,42 @@
                     </child>
                   </object>
                   <packing>
+                    <property name="resize">True</property>
+                    <property name="shrink">True</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="resize">False</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkHPaned" id="hpaned2">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="position">130</property>
+                <child>
+                  <object class="GtkEntry" id="messageChat">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">●</property>
+                    <property name="primary_icon_activatable">False</property>
+                    <property name="secondary_icon_activatable">False</property>
+                    <property name="primary_icon_sensitive">True</property>
+                    <property name="secondary_icon_sensitive">True</property>
+                  </object>
+                  <packing>
                     <property name="resize">False</property>
                     <property name="shrink">True</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHPaned" id="hpaned2">
+                  <object class="GtkButton" id="bouttonChat">
+                    <property name="label" translatable="yes">Envoyer</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="position">130</property>
-                    <child>
-                      <object class="GtkEntry" id="messageChat">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="invisible_char">●</property>
-                        <property name="primary_icon_activatable">False</property>
-                        <property name="secondary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">True</property>
-                        <property name="secondary_icon_sensitive">True</property>
-                      </object>
-                      <packing>
-                        <property name="resize">False</property>
-                        <property name="shrink">True</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="bouttonChat">
-                        <property name="label" translatable="yes">Envoyer</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                      </object>
-                      <packing>
-                        <property name="resize">True</property>
-                        <property name="shrink">True</property>
-                      </packing>
-                    </child>
+                    <property name="receives_default">True</property>
                   </object>
                   <packing>
                     <property name="resize">True</property>
@@ -305,17 +275,6 @@
                 <property name="shrink">True</property>
               </packing>
             </child>
-          </object>
-          <packing>
-            <property name="resize">False</property>
-            <property name="shrink">True</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="messageServeur">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Message du Serveur</property>
           </object>
           <packing>
             <property name="resize">True</property>
