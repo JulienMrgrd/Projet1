@@ -1,40 +1,44 @@
 #include "pageAttente.h"
 
-GtkWidget *fenetre_attente = NULL;
-GtkBuilder *builder_attente = NULL;
-GError *error_attente = NULL;
-gchar *filename_attente = NULL;
+static GtkWidget *fenetre = NULL;
+static GtkBuilder *builder = NULL;
+static GError *error = NULL;
+static gchar *filename = NULL;
+static int isButtonXclicked = 1;
 
 /* callback */
 static void destroy( GtkWidget *widget, gpointer data ){
     gtk_main_quit ();
 }
  
-void startPageAttente(){
+int startPageAttente(){
     gtk_init(NULL,NULL);
-    builder_attente = gtk_builder_new();
-    filename_attente =  g_build_filename ("glade_files/pageAttente.glade", NULL);
+    builder = gtk_builder_new();
+    filename =  g_build_filename ("glade_files/pageAttente.glade", NULL);
 
-    gtk_builder_add_from_file (builder_attente, filename_attente, &error_attente);
-    g_free (filename_attente);
-    if (error_attente){
-        gint code = error_attente->code;
-        g_printerr("%s\n", error_attente->message);
-        g_error_free (error_attente);
-        return;
+    gtk_builder_add_from_file (builder, filename, &error);
+    g_free (filename);
+    if (error){
+        gint code = error->code;
+        g_printerr("%s\n", error->message);
+        g_error_free (error);
+        return code;
     }
 
-    fenetre_attente = GTK_WIDGET(gtk_builder_get_object (builder_attente, "window1"));
-    g_signal_connect (fenetre_attente, "destroy", G_CALLBACK (destroy), NULL);
+    fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
+    g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
 
-    gtk_widget_show_all (fenetre_attente);
+    gtk_widget_show_all (fenetre);
     gtk_main();
 
     printf("Fin de la fonction startPageAttente\n");
+    return isButtonXclicked;
 }
 
+/* Appelé par le programme pour fermer la fenêtre */
 void destroyPageAttente(){
 	printf("Destruction de la fenetre d'attente\n");
-	gtk_widget_destroy(fenetre_attente);
+	isButtonXclicked=0;
+	gtk_widget_destroy(fenetre);
 	printf("Destroy d'attente reussi\n");
 }

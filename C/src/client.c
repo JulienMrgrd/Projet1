@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include "pageConnexion.h"
 #include "pageAttente.h"
+#include "pageJeu.h"
 #include "utils.h"
 
 typedef int SOCKET;
@@ -9,18 +10,32 @@ SOCKET sock;
 pthread_t threadEcoute;
 pthread_t threadFenetreConnexion;
 pthread_t threadFenetreAttente;
-pthread_t threadFenetrePrincipale;
+pthread_t threadFenetreJeu;
+char* username;
 
 void *fctThreadFenetreAttente(void *arg){
-	startPageAttente();
-	printf("(thread) Fin affichage d'attente");
+	if(startPageAttente()==1){
+		printf("Bouton \"X\" cliqué !\n");
+	}
+	printf("(thread) Fin affichage d'attente\n");
 	(void) arg; //Pour enlever le warning
 	pthread_exit(NULL);
 }
 
 void *fctThreadFenetreConnexion(void *arg){
-	startPageConnexion();
-	printf("(thread) Fin affichage connexion");
+	if(startPageConnexion()==1){
+		printf("Bouton \"X\" cliqué !\n");
+	}
+	printf("(thread) Fin affichage connexion\n");
+	(void) arg; //Pour enlever le warning
+	pthread_exit(NULL);
+}
+
+void *fctThreadFenetreJeu(void *arg){
+	if(startPageJeu(username)==1){
+		printf("Bouton \"X\" cliqué !\n");
+	}
+	printf("(thread) Fin affichage jeu\n");
 	(void) arg; //Pour enlever le warning
 	pthread_exit(NULL);
 }
@@ -58,7 +73,8 @@ void *fctThreadEcoute(void *arg){
 		char* prot = split[0];
 
 		if(!strcmp(prot,"BIENVENUE")){
-			sprintf(affich,"Bienvenue %s",split[1]);
+			username = split[1];
+			sprintf(affich,"Bienvenue %s",username);
 			printf("Fermeture de la fenetre de connexion dans client.c\n");
 			destroyPageConnexion();
 			printf("Fermeture de connexion effectuée dans client.c\n");

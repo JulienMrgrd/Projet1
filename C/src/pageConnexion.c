@@ -1,10 +1,10 @@
 #include "pageConnexion.h"
 
-GtkWidget *fenetre_connexion = NULL;
-GtkBuilder *builder_connexion = NULL;
-GError *error_connexion = NULL;
-gchar *filename_connexion = NULL;
-
+static GtkWidget *fenetre = NULL;
+static GtkBuilder *builder = NULL;
+static GError *error = NULL;
+static gchar *filename = NULL;
+static int isButtonXclicked = 1;
 
 typedef int SOCKET;
 SOCKET sock;
@@ -40,33 +40,36 @@ static void destroy( GtkWidget *widget, gpointer   data ){
     gtk_main_quit ();
 }
  
-void startPageConnexion(){
+int startPageConnexion(){
     gtk_init(NULL,NULL);
-    builder_connexion = gtk_builder_new();
-    filename_connexion =  g_build_filename ("glade_files/pageDeCo.glade", NULL);
+    builder = gtk_builder_new();
+    filename =  g_build_filename ("glade_files/pageConnexion.glade", NULL);
 
-    gtk_builder_add_from_file (builder_connexion, filename_connexion, &error_connexion);
-    g_free (filename_connexion);
-    if (error_connexion){
-        gint code = error_connexion->code;
-        g_printerr("%s\n", error_connexion->message);
-        g_error_free (error_connexion);
-        return;
+    gtk_builder_add_from_file (builder, filename, &error);
+    g_free (filename);
+    if (error){
+        gint code = error->code;
+        g_printerr("%s\n", error->message);
+        g_error_free (error);
+        return code;
     }
 
-    fenetre_connexion = GTK_WIDGET(gtk_builder_get_object (builder_connexion, "window1"));
+    fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 
-    g_signal_connect (gtk_builder_get_object (builder_connexion, "connexion"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder_connexion, "userText")));
-    g_signal_connect (fenetre_connexion, "destroy", G_CALLBACK (destroy), NULL);
+    g_signal_connect (gtk_builder_get_object (builder, "connexion"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder, "userText")));
+    g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
 
-    gtk_widget_show_all (fenetre_connexion);
+    gtk_widget_show_all (fenetre);
     gtk_main();
 
     printf("Fin de la fonction startPageConnexion\n");
+    return isButtonXclicked;
 }
 
+/* Appelé par le programme pour fermer la fenêtre */
 void destroyPageConnexion(){
 	printf("Destruction de la fenetre\n");
-	gtk_widget_destroy(fenetre_connexion);
+	isButtonXclicked=0;
+	gtk_widget_destroy(fenetre);
 	printf("Destroy reussi\n");
 }

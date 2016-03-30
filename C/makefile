@@ -14,7 +14,7 @@ GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 # L'exécutable
 BIN=client
 
-all: clean utils pageConnexion pageAttente pagePrincipale client
+all: clean utils pageConnexion pageAttente pageJeu client
 
 utils:
 	gcc -c $(SRCDIR)/utils.c -o $(LIBDIR)/utils.o $(CFLAGS) 
@@ -25,14 +25,14 @@ pageConnexion:
 pageAttente: 
 	gcc -c $(SRCDIR)/pageAttente.c -o $(LIBDIR)/pageAttente.o $(CFLAGS) $(GTKFLAGS)
 	
-pagePrincipale:
-	gcc -c $(SRCDIR)/pagePrincipale.c -o $(LIBDIR)/pagePrincipale.o $(CFLAGS) $(GTKFLAGS)
+pageJeu:
+	gcc -c $(SRCDIR)/pageJeu.c -o $(LIBDIR)/pageJeu.o $(CFLAGS) $(GTKFLAGS)
 	
 client2:
 	gcc -c $(SRCDIR)/client.c -o $(LIBDIR)/client.o $(CFLAGS) $(GTKFLAGS)
 	
 $(BIN): client2
-	gcc -o client $(LIBDIR)/pageConnexion.o $(LIBDIR)/pageAttente.o $(LIBDIR)/pagePrincipale.o $(LIBDIR)/client.o $(LIBDIR)/utils.o $(CFLAGS) $(GTKFLAGS)
+	gcc -o client $(LIBDIR)/pageConnexion.o $(LIBDIR)/pageAttente.o $(LIBDIR)/pageJeu.o $(LIBDIR)/client.o $(LIBDIR)/utils.o $(CFLAGS) $(GTKFLAGS)
 
 # Nettoyage => Tout sera recompiler !
 clean:
