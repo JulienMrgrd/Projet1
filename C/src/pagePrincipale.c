@@ -86,7 +86,7 @@ int startPageJeu(char* usr)
     /* Création du chemin complet pour accéder au fichier test.glade. */
     /* g_build_filename(); construit le chemin complet en fonction du système */
     /* d'exploitation. ( / pour Linux et \ pour Windows) */
-    filename2 =  g_build_filename ("pageJeu.glade", NULL);
+    filename2 =  g_build_filename ("glade_files/pageJeu.glade", NULL);
     printf("avant le for");
 
     /* Chargement du fichier test.glade. */

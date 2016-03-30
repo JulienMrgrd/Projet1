@@ -1,21 +1,39 @@
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
 
-all: clean utils client
+# Les différents répertoires contenant respectivement les fichiers : Sources *.c, Headers *.h, Objets *.o, l'exécutable
+SRCDIR=src
+HEADDIR=include
+LIBDIR=objet
+ 
+ 
+# Les différentes options de compilations, soyons strictes !
+CFLAGS= -I$(HEADDIR) -w
+# Les différents FrameWorks et bibliothèques pour le linkage
+GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
+ 
+# L'exécutable
+BIN=client
+
+all: clean utils pageConnexion pageAttente pagePrincipale client
 
 utils:
-	gcc -w -c utils.c -o utils.o
-
-pageConnexion: pagePrincipale
-	gcc -w -c pageConnexion.c -o pageConnexion.o $(GTKFLAGS)
+	gcc -c $(SRCDIR)/utils.c -o $(LIBDIR)/utils.o $(CFLAGS) 
+	
+pageConnexion:
+	gcc -c $(SRCDIR)/pageConnexion.c -o $(LIBDIR)/pageConnexion.o $(CFLAGS) $(GTKFLAGS)
+	
+pageAttente: 
+	gcc -c $(SRCDIR)/pageAttente.c -o $(LIBDIR)/pageAttente.o $(CFLAGS) $(GTKFLAGS)
 	
 pagePrincipale:
-	gcc -w -c pagePrincipale.c -o pagePrincipale.o $(GTKFLAGS)
+	gcc -c $(SRCDIR)/pagePrincipale.c -o $(LIBDIR)/pagePrincipale.o $(CFLAGS) $(GTKFLAGS)
 	
-client2: pageConnexion
-	gcc -w -c client.c -o client.o $(GTKFLAGS)
+client2:
+	gcc -c $(SRCDIR)/client.c -o $(LIBDIR)/client.o $(CFLAGS) $(GTKFLAGS)
 	
-client: client2
-	gcc -w -o client pageConnexion.o pagePrincipale.o client.o utils.o $(GTKFLAGS)
+$(BIN): client2
+	gcc -o client $(LIBDIR)/pageConnexion.o $(LIBDIR)/pageAttente.o $(LIBDIR)/pagePrincipale.o $(LIBDIR)/client.o $(LIBDIR)/utils.o $(CFLAGS) $(GTKFLAGS)
 
+# Nettoyage => Tout sera recompiler !
 clean:
-	rm -rf *.o client
+	rm -rf $(LIBDIR)/*.o client

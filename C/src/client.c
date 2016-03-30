@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include "pageConnexion.h"
+#include "pageAttente.h"
 #include "utils.h"
 
 typedef int SOCKET;
@@ -7,7 +8,22 @@ SOCKET sock;
 
 pthread_t threadEcoute;
 pthread_t threadFenetreConnexion;
-pthread_t threadFenetreWait;
+pthread_t threadFenetreAttente;
+pthread_t threadFenetrePrincipale;
+
+void *fctThreadFenetreAttente(void *arg){
+	startPageAttente();
+	printf("(thread) Fin affichage d'attente");
+	(void) arg; //Pour enlever le warning
+	pthread_exit(NULL);
+}
+
+void *fctThreadFenetreConnexion(void *arg){
+	startPageConnexion();
+	printf("(thread) Fin affichage connexion");
+	(void) arg; //Pour enlever le warning
+	pthread_exit(NULL);
+}
 
 void *fctThreadEcoute(void *arg){
 	int i=0;
@@ -46,7 +62,11 @@ void *fctThreadEcoute(void *arg){
 			printf("Fermeture de la fenetre de connexion dans client.c\n");
 			destroyPageConnexion();
 			printf("Fermeture de connexion effectuée dans client.c\n");
-			//TODO: Afficher Wainting dans un thread
+			printf("Démarrage de la fenêtre d'attente\n");
+			if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
+				perror("pthread_create");
+				return EXIT_FAILURE;
+			}
 		}else if(!strcmp(prot,"CONNECTE")){
 			sprintf(affich,"%s vient de se connecter",split[1]);
 
@@ -116,13 +136,6 @@ void *fctThreadEcoute(void *arg){
 	pthread_exit(NULL);
 }
 
-void *fctThreadFenetre(void *arg){
-	startPageJeu("eeee");
-	printf("Fin affichage connexion");
-	(void) arg; //Pour enlever le warning
-	pthread_exit(NULL);
-}
-
 int main(int argc, char* argv[]){
 	sock = socket(AF_INET , SOCK_STREAM , 0);
 
@@ -147,11 +160,11 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	if(pthread_create(&threadFenetreConnexion, NULL, fctThreadFenetre, NULL)) {
+	if(pthread_create(&threadFenetreConnexion, NULL, fctThreadFenetreConnexion, NULL)) {
 		perror("pthread_create");
+		return EXIT_FAILURE;
 	}
 
-	printf("Before join.\n");
 	if (pthread_join(threadEcoute, NULL)) {
 		perror("pthread_join");
 		return EXIT_FAILURE;
