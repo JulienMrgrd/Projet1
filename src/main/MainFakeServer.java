@@ -112,6 +112,7 @@ public class MainFakeServer {
 
 	private synchronized static void sendAll(String line) throws IOException {
 		if(all.isEmpty()) return;
+		if(!line.endsWith("/")) line+="/";
 		for(Socket sock : all){
 			PrintWriter streamOut = new PrintWriter(sock.getOutputStream());
 			streamOut.println(line);

@@ -5,71 +5,79 @@ static GtkBuilder *builder = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked = 1;
+static int isClosed = 0;
 
 typedef int SOCKET;
 SOCKET sock;
-char user[255];
+char user[50];
 
 int connexion(GtkWidget * p_wid, gpointer p_data){
-
 	GtkEntry* entry = (GtkEntry*)p_data;
-	//puts(gtk_entry_get_text(entry)); //Recuperation du texte de l'area text
 
-	//Initialisation des valeur
-	char buffer[1024];
-	char messageEnvoye[255];
-	char connexionReussi[255];
-    char fin[8], name[50];
-    // strcpy(fin,"\0\r\n");
-    // strcpy(messageEnvoye,"CONNEX/");
-    sprintf(name, "%s",  gtk_entry_get_text(entry));
-    sprintf(messageEnvoye, "CONNEX/%s/\n", name);
-
-    if(send(sock, messageEnvoye, strlen(messageEnvoye), 0) < 0)
-    {
-        perror("send(pseudo)");
-        return;
-    }
-
-    puts("Connected\n");
+	char messageEnvoye[70];
+	char name[50];
+	
+	sprintf(name, "%s",  gtk_entry_get_text(entry));
+	if(strcmp(name, "")){
+		sprintf(messageEnvoye, "CONNEX/%s/\n", name);
+		sendToServer(messageEnvoye);
+	}
 }
-
 
 /* callback */
 static void destroy( GtkWidget *widget, gpointer   data ){
-    gtk_main_quit ();
+	gtk_main_quit ();
 }
- 
+
 int startPageConnexion(){
-    gtk_init(NULL,NULL);
-    builder = gtk_builder_new();
-    filename =  g_build_filename ("glade_files/pageConnexion.glade", NULL);
+	isClosed = 0;
+	if( !g_thread_supported()) g_thread_init( NULL );
+	gdk_threads_init();
 
-    gtk_builder_add_from_file (builder, filename, &error);
-    g_free (filename);
-    if (error){
-        gint code = error->code;
-        g_printerr("%s\n", error->message);
-        g_error_free (error);
-        return code;
-    }
+	gtk_init(NULL,NULL);
+	builder = gtk_builder_new();
+	filename =  g_build_filename ("glade_files/pageConnexion.glade", NULL);
 
-    fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
+	gtk_builder_add_from_file (builder, filename, &error);
+	g_free (filename);
+	if (error){
+		gint code = error->code;
+		g_printerr("%s\n", error->message);
+		g_error_free (error);
+		return code;
+	}
 
-    g_signal_connect (gtk_builder_get_object (builder, "connexion"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder, "userText")));
-    g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
+	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 
-    gtk_widget_show_all (fenetre);
-    gtk_main();
+	g_signal_connect (gtk_builder_get_object (builder, "connexion"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder, "userText")));
+	g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
 
-    printf("Fin de la fonction startPageConnexion\n");
-    return isButtonXclicked;
+	gtk_widget_show_all (fenetre);
+	gtk_main();
+
+	isClosed = 1;
+	printf("Fin de la fonction startPageConnexion\n");
+	return isButtonXclicked;
 }
 
 /* Appelé par le programme pour fermer la fenêtre */
 void destroyPageConnexion(){
 	printf("Destruction de la fenetre\n");
 	isButtonXclicked=0;
+	gdk_threads_enter();
 	gtk_widget_destroy(fenetre);
+	gdk_threads_leave();
 	printf("Destroy reussi\n");
+}
+
+void changeLabelPageConnexion(char* message){
+	if(isClosed==1) return; // la fenêtre a été fermée
+	gdk_threads_enter();
+	{
+		GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "user"));
+		printf("Label before = %s\n", gtk_label_get_text(lab));
+		gtk_label_set_text(lab, message);
+		printf("Label after = %s\n", gtk_label_get_text(lab));
+	}
+	gdk_threads_leave();
 }

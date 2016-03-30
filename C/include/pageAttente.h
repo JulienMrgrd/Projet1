@@ -11,4 +11,5 @@
 
 int startPageAttente();
 void destroyPageAttente();
+void addMessageServerPageAttente(char *message);
  

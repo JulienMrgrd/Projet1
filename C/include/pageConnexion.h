@@ -14,4 +14,5 @@ struct sockaddr_in server;
 
 int startPageConnexion();
 void destroyPageConnexion();
+void changeLabelPageConnexion(char* message);
  

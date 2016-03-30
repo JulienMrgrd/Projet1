@@ -8,6 +8,7 @@ static GtkBuilder *builder = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked=1;
+static int isClosed = 0;
 
 int deconnex(){
 
@@ -72,22 +73,15 @@ void* ecouteThread(){
 
 }
 
-int startPageJeu(char* usr){
-	strcpy(user,usr);
+int startPageJeu(char* plateau){
+	isClosed = 0;
+//	strcpy(user,usr);
+	if( !g_thread_supported()) g_thread_init( NULL );
+	gdk_threads_init();
 
-	/* Initialisation de la librairie Gtk. */
-	gtk_init(NULL, NULL);
-
-	/* Ouverture du fichier Glade de la fenêtre jeu */
 	builder = gtk_builder_new();
-
-	/* Création du chemin complet pour accéder au fichier test.glade. */
-	/* g_build_filename(); construit le chemin complet en fonction du système */
-	/* d'exploitation. ( / pour Linux et \ pour Windows) */
 	filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
-	printf("avant le for");
 
-	/* Chargement du fichier test.glade. */
 	gtk_builder_add_from_file (builder, filename, &error);
 	g_free (filename);
 	if (error) {
@@ -96,7 +90,6 @@ int startPageJeu(char* usr){
 		g_error_free (error);
 		return code;
 	}
-	/* Récupération du pointeur de la fenêtre jeu */
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 
 	GtkWidget *pTable;
@@ -145,7 +138,7 @@ int startPageJeu(char* usr){
 	gtk_widget_show_all (fenetre);
 
 	gtk_main();
-
+	isClosed = 1;
 	return isButtonXclicked;
 }
 
@@ -153,7 +146,9 @@ int startPageJeu(char* usr){
 void destroyPageJeu(){
 	printf("Destruction de la fenetre de jeu\n");
 	isButtonXclicked=0;
+	gdk_threads_enter();
 	gtk_widget_destroy(fenetre);
+	gdk_threads_leave();
 	printf("Destroy de jeu reussi\n");
 }
 

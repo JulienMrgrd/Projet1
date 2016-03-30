@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import other.LeSaviezVousGenerator;
 import other.Protocole;
 import other.ProtocoleCreator;
 
@@ -79,11 +80,11 @@ public class Server{
 					secondsBeforeStartSession = Session.SECONDS_BEFORE_START;
 					sendAll(ProtocoleCreator.create(Protocole.START_TIME_SESSION, Integer.toString(Session.SECONDS_BEFORE_START)));
 					System.out.println("Début de partie dans "+Session.SECONDS_BEFORE_START+" secondes");
-					try { // TODO: décommenter avant soumission !
-//						LeSaviezVousGenerator gen = new LeSaviezVousGenerator();
+					try {
+						LeSaviezVousGenerator gen = new LeSaviezVousGenerator();
 						do{
 							Thread.sleep(Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS*1000);
-//							sendAll(ProtocoleCreator.create(Protocole.LE_SAVIEZ_VOUS,gen.get()));
+							sendAll(ProtocoleCreator.create(Protocole.LE_SAVIEZ_VOUS,gen.get()));
 							secondsBeforeStartSession -= Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS;
 						} while(secondsBeforeStartSession>0);
 					} catch (InterruptedException e) {

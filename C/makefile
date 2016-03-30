@@ -1,5 +1,3 @@
-GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
-
 # Les différents répertoires contenant respectivement les fichiers : Sources *.c, Headers *.h, Objets *.o, l'exécutable
 SRCDIR=src
 HEADDIR=include
@@ -9,7 +7,7 @@ LIBDIR=objet
 # Les différentes options de compilations, soyons strictes !
 CFLAGS= -I$(HEADDIR) -w
 # Les différents FrameWorks et bibliothèques pour le linkage
-GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
+GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0`
  
 # L'exécutable
 BIN=client

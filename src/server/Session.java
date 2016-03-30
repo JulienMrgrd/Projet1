@@ -15,7 +15,7 @@ import utils.StringUtils;
 public class Session {
 
 	public static final int SCORE_MAX = 10;
-	public static final int SECONDS_BEFORE_START = 5;
+	public static final int SECONDS_BEFORE_START = 20;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
 	public static final int SECONDS_REFLEXION = 120;
 	public static final int SECONDS_ENCHERES = 40;
@@ -161,7 +161,7 @@ public class Session {
 		
 		synchronized (this) {
 			try {
-				this.wait(SECONDS_REFLEXION*1000);
+				this.wait((SECONDS_REFLEXION+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -178,7 +178,7 @@ public class Session {
 		System.out.println("startEncheres ("+SECONDS_ENCHERES+" sec)");
 		if(nbCoupsVainqueurReflexion!=null && vainqueurReflexion!=null) addEncheres(new Enchere(vainqueurReflexion, nbCoupsVainqueurReflexion));
 		try {
-			Thread.sleep(SECONDS_ENCHERES*1000);
+			Thread.sleep((SECONDS_ENCHERES+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -213,7 +213,7 @@ public class Session {
 		System.out.println("startResolution ("+SECONDS_RESOLUTION+" sec) avec "+actif);
 		synchronized (this) {
 			try {
-				this.wait(SECONDS_RESOLUTION*1000);
+				this.wait((SECONDS_RESOLUTION+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
