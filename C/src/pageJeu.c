@@ -181,9 +181,10 @@ int startPageJeu(char* usr)
 
 	isClosed = 0;
 	//	strcpy(user,usr);
-	if( !g_thread_supported()) g_thread_init( NULL );
-	gdk_threads_init();
+	//if( !g_thread_supported()) g_thread_init( NULL );
+	//gdk_threads_init();
 
+	gtk_init(NULL,NULL);
     builder = gtk_builder_new();
     filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 
@@ -199,7 +200,7 @@ int startPageJeu(char* usr)
 
     pTable=gtk_table_new(48,20,FALSE);
 
-   gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "hpaned3")), GTK_WIDGET(pTable));
+   gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
    printf("avant le for");
    int i=0;
    int j=0;
