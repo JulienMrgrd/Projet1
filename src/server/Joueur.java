@@ -196,6 +196,21 @@ public class Joueur extends Thread{
 				}
 			}
 
+		} else if(cmd.startsWith(Protocole.CHAT.name())){ //CHAT/user/message 
+			Session session = server.getSession();
+			if(session.hasStarted() && session.isPlaying(this)){
+				String message = null;
+				try{
+					message = msgs[2]; // msgs[2] = message
+					System.out.println(pseudo+" propose sa solution : "+message);
+				} catch (ArrayIndexOutOfBoundsException exc){}
+				if(message==null){
+					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
+				} else {
+					server.sendAllButThis(message, this);
+				}
+			}
+
 		} else {
 			this.sendToJoueur(Protocole.UNKNOWN_CMD.name());
 		}
