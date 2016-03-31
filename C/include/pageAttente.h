@@ -9,7 +9,7 @@
 #include <unistd.h> /* close */
 #include <netdb.h> /* gethostbyname */
 
-int startPageAttente();
+int startPageAttente(char* pseudo);
 void destroyPageAttente();
 void addMessageServerPageAttente(char *message);
  

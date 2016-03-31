@@ -3,3 +3,4 @@
 
 char **splitWithString(char *str, char* separator);
 char **splitWithChar(char *str, char separator);
+int isNonPrintable(char* chaine);

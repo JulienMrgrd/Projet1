@@ -7,7 +7,7 @@ LIBDIR=objet
 # Les différentes options de compilations, soyons strictes !
 CFLAGS= -I$(HEADDIR) -w
 # Les différents FrameWorks et bibliothèques pour le linkage
-GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0`
+GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
  
 # L'exécutable
 BIN=client

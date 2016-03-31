@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <unistd.h> /* close */
 #include <netdb.h> /* gethostbyname */
+
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 struct sockaddr_in server;

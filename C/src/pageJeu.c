@@ -10,10 +10,10 @@ static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked=1;
 static int isClosed = 0;
-GtkWidget *pTable;
-GtkLabel *pLabel[17][17];
-char* murLabel[17][17];
-pthread_t temps;
+static GtkWidget *pTable;
+static GtkLabel *pLabel[17][17];
+static char* murLabel[17][17];
+static pthread_t temps;
 
 
 int enchere(GtkWidget * p_wid, gpointer p_data){
@@ -54,7 +54,6 @@ void addMurTableau(int x, int y, char *mur){
 	}
 }
 
-
 void addMurTableauCible(int x, int y, char *mur){
 	char *tmp;
 	tmp=strdup("c");
@@ -69,6 +68,7 @@ void addMurTableauCible(int x, int y, char *mur){
 		addMurTableau(x,y,tmp);
 	}
 }
+
 
 void addMurTableauBase(){
 	int i=0;
@@ -308,15 +308,13 @@ void threadChronoResolution(){
 	}
 }
 
-int startPageJeu(char* usr)
-{
+int startPageJeu(char* plateau){
 
 	isClosed = 0;
-	//	strcpy(user,usr);
+	
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
 
-	gtk_init(NULL,NULL);
     builder = gtk_builder_new();
     filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 

@@ -30,3 +30,16 @@ char **splitWithChar(char *str, char separator) {
 	res[nbstr - 1] =  NULL;
 	return res;
 }
+
+// Retourne 1 si la chaine n'est pas printable
+int isNonPrintable(char* chaine){
+	if(chaine==NULL) return 1;
+	char* str = chaine;
+	while(*str){
+		if(isprint(*str)){
+			return 0;
+		}
+		str++;
+	}
+	return 1;
+}

@@ -11,6 +11,11 @@ typedef int SOCKET;
 SOCKET sock;
 char user[50];
 
+/* callback */
+static void destroy( GtkWidget *widget, gpointer   data ){
+	gtk_main_quit ();
+}
+
 int connexion(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
 
@@ -24,17 +29,15 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
 	}
 }
 
-/* callback */
-static void destroy( GtkWidget *widget, gpointer   data ){
-	gtk_main_quit ();
-}
 
 int startPageConnexion(){
+	printf("Startpage connexion\n");
 	isClosed = 0;
+
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
+	gdk_threads_enter();
 
-	gtk_init(NULL,NULL);
 	builder = gtk_builder_new();
 	filename =  g_build_filename ("glade_files/pageConnexion.glade", NULL);
 
@@ -54,6 +57,7 @@ int startPageConnexion(){
 
 	gtk_widget_show_all (fenetre);
 	gtk_main();
+	gdk_threads_leave();
 
 	isClosed = 1;
 	printf("Fin de la fonction startPageConnexion\n");
@@ -62,7 +66,7 @@ int startPageConnexion(){
 
 /* Appelé par le programme pour fermer la fenêtre */
 void destroyPageConnexion(){
-	printf("Destruction de la fenetre\n");
+	printf("Destruction de la fenetre de connexion\n");
 	isButtonXclicked=0;
 	gdk_threads_enter();
 	gtk_widget_destroy(fenetre);
@@ -73,11 +77,13 @@ void destroyPageConnexion(){
 void changeLabelPageConnexion(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	gdk_threads_enter();
+	printf("Before changer label\n");
 	{
 		GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "user"));
 		printf("Label before = %s\n", gtk_label_get_text(lab));
 		gtk_label_set_text(lab, message);
 		printf("Label after = %s\n", gtk_label_get_text(lab));
 	}
+	printf("After changer label\n");
 	gdk_threads_leave();
 }
