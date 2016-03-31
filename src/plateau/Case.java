@@ -177,10 +177,10 @@ public class Case {
 		if(!containsMur()) return "";
 		String res = "";
 		for(Mur m : murs){
-			res+="("+x+","+y+","+m+"),";
+			res+="("+x+","+y+","+m+")";
 		}
 		for(Mur m : mursInvisibles){
-			res+="("+x+","+y+","+m+"),";
+			res+="("+x+","+y+","+m+")";
 		}
 		if(res.endsWith(",")) return res.substring(0, res.length()-1); // remove the last "," if exists 
 		return res;
