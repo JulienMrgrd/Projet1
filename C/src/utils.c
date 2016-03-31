@@ -31,6 +31,16 @@ char **splitWithChar(char *str, char separator) {
 	return res;
 }
 
+char *replace(char *st, char *orig, char *repl) {
+	static char buffer[4096];
+	char *ch;
+	if (!(ch = strstr(st, orig))) return st;
+	strncpy(buffer, st, ch-st);
+	buffer[ch-st] = 0;
+	sprintf(buffer+(ch-st), "%s%s", repl, ch+strlen(orig));
+	return buffer;
+}
+
 // Retourne 1 si la chaine n'est pas printable
 int isNonPrintable(char* chaine){
 	if(chaine==NULL) return 1;

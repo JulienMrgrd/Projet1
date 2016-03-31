@@ -14,8 +14,7 @@ void fctThreadFenetreConnexion(){
 	printf("fctThreadFenetreConnexion\n");
 	if(startPageConnexion()==1){
 		printf("Bouton \"X\" cliqué !\n");
-		quit();
-		shutdown(sock, SHUT_RDWR);
+		quit(); // Envoie SORT/user
 	}
 	printf("(thread) Fin affichage connexion\n");
 	pthread_exit(NULL);
@@ -27,7 +26,6 @@ void fctThreadFenetreAttente(){
 	if(startPageAttente(username)==1){
 		printf("Bouton \"X\" cliqué !\n");
 		quit();
-		shutdown(sock, SHUT_RDWR);
 	}
 	printf("(thread) Fin affichage d'attente\n");
 	pthread_exit(NULL);
@@ -38,7 +36,6 @@ void fctThreadFenetreJeu(char* plateau){
 	if(startPageJeu(plateau)==1){
 		printf("Bouton \"X\" cliqué !\n");
 		quit();
-		shutdown(sock, SHUT_RDWR);
 	}
 	printf("(thread) Fin affichage jeu\n");
 	pthread_exit(NULL);
@@ -231,6 +228,7 @@ void quit(){
 	strcpy(message,"SORT/");
 	strcat(message, username);
 	sendToServer(message);
+	shutdown(sock, SHUT_RDWR); // Coupe le thread d'écoute, et donc termine le programme
 }
 
 int main(int argc, char* argv[]){

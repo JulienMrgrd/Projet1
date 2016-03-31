@@ -17,26 +17,26 @@ static pthread_t temps;
 
 
 int enchere(GtkWidget * p_wid, gpointer p_data){
-//Ajouter un boolean pour savoir on est dans quel etat
-//Reflexion ou Enchere ou Resolution
-    char coup[255];
-    GtkEntry* entry = (GtkEntry*)p_data;
+	//Ajouter un boolean pour savoir on est dans quel etat
+	//Reflexion ou Enchere ou Resolution
+	char coup[255];
+	GtkEntry* entry = (GtkEntry*)p_data;
 
-    strcpy(coup, gtk_entry_get_text(entry));
+	strcpy(coup, gtk_entry_get_text(entry));
 
-    char fin[2];
-    char mess[255];
-    strcpy(fin,"/");
-    strcpy(mess,"TROUVE/");
+	char fin[2];
+	char mess[255];
+	strcpy(fin,"/");
+	strcpy(mess,"TROUVE/");
 
-    strcat(mess, user);
-    strcat(mess, fin);
-    strcat(mess, coup);
-    strcat(mess, fin);
+	strcat(mess, user);
+	strcat(mess, fin);
+	strcat(mess, coup);
+	strcat(mess, fin);
 
-    send(sock, mess, strlen(mess), 0);
+	send(sock, mess, strlen(mess), 0);
 
-    gtk_button_set_label(GTK_BUTTON(gtk_builder_get_object(builder, "Deconnexion")), "Connexion");
+	gtk_button_set_label(GTK_BUTTON(gtk_builder_get_object(builder, "Deconnexion")), "Connexion");
 
 	return 0;
 
@@ -97,49 +97,45 @@ void addMurTableauBase(){
 
 void setCouleurLabel(int i, int j){
 	gchar* tmp = NULL;
-	gchar* coul;
+	char* mur = murLabel[i][j];
+	char lettre = 'R'; // par défaut (économise des lignes ci-dessous)
+	char couleur[6] = "FF0000"; // par défaut
+	gdk_threads_enter();
 	tmp=g_strdup_printf("%s",gtk_label_get_text (pLabel[i][j]));
-	if(strstr(murLabel[i][j], "B")){
-		if(strstr(murLabel[i][j], "rR")){
-			coul=g_strdup_printf("%s<span foreground=\"#FF0000\" face=\"Sans\"><u><small>R</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rA")){
-			printf("%s\n",murLabel[i][j]);
-			printf(" i = %d j = %d\n",i,j);
-			coul=g_strdup_printf("%s<span foreground=\"#0000FF\" face=\"Sans\"><u><small>R</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rJ")){
-			coul=g_strdup_printf("%s<span foreground=\"#FFFF00\" face=\"Sans\"><u><small>R</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rV")){
-			coul=g_strdup_printf("%s<span foreground=\"#00FF00\" face=\"Sans\"><u><small>R</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cR")){
-			coul=g_strdup_printf("%s<span foreground=\"#FF0000\" face=\"Sans\"><u><small>C</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cA")){
-			coul=g_strdup_printf("%s<span foreground=\"#0000FF\" face=\"Sans\"><u><small>C</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cJ")){
-			coul=g_strdup_printf("%s<span foreground=\"#E3FF00\" face=\"Sans\"><u><small>C</small></u></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cV")){
-			coul=g_strdup_printf("%s<span foreground=\"#00FF00\" face=\"Sans\"><u><small>C</small></u></span>",tmp);
-		}
-	}else{
-		if(strstr(murLabel[i][j], "rR")){
-			coul=g_strdup_printf("%s<span foreground=\"#FF0000\" face=\"Sans\"><small>R</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rA")){
-			coul=g_strdup_printf("%s<span foreground=\"#0000FF\" face=\"Sans\"><small>R</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rJ")){
-			coul=g_strdup_printf("%s<span foreground=\"#FFFF00\" face=\"Sans\"><small>R</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "rV")){
-			coul=g_strdup_printf("%s<span foreground=\"#00FF00\" face=\"Sans\"><small>R</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cR")){
-			coul=g_strdup_printf("%s<span foreground=\"#FF0000\" face=\"Sans\"><small>C</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cA")){
-			coul=g_strdup_printf("%s<span foreground=\"#0000FF\" face=\"Sans\"><small>C</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cJ")){
-			coul=g_strdup_printf("%s<span foreground=\"#E3FF00\" face=\"Sans\"><small>C</small></span>",tmp);
-		}else if(strstr(murLabel[i][j], "cV")){
-			coul=g_strdup_printf("%s<span foreground=\"#00FF00\" face=\"Sans\"><small>C</small></span>",tmp);
-		}
+	gdk_threads_leave();
+
+	int isUnderline = 0;
+	if(strstr(mur, "B")) isUnderline = 1;
+
+	if(strstr(mur, "rR")){
+		// nada, on laisse les valeurs par défaut
+	}else if(strstr(mur, "rA")){
+		sprintf(couleur, "0000FF");
+	}else if(strstr(mur, "rJ")){
+		sprintf(couleur, "FFFF00");
+	}else if(strstr(mur, "rV")){
+		sprintf(couleur, "00FF00");
+	}else if(strstr(mur, "cR")){
+		lettre = 'C'; // couleur par defaut
+	}else if(strstr(mur, "cA")){
+		lettre = 'C';
+		sprintf(couleur, "0000FF");
+	}else if(strstr(mur, "cJ")){
+		lettre = 'C';
+		sprintf(couleur, "E3FF00");
+	}else if(strstr(mur, "cV")){
+		lettre = 'C';
+		sprintf(couleur, "00FF00");
 	}
+
+	gchar* coul;
+	if(isUnderline==1) coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",tmp, couleur, lettre);
+	else g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",tmp, couleur, lettre);
+
+	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[i][j], TRUE);
 	gtk_label_set_markup(pLabel[i][j], coul);
+	gdk_threads_leave();
 }
 
 
@@ -150,75 +146,69 @@ void addMurLabel(){
 
 	for(i=0; i<16;i++){
 		for(j=16;j>=0;j--){
-    		pLabel[i][j]=gtk_label_new("");
+			pLabel[i][j]=gtk_label_new("");
 			if(strstr(murLabel[i][j], "G")){
 				if((i!=0)&&(j!=16)&& (strstr(murLabel[i-1][j],"D") &&  ((strstr(murLabel[i-1][j+1],"B")) || (strstr(murLabel[i-1][j],"B"))))
 						&& 	!strstr(murLabel[i][j], "B") && !strstr(murLabel[i][j+1], "B") ){
-						gdk_threads_enter();
-						pLabel[i][j]= gtk_label_new(" ");
-						gdk_threads_leave();
-					}else{
-						gdk_threads_enter();
-						pLabel[i][j]= gtk_label_new("|");
-						gdk_threads_leave();
-					}
+					pLabel[i][j]= gtk_label_new(" ");
+				}else{
+					pLabel[i][j]= gtk_label_new("|");
+				}
 			}else {
-				gdk_threads_enter();
 				pLabel[i][j]= gtk_label_new("  ");
-				gdk_threads_leave();
 			}
+			gdk_threads_enter();
 			tmp=g_strdup_printf("%s",gtk_label_get_text (pLabel[i][j]));
+			gdk_threads_leave();
 			if(strstr(murLabel[i][j],"r")||strstr(murLabel[i][j],"c")){
 				setCouleurLabel(i,j);
 			}else{
-				if(strstr(murLabel[i][j], "B")){
-						tmp=g_strdup_printf("%s_",tmp);
-						gdk_threads_enter();
-						gtk_label_set_text (pLabel[i][j],tmp);
-						gdk_threads_leave();
-				}else {
-					tmp=g_strdup_printf("%s ",tmp);
-					gdk_threads_enter();
-					gtk_label_set_text (pLabel[i][j],tmp);
-					gdk_threads_leave();
-				}
-			}
-			tmp=g_strdup_printf("%s",gtk_label_get_label (pLabel[i][j]));
-			if(strstr(murLabel[i][j], "D")){
-				if((i!=15)&&(j!=16)&&(strstr(murLabel[i+1][j],"G") &&  ((strstr(murLabel[i+1][j+1],"B")) || (strstr(murLabel[i+1][j],"B"))))){
-						tmp=g_strdup_printf("%s ",tmp);
-						gdk_threads_enter();
-						gtk_label_set_markup (pLabel[i][j],tmp);
-						gdk_threads_leave();
-					}else{
-						tmp=strdup(gtk_label_get_text (pLabel[i][j]));
-						tmp=g_strdup_printf("%s|",tmp);
-						gdk_threads_enter();
-						gtk_label_set_markup (pLabel[i][j],tmp);
-						gdk_threads_leave();
-					}
-			}else {
+				if(strstr(murLabel[i][j], "B")) tmp=g_strdup_printf("%s_",tmp);
+				else tmp=g_strdup_printf("%s ",tmp);
 				gdk_threads_enter();
-				tmp=g_strdup_printf("%s ",tmp);
-				gtk_label_set_markup (pLabel[i][j],tmp);
+				gtk_label_set_text (pLabel[i][j],tmp);
 				gdk_threads_leave();
 			}
+			gdk_threads_enter();
+			tmp=g_strdup_printf("%s",gtk_label_get_label (pLabel[i][j]));
+			gdk_threads_enter();
+			if(strstr(murLabel[i][j], "D")){
+				if( (i!=15) && (j!=16) && (strstr(murLabel[i+1][j],"G")
+						&&  ((strstr(murLabel[i+1][j+1],"B")) || (strstr(murLabel[i+1][j],"B"))) )){
+					tmp=g_strdup_printf("%s ",tmp);
+				}else{
+					gdk_threads_enter();
+					tmp=strdup(gtk_label_get_text (pLabel[i][j]));
+					gdk_threads_leave();
+					tmp=g_strdup_printf("%s|",tmp);
+				}
+			}else {
+				tmp=g_strdup_printf("%s ",tmp);
+			}
+			gdk_threads_enter();
+			gtk_label_set_markup (pLabel[i][j],tmp);
+			gdk_threads_leave();
 		}
 	}
 	gchar* xSouligne;
 	xSouligne="|<span face=\"Sans\"><small><small><small>    </small></small></small></span>";
+	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][8], TRUE);
 	gtk_label_set_markup(pLabel[7][8], xSouligne);
+	gdk_threads_enter();
 
-	xSouligne;
 	xSouligne="|<span face=\"Sans\"><u><small><small><small>360</small></small></small></u></span>";
+	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
 	gtk_label_set_markup(pLabel[7][7], xSouligne);
+	gdk_threads_enter();
 
 	gchar* secSouligne;
 	secSouligne="<span face=\"Sans\"><u><small><small>S</small></small></u></span> |";
+	gdk_threads_enter();	
 	gtk_label_set_use_markup(pLabel[8][7], TRUE);
 	gtk_label_set_markup(pLabel[8][7], secSouligne);
+	gdk_threads_enter();
 }
 
 
@@ -240,17 +230,6 @@ void addMurTableauPlateau(char* plateau){
 		}
 	}
 }
-
-char *replace(char *st, char *orig, char *repl) {
-  static char buffer[4096];
-  char *ch;
-  if (!(ch = strstr(st, orig)))
-   return st;
-  strncpy(buffer, st, ch-st);
-  buffer[ch-st] = 0;
-  sprintf(buffer+(ch-st), "%s%s", repl, ch+strlen(orig));
-  return buffer;
-  }
 
 void addRobotCible(char* enigme){
 
@@ -281,37 +260,16 @@ void addRobotCible(char* enigme){
 	}
 }
 
-void threadChronoReflexion(){
-	int chrono=300;
+void threadChrono(int chrono){
 	gchar* temps;
+	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
+	gdk_threads_leave();
 	while(chrono>=0){
 		temps=g_strdup_printf("|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>",chrono);
+		gdk_threads_enter();
 		gtk_label_set_markup(pLabel[7][7], temps);
-		sleep(1);
-		chrono--;
-	}
-}
-
-void threadChronoEnchere(){
-	int chrono=40;
-	gchar* temps;
-	gtk_label_set_use_markup(pLabel[7][7], TRUE);
-	while(chrono>=0){
-		temps=g_strdup_printf("|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>",chrono);
-		gtk_label_set_markup(pLabel[7][7], temps);
-		sleep(1);
-		chrono--;
-	}
-}
-
-void threadChronoResolution(){
-	int chrono=60;
-	gchar* temps;
-	gtk_label_set_use_markup(pLabel[7][7], TRUE);
-	while(chrono>=0){
-		temps=g_strdup_printf("|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>",chrono);
-		gtk_label_set_markup(pLabel[7][7], temps);
+		gdk_threads_leave();
 		sleep(1);
 		chrono--;
 	}
@@ -319,11 +277,11 @@ void threadChronoResolution(){
 
 void affichageBilan(char *bilan){
 	gchar* bil;
-    gdk_threads_enter();
+	gdk_threads_enter();
 	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
 	bil=g_strdup_printf("%s",bilan);
 	gtk_label_set_text(lab, bil);
-    gdk_threads_leave();
+	gdk_threads_leave();
 }
 
 void startReflexion(char* enigme, char *bilan){
@@ -334,11 +292,10 @@ void startReflexion(char* enigme, char *bilan){
 
 int startPageJeu(char* plateau){
 
-
-   int i=0;
-   int j=0;
-   int x=0;
-   int y=0;
+	int i=0;
+	int j=0;
+	int x=0;
+	int y=0;
 
 	for(x=0;x<17;x++){
 		for(y=0;y<17;y++){
@@ -347,50 +304,50 @@ int startPageJeu(char* plateau){
 	}
 
 	isClosed = 0;
-	
+
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
 
-    builder = gtk_builder_new();
-    filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
+	builder = gtk_builder_new();
+	filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 
-    gtk_builder_add_from_file (builder, filename, &error);
-    g_free (filename);
-    if (error){
+	gtk_builder_add_from_file (builder, filename, &error);
+	g_free (filename);
+	if (error){
 		gint code = error->code;
 		g_printerr("%s\n", error->message);
 		g_error_free (error);
 		return code;
-    }
-    fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
+	}
+	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 
-    pTable=gtk_table_new(48,20,FALSE);
-    gdk_threads_enter();
-   gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
-	gdk_threads_leave();
+	pTable=gtk_table_new(48,20,FALSE);
+	gdk_threads_enter();
+	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
 
-    addMurTableauBase();
+	addMurTableauBase();
 
-    addMurTableauPlateau(plateau);
+	addMurTableauPlateau(plateau);
 
-    addMurLabel();
+	addMurLabel();
 
-    for(i=0;i<16;i++){
-    	for(j=16;j>=0;j--){
+	for(i=0;i<16;i++){
+		for(j=16;j>=0;j--){
 			gtk_table_attach(GTK_TABLE(pTable), pLabel[i][j],
-								  i*3,i*3+2, 16-j, 16-j+1,
-								  GTK_SHRINK ,  GTK_SHRINK,
-								  0, 0);
-    	}
-    }
+					i*3,i*3+2, 16-j, 16-j+1,
+					GTK_SHRINK ,  GTK_SHRINK,
+					0, 0);
+		}
+	}
 
-    gtk_widget_show_all (fenetre);
+	gtk_widget_show_all (fenetre);
 
-    pthread_create(&temps, NULL, threadChronoReflexion, NULL);
+	pthread_create(&temps, NULL, threadChrono, 300);
 
-    gtk_main();
-
-    isClosed = 1;
+	gtk_main();
+	gdk_threads_leave();
+	
+	isClosed = 1;
 	return isButtonXclicked;
 }
 
