@@ -46,6 +46,7 @@ public enum Protocole {
 	START_TIME_SESSION, // indique au client que la partie va commencer dans X secondes
 	START_CANCEL_SESSION, // indique au client que la partie est annulée, faute de 2 joueurs
 	LE_SAVIEZ_VOUS,
+	CHAT,
 	;
 	
 }

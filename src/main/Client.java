@@ -10,8 +10,8 @@ import java.util.Scanner;
 import other.Protocole;
 import utils.PlateauUtils;
 
-public class Client
-{  
+public class Client{  
+	
 	private Socket socket = null;
 	private Scanner  console = null;
 	private PrintWriter streamOut = null;
@@ -22,7 +22,7 @@ public class Client
 		try {  
 			socket = new Socket(serverName, serverPort);
 			System.out.println("Connected: " + socket);
-			
+
 			runThreadEcouteSocket();
 			// Out
 			console   = new Scanner(System.in);
@@ -35,7 +35,7 @@ public class Client
 			System.out.println("Unexpected exception: " + ioe.getMessage());
 		}
 		String line = "";
-		
+
 		System.out.println("Vous pouvez parler au serveur.");
 		try{
 			while ( !hasBeenStopped && (line = console.nextLine())!="exit."){  
@@ -54,14 +54,14 @@ public class Client
 			@Override
 			public void run() {
 				if(socket!=null){
-					
+
 					BufferedReader reader = null;
 					String plateau = "";
 					String enigme = "";
 					try {
 						reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 						while(true){
-							
+
 							String str;
 							try {
 								str = reader.readLine();
@@ -69,32 +69,32 @@ public class Client
 									serverHS();
 									return;
 								} else if(str.isEmpty()){
-//									System.out.println("message vide du server");
+									//									System.out.println("message vide du server");
 								} else {
 									System.out.println(str);
 								}
-								
+
 								if(str.startsWith(Protocole.SESSION.name())){
 									plateau = str.split("/")[1];
 								}
-								
+
 								if(str.startsWith(Protocole.TOUR.name())){
 									enigme = str.split("/")[1];
 									System.out.println();
 									PlateauUtils.display(PlateauUtils.getPlateauDeBase(), plateau, enigme);
 									System.out.println("\n");
 								}
-								
+
 								if(str.equals(Protocole.BYE.name())){
 									stop();
 									return;
 								}
-								
+
 							} catch (IOException e) {
 								serverHS();
 								return;
 							}
-							
+
 						}
 					} catch (IOException e1) {
 						System.out.println("Problème de création du reader");
@@ -109,7 +109,7 @@ public class Client
 			}
 		}).start();
 	}
-	
+
 	public void stop(){
 		hasBeenStopped = true;
 		try {  
@@ -123,14 +123,14 @@ public class Client
 			System.out.println("Error closing ...");
 		}
 	}
-	
+
 	private void serverHS() {
 		System.out.println("Serveur HS");
 		stop();
 	}
 
 	public static void main(String args[]) throws UnknownHostException{
-//		new Client("JulienM-HP", Server.PORT);
+		//		new Client("JulienM-HP", Server.PORT);
 		new Client("localhost", MainServer.PORT);
 	}
 }
