@@ -327,7 +327,7 @@ void affichageBilan(char *bilan){
 }
 
 void startReflexion(char* enigme, char *bilan){
-	printf("enigme = %s \n",enigme);
+	printf("enigme === %s \n",enigme);
 	addRobotCible(enigme);
 	affichageBilan(bilan);
 }
