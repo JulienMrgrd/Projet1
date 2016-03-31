@@ -171,7 +171,7 @@ void addMurLabel(){
 			}
 			gdk_threads_enter();
 			tmp=g_strdup_printf("%s",gtk_label_get_label (pLabel[i][j]));
-			gdk_threads_enter();
+			gdk_threads_leave();
 			if(strstr(murLabel[i][j], "D")){
 				if( (i!=15) && (j!=16) && (strstr(murLabel[i+1][j],"G")
 						&&  ((strstr(murLabel[i+1][j+1],"B")) || (strstr(murLabel[i+1][j],"B"))) )){
@@ -195,20 +195,20 @@ void addMurLabel(){
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][8], TRUE);
 	gtk_label_set_markup(pLabel[7][8], xSouligne);
-	gdk_threads_enter();
+	gdk_threads_leave();
 
 	xSouligne="|<span face=\"Sans\"><u><small><small><small>360</small></small></small></u></span>";
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
 	gtk_label_set_markup(pLabel[7][7], xSouligne);
-	gdk_threads_enter();
+	gdk_threads_leave();
 
 	gchar* secSouligne;
 	secSouligne="<span face=\"Sans\"><u><small><small>S</small></small></u></span> |";
 	gdk_threads_enter();	
 	gtk_label_set_use_markup(pLabel[8][7], TRUE);
 	gtk_label_set_markup(pLabel[8][7], secSouligne);
-	gdk_threads_enter();
+	gdk_threads_leave();
 }
 
 
@@ -307,7 +307,7 @@ int startPageJeu(char* plateau){
 
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
-
+	gdk_threads_enter();
 	builder = gtk_builder_new();
 	filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 
@@ -322,7 +322,6 @@ int startPageJeu(char* plateau){
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 
 	pTable=gtk_table_new(48,20,FALSE);
-	gdk_threads_enter();
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
 
 	addMurTableauBase();
