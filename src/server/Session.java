@@ -17,7 +17,7 @@ public class Session {
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 30;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
-	public static final int SECONDS_REFLEXION = 120;
+	public static final int SECONDS_REFLEXION = 30;
 	public static final int SECONDS_ENCHERES = 40;
 	public static final int SECONDS_RESOLUTION = 60;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
@@ -91,7 +91,7 @@ public class Session {
 			}
 		}
 
-		sendToAllPlaying(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
+		if(nbTours==1) sendToAllPlaying(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
 		
 		if(getNbActifs()<=1){
 			if(getNbActifs()==1) sendVainqueur(allPlaying.get(0));
@@ -141,7 +141,7 @@ public class Session {
 
 		case MaxScoreReached:
 			System.out.println("case : Max score reached");
-			server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, actif.getPseudo()));
+			sendVainqueur(actif);
 			stopSession();
 			break;
 
@@ -157,6 +157,9 @@ public class Session {
 
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
+		try {
+			Thread.sleep(5); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
+		} catch (InterruptedException e1) {}
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
 		synchronized (this) {
@@ -280,7 +283,7 @@ public class Session {
 	
 	private void sendVainqueur(Joueur joueur) {
 		System.out.println("Vainqueur : "+joueur.getPseudo());
-		server.sendAll(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
 	}
 	
 	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */

@@ -32,7 +32,7 @@ void fctThreadFenetreAttente(){
 }
 
 void fctThreadFenetreJeu(char* plateau){
-	printf("fctThreadFenetreConnexion\n");
+	printf("fctThreadFenetreJeu\n");
 	if(startPageJeu(plateau)==1){
 		printf("Bouton \"X\" cliqué !\n");
 		quit();
@@ -151,7 +151,7 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"TOUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // enigme
 			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // bilan
-			//TODO: startReflexion(argOne, split[2]);
+			startReflexion(argOne, split[2]);
 
 		} else if(!strcmp(prot,"TUASTROUVE")){
 			sprintf(affich,"[serveur] : Tu es le premier à avoir trouvé !");

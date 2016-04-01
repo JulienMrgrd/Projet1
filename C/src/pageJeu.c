@@ -44,6 +44,7 @@ int enchere(GtkWidget * p_wid, gpointer p_data){
 
 
 void addMurTableau(int x, int y, char *mur){
+	printf("On entre ici\n");
 	if (strstr(murLabel[x][y], mur) != NULL) {
 	}else{
 		if(!strcmp(mur,"H")){
@@ -129,8 +130,8 @@ void setCouleurLabel(int i, int j){
 	}
 
 	gchar* coul;
-	if(isUnderline==1) coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",tmp, couleur, lettre);
-	else g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",tmp, couleur, lettre);
+	if(isUnderline==1) coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%s</small></u></span>",tmp, couleur, lettre);
+	else g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%s</small></span>",tmp, couleur, lettre);
 
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[i][j], TRUE);
@@ -232,7 +233,8 @@ void addMurTableauPlateau(char* plateau){
 }
 
 void addRobotCible(char* enigme){
-
+	printf("On entre dans addRobotCible \n");
+	printf("enigme == %s\n",enigme);
 	char** splitParentOuvr = splitWithChar(enigme, '(');
 	char** splitParentFerm;
 	char** splitVirgule;
@@ -245,19 +247,16 @@ void addRobotCible(char* enigme){
 	char *s;
 	char *tmp;
 	tmp=strdup("");
-	for (i=0; (splitParentOuvr[i] != NULL) ; i++) {
-		if(strlen(splitParentOuvr[i])!=0){
-			splitParentFerm = splitWithChar(splitParentOuvr[i], ')');
-			for(j=0; (splitParentFerm[j] != NULL) ; j++){
-				splitVirgule = splitWithChar(splitParentFerm[j], ',');
-				addMurTableau(atoi(splitVirgule[0]),atoi(splitVirgule[1]),"rR");
-				addMurTableau(atoi(splitVirgule[2]),atoi(splitVirgule[3]),"rA");
-				addMurTableau(atoi(splitVirgule[4]),atoi(splitVirgule[5]),"rJ");
-				addMurTableau(atoi(splitVirgule[6]),atoi(splitVirgule[7]),"rV");
-				addMurTableauCible(atoi(splitVirgule[8]),atoi(splitVirgule[9]),splitVirgule[10]);
-			}
-		}
-	}
+
+	splitParentFerm = splitWithChar(splitParentOuvr[1], ')');
+	splitVirgule = splitWithChar(splitParentFerm[0], ',');
+	printf("SplintVirgule[10]=%s\n",splitVirgule[9]);
+	addMurTableau(atoi(splitVirgule[0]),atoi(splitVirgule[1]),"rR");
+	/*addMurTableau(atoi(splitVirgule[2]),atoi(splitVirgule[3]),"rA");
+	addMurTableau(atoi(splitVirgule[4]),atoi(splitVirgule[5]),"rJ");
+	addMurTableau(atoi(splitVirgule[6]),atoi(splitVirgule[7]),"rV");
+	addMurTableauCible(atoi(splitVirgule[8]),atoi(splitVirgule[9]),splitVirgule[10]);
+*/
 }
 
 void threadChrono(int chrono){
@@ -276,6 +275,8 @@ void threadChrono(int chrono){
 }
 
 void affichageBilan(char *bilan){
+	printf("on entre dans affichage bilan\n");
+	printf("bilan ==== %s\n",bilan);
 	gchar* bil;
 	gdk_threads_enter();
 	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
@@ -286,8 +287,8 @@ void affichageBilan(char *bilan){
 
 void startReflexion(char* enigme, char *bilan){
 	printf("enigme === %s \n",enigme);
-	addRobotCible(enigme);
 	affichageBilan(bilan);
+	addRobotCible(enigme);
 }
 
 int startPageJeu(char* plateau){
@@ -303,11 +304,19 @@ int startPageJeu(char* plateau){
 		}
 	}
 
-	isClosed = 0;
-
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
+
+	addMurTableauBase();
+	addMurTableauPlateau(plateau);
+	addMurLabel();
+
+	isClosed = 0;
+
+
+	printf("Before init \n");
 	gdk_threads_enter();
+
 	builder = gtk_builder_new();
 	filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 
@@ -324,12 +333,6 @@ int startPageJeu(char* plateau){
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
 
-	addMurTableauBase();
-
-	addMurTableauPlateau(plateau);
-
-	addMurLabel();
-
 	for(i=0;i<16;i++){
 		for(j=16;j>=0;j--){
 			gtk_table_attach(GTK_TABLE(pTable), pLabel[i][j],
@@ -343,6 +346,7 @@ int startPageJeu(char* plateau){
 
 	pthread_create(&temps, NULL, threadChrono, 300);
 
+	printf("Before main \n");
 	gtk_main();
 	gdk_threads_leave();
 	

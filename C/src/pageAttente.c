@@ -89,21 +89,11 @@ void addMessageServerPageAttente(char* message){
 		printf("getText non vide\n");
 		char* res[strlen(toDisplay) + strlen(message) + 2];
 		printf("Après instanc toDisplay\n");
-		printf("Label before = %s\n", toDisplay);
 		sprintf(res, "%s\n%s", toDisplay, message);
 		printf("Après cat toDisplay\n");
 		gdk_threads_enter();
 		gtk_label_set_text(lab, res);
 		gdk_threads_leave();
-//		toDisplay=NULL;
-//		res=NULL;
 	}
-	printf("Après setText\n");
-	gdk_threads_enter();
-	printf("Label after = %s\n", gtk_label_get_text(lab));
-	gdk_threads_leave();
 	printf("Après ajouter message attente\n");
-
-	printf("Après leave le thread message attente\n");
-//	sleep(1);
 }
