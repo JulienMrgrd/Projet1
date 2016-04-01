@@ -23,7 +23,7 @@ static int phaseResolution=0;
 static int phaseEnchere=0;
 static int xR,xA,xJ,xV,xC;
 static int yR,yA,yJ,yV,yC;
-static int cC;
+static char* cC;
 
 int solution(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
@@ -494,12 +494,17 @@ void addRobotCible(char* enigme){
 	yV=atoi(splitVirgule[7]);
 	xC=atoi(splitVirgule[8]);
 	yC=atoi(splitVirgule[9]);
-	cC=strdup("");
+	printf("Before cC\n");
+	cC=strdup("c");
+	printf("After cC\n");
 	if(strstr(splitVirgule[10],"B")){
-		sprintf(cC,"cA");
+		printf("then\n");
+		strcat(cC, "A");
 	}else{
-		sprintf(cC,"c%s",splitVirgule[10]);
+		printf("else\n");
+		strcat(cC, splitVirgule[10]);
 	}
+	printf("AFter splitVirgule 10\n");
 //
 //	addMurTableau(xR,yR,"rR");
 //	addMurTableau(xA,yA,"rA");
@@ -540,6 +545,7 @@ void startReflexion(char* enigme, char *bilan){
 	printf("enigme === %s \n",enigme);
 	affichageBilan(bilan);
 	addRobotCible(enigme);
+	printf("Before display robot\n");
 	displayRobot();
 	printf("fin startreflex\n");
 }
