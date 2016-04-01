@@ -33,7 +33,7 @@ void fctThreadFenetreAttente(){
 
 void fctThreadFenetreJeu(char* plateau){
 	printf("fctThreadFenetreJeu\n");
-	if(startPageJeu(plateau)==1){
+	if(startPageJeu(plateau,username)==1){
 		printf("Bouton \"X\" cliqué !\n");
 		quit();
 	}
@@ -129,9 +129,6 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"SESSION")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
-			sprintf(affich,"[serveur] : La partie commence !");
-			addMessageServerPageAttente(affich);
-			sleep(1);
 			destroyPageAttente();
 			if(pthread_create(&threadFenetreJeu, NULL, fctThreadFenetreJeu, argOne)) {
 				perror("pthread_create");
@@ -151,6 +148,7 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"TOUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // enigme
 			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // bilan
+			sleep(1);
 			startReflexion(argOne, split[2]);
 
 		} else if(!strcmp(prot,"TUASTROUVE")){

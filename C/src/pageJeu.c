@@ -18,9 +18,9 @@ static GtkLabel *pLabel[17][17];
 static char* murLabel[17][17];
 static pthread_t temps;
 static char* name;
-int phaseReflexion=0;
-int phaseSolution=0;
-int phaseEnchere=0;
+static int phaseReflexion=0;
+static int phaseResolution=0;
+static int phaseEnchere=0;
 
 int solution(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
@@ -55,7 +55,7 @@ void setPhase(char *phase){
 		gtk_button_set_label(buttonSoumission, "Encherir");
 		gdk_threads_leave();
 		phaseReflexion=0;
-		phaseSolution=0;
+		phaseResolution=0;
 		phaseEnchere=1;
 	}
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
@@ -65,14 +65,14 @@ void setPhase(char *phase){
 		gdk_threads_leave();
 		phaseEnchere=0;
 		phaseReflexion=0;
-		phaseSolution=1;
+		phaseResolution=1;
 	}
 	if(strstr(phase,"REFLEXION")){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "phase Reflexion");
 		gtk_button_set_label(buttonSoumission, "Encherir");
 		gdk_threads_leave();
-		phaseSolution=0;
+		phaseResolution=0;
 		phaseReflexion=1;
 		phaseEnchere=0;
 	}
@@ -97,7 +97,6 @@ int chat(GtkWidget * p_wid, gpointer p_data){
 }
 
 void addMurTableau(int x, int y, char *mur){
-	printf("On entre ici\n");
 	if (strstr(murLabel[x][y], mur) != NULL) {
 	}else{
 		if(!strcmp(mur,"H")){
@@ -192,7 +191,7 @@ void setCouleurLabel(int i, int j){
 }
 
 
-void addMurLabel(){
+void display(){
 	int i=0;
 	int j=0;
 	gchar* tmp = NULL;
@@ -304,11 +303,11 @@ void addRobotCible(char* enigme){
 	splitVirgule = splitWithChar(splitParentFerm[0], ',');
 	printf("SplintVirgule[10]=%s\n",splitVirgule[9]);
 	addMurTableau(atoi(splitVirgule[0]),atoi(splitVirgule[1]),"rR");
-	/*addMurTableau(atoi(splitVirgule[2]),atoi(splitVirgule[3]),"rA");
+	addMurTableau(atoi(splitVirgule[2]),atoi(splitVirgule[3]),"rA");
 	addMurTableau(atoi(splitVirgule[4]),atoi(splitVirgule[5]),"rJ");
 	addMurTableau(atoi(splitVirgule[6]),atoi(splitVirgule[7]),"rV");
 	addMurTableauCible(atoi(splitVirgule[8]),atoi(splitVirgule[9]),splitVirgule[10]);
-*/
+
 }
 
 void threadChrono(int chrono){
@@ -341,6 +340,8 @@ void startReflexion(char* enigme, char *bilan){
 	printf("enigme === %s \n",enigme);
 	affichageBilan(bilan);
 	addRobotCible(enigme);
+	display();
+	printf("fin startreflex\n");
 }
 
 int startPageJeu(char* plateau, char* pseudo){
@@ -349,20 +350,24 @@ int startPageJeu(char* plateau, char* pseudo){
 	int j=0;
 	int x=0;
 	int y=0;
-
+	printf("on entre dans StartPageJEu\n");
 	for(x=0;x<17;x++){
 		for(y=0;y<17;y++){
 			murLabel[x][y]=strdup("");
+			pLabel[x][y]=gtk_label_new("");
+
 		}
 	}
-	
+	printf("apreesStartPageJEu\n");
+	name = strdup("");
 	sprintf(name,"%s",pseudo);
+	printf("apres name\n");
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
 
 	addMurTableauBase();
 	addMurTableauPlateau(plateau);
-	addMurLabel();
+	//display();
 
 	isClosed = 0;
 
@@ -400,7 +405,7 @@ int startPageJeu(char* plateau, char* pseudo){
 
 	setPhase("Reflexion");
 
-	g_signal_connect (gtk_builder_get_object (builder, "soumission"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder, "proposition")));
+	g_signal_connect (gtk_builder_get_object (builder, "soumission"), "clicked", G_CALLBACK (solution),(gpointer)(gtk_builder_get_object(builder, "proposition")));
 	g_signal_connect (gtk_builder_get_object (builder, "bouttonChat"), "clicked", G_CALLBACK (chat),(gpointer)(gtk_builder_get_object(builder, "messageChat")));
 	
 	gtk_widget_show_all (fenetre);
