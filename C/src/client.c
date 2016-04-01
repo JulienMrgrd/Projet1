@@ -254,7 +254,7 @@ void fctThreadEcoute(){
 
 		argError: // goto
 		if(argCheck==0 && isProtInconnu==0) printf("Arguments de %s incomplets !!\n", prot);
-		puts(affich);
+//		if(affich!=NULL && strlen(affich)>0) puts(affich);
 	}
 
 	printf("Fin d'écoute du server\n");

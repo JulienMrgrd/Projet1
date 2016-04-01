@@ -494,18 +494,13 @@ void addRobotCible(char* enigme){
 	yV=atoi(splitVirgule[7]);
 	xC=atoi(splitVirgule[8]);
 	yC=atoi(splitVirgule[9]);
-	printf("Before cC\n");
 	cC=strdup("c");
-	printf("After cC\n");
 	if(strstr(splitVirgule[10],"B")){
-		printf("then\n");
 		strcat(cC, "A");
 	}else{
-		printf("else\n");
 		strcat(cC, splitVirgule[10]);
 	}
-	printf("AFter splitVirgule 10\n");
-//
+
 //	addMurTableau(xR,yR,"rR");
 //	addMurTableau(xA,yA,"rA");
 //	addMurTableau(xJ,yJ,"rJ");
