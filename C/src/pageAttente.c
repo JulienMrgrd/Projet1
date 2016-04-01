@@ -44,8 +44,8 @@ int startPageAttente(char* pseudo){
 
 	if(username==NULL){
 		printf("Avant bienvenue\n");
-		char toDisplay[] = "Bienvenue ";
-		strcat(toDisplay, pseudo);
+		char* toDisplay[11 + strlen(pseudo)];
+		sprintf(toDisplay,"Bienvenue %s", pseudo);
 		printf("Après init toDisplay\n");
 		gtk_label_set_text(label, toDisplay);
 		printf("Après bienvenue\n");
