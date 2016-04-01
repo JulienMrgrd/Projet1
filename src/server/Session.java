@@ -1,5 +1,6 @@
 package server;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,12 +87,24 @@ public class Session {
 		System.out.print("Tous les joueurs : ");
 		synchronized (allPlaying) {
 			for(int i=0; i<allPlaying.size(); i++){ 
-				if(i==allPlaying.size()-1) System.out.print(allPlaying.get(i).getPseudo());
+				if(i==allPlaying.size()-1) System.out.println(allPlaying.get(i).getPseudo());
 				else System.out.print(allPlaying.get(i).getPseudo()+", ");
 			}
 		}
 
 		if(nbTours==1) sendToAllPlaying(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
+		else {
+			for(Joueur j : allPlaying){
+				if(j.isWaiting()){
+					try {
+						j.sendToJoueur(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
+						j.setIsWaiting(false);
+					} catch (IOException e) {
+						server.removeJoueur(j);
+					}
+				}
+			}
+		}
 		
 		if(getNbActifs()<=1){
 			if(getNbActifs()==1) sendVainqueur(allPlaying.get(0));

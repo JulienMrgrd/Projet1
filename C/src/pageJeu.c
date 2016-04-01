@@ -6,6 +6,7 @@ char user[255];
 
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
+static GtkLabel *lab = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked=1;
@@ -329,6 +330,7 @@ int startPageJeu(char* plateau){
 		return code;
 	}
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
+	lab = GTK_WIDGET(gtk_builder_get_object (builder, "messageServeur"));
 
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
@@ -361,4 +363,30 @@ void destroyPageJeu(){
 	gtk_widget_destroy(fenetre);
 	gdk_threads_leave();
 	printf("Destroy de jeu reussi\n");
+}
+
+
+void addMessageServerPageJeu(char* message){
+	if(isClosed==1) return; // la fenêtre a été fermée
+
+	printf("Avant ajouter message server\n");
+	gdk_threads_enter();
+	char* toDisplay = gtk_label_get_text(lab);
+	gdk_threads_leave();
+	printf("Avant setText\n");
+	if(toDisplay==NULL || !strcmp(toDisplay, "") ){
+		printf("getText vide\n");
+		gdk_threads_enter();
+		gtk_label_set_text(lab, message);
+		gdk_threads_leave();
+	} else {
+		printf("getText non vide\n");
+		char* res[strlen(toDisplay) + strlen(message) + 2];
+		sprintf(res, "%s\n%s", toDisplay, message);
+		printf("Après cat toDisplay\n");
+		gdk_threads_enter();
+		gtk_label_set_text(lab, res);
+		gdk_threads_leave();
+	}
+	printf("Après ajouter message server\n");
 }

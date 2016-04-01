@@ -2,6 +2,7 @@
 
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
+static GtkLabel *label = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked = 1;
@@ -54,6 +55,7 @@ int startPageConnexion(){
 
 	g_signal_connect (gtk_builder_get_object (builder, "connexion"), "clicked", G_CALLBACK (connexion),(gpointer)(gtk_builder_get_object(builder, "userText")));
 	g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
+	label = GTK_WIDGET(gtk_builder_get_object (builder, "user"));
 
 	gtk_widget_show_all (fenetre);
 	gtk_main();
@@ -78,12 +80,7 @@ void changeLabelPageConnexion(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	gdk_threads_enter();
 	printf("Before changer label\n");
-	{
-		GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "user"));
-		printf("Label before = %s\n", gtk_label_get_text(lab));
-		gtk_label_set_text(lab, message);
-		printf("Label after = %s\n", gtk_label_get_text(lab));
-	}
+	gtk_label_set_text(label, message);
 	printf("After changer label\n");
 	gdk_threads_leave();
 }

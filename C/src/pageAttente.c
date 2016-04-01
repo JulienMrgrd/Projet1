@@ -2,6 +2,7 @@
 
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
+static GtkLabel *label = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked = 1;
@@ -36,8 +37,8 @@ int startPageAttente(char* pseudo){
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 	g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
 
-	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "messageAttente"));
-	gtk_misc_set_alignment(lab,0,0);
+	label = GTK_WIDGET(gtk_builder_get_object (builder, "messageAttente"));
+	gtk_misc_set_alignment(label,0,0);
 
 	gtk_widget_show_all (fenetre);
 	/*
@@ -72,18 +73,15 @@ void destroyPageAttente(){
 void addMessageServerPageAttente(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 
-
-
 	printf("Avant ajouter message attente\n");
 	gdk_threads_enter();
-	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "messageAttente"));
-	char* toDisplay = gtk_label_get_text(lab);
+	char* toDisplay = gtk_label_get_text(label);
 	gdk_threads_leave();
 	printf("Avant setText\n");
 	if(toDisplay==NULL || !strcmp(toDisplay, " ") ){
 		printf("getText vide\n");
 		gdk_threads_enter();
-		gtk_label_set_text(lab, message);
+		gtk_label_set_text(label, message);
 		gdk_threads_leave();
 	} else {
 		printf("getText non vide\n");
@@ -92,7 +90,7 @@ void addMessageServerPageAttente(char* message){
 		sprintf(res, "%s\n%s", toDisplay, message);
 		printf("Après cat toDisplay\n");
 		gdk_threads_enter();
-		gtk_label_set_text(lab, res);
+		gtk_label_set_text(label, res);
 		gdk_threads_leave();
 	}
 	printf("Après ajouter message attente\n");

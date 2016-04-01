@@ -175,7 +175,7 @@
                                           <object class="GtkLabel" id="messageServeur">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Message du Serveur :</property>
+                                            <property name="label"> </property>
                                             <property name="ellipsize">end</property>
                                           </object>
                                           <packing>

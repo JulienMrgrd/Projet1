@@ -18,6 +18,7 @@ public class Joueur extends Thread{
 	private Server server;
 	
 	private boolean hasQuit; // To stop listening and stop the thread
+	private boolean isWaiting;
 
 	public Joueur(Socket socket, Server server) {
 		score = 0;
@@ -234,6 +235,13 @@ public class Joueur extends Thread{
 		return pseudo;
 	}
 
+	public boolean isWaiting() {
+		return isWaiting;
+	}
+	
+	public void setIsWaiting(boolean bool){
+		isWaiting = bool;
+	}
 
 
 }
