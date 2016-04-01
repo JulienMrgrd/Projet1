@@ -7,7 +7,7 @@
     <property name="width_request">650</property>
     <property name="height_request">500</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Rasende-Roboter</property>
+    <property name="title">Rasende-Roboter</property>
     <property name="window_position">center</property>
     <child>
       <object class="GtkHPaned" id="hpaned1">
@@ -77,7 +77,7 @@
                       <object class="GtkLabel" id="monScore">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Mon Socre :</property>
+                        <property name="label">Mon Socre :</property>
                       </object>
                       <packing>
                         <property name="resize">False</property>
@@ -93,7 +93,7 @@
                           <object class="GtkLabel" id="meilleurProposition">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Meilleur Proposition :</property>
+                            <property name="label">Meilleur Proposition :</property>
                           </object>
                           <packing>
                             <property name="resize">False</property>
@@ -109,7 +109,7 @@
                               <object class="GtkLabel" id="phase">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Phase de ???</property>
+                                <property name="label">Phase de ???</property>
                               </object>
                               <packing>
                                 <property name="resize">False</property>
@@ -126,7 +126,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">●</property>
-                                    <property name="text" translatable="yes">proposition</property>
+                                    <property name="text">proposition</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
                                     <property name="primary_icon_sensitive">True</property>
@@ -144,7 +144,7 @@
                                     <property name="position">30</property>
                                     <child>
                                       <object class="GtkButton" id="soumission">
-                                        <property name="label" translatable="yes">Soumettre proposition</property>
+                                        <property name="label">Soumettre proposition</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">True</property>
@@ -162,7 +162,7 @@
                                           <object class="GtkLabel" id="recapPartie">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Recapitulatif de la partie :</property>
+                                            <property name="label">Recapitulatif de la partie :</property>
                                             <property name="wrap">True</property>
                                             <property name="ellipsize">start</property>
                                           </object>
@@ -247,7 +247,7 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="bouttonChat">
-                    <property name="label" translatable="yes">Envoyer</property>
+                    <property name="label">Envoyer</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>

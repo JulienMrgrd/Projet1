@@ -66,7 +66,6 @@ public class Joueur extends Thread{
 			server.removeJoueur(this);
 		} catch (Exception e) {
 			System.out.println("(Joueur run) Exception : "+e.toString());
-			e.printStackTrace();
 		}
 	}
 

@@ -71,6 +71,7 @@ public class Server{
 						while(nbJoueurs<2){ // Préconditions pour lancer une session
 							try {
 								sync.wait();
+								sleep(2000); // Pour ne pas envoyer immédiatement envoyer START_TIME après BIENVENUE (problème TCP)
 							} catch (InterruptedException e) {
 								System.out.println("(startSessionIfNeeded) wait impossible");
 							}
@@ -80,16 +81,13 @@ public class Server{
 					secondsBeforeStartSession = Session.SECONDS_BEFORE_START;
 					sendAll(ProtocoleCreator.create(Protocole.START_TIME_SESSION, Integer.toString(Session.SECONDS_BEFORE_START)));
 					System.out.println("Début de partie dans "+Session.SECONDS_BEFORE_START+" secondes");
-					try {
-						LeSaviezVousGenerator gen = new LeSaviezVousGenerator();
-						do{
-							Thread.sleep(Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS*1000);
-							sendAll(ProtocoleCreator.create(Protocole.LE_SAVIEZ_VOUS,gen.get()));
-							secondsBeforeStartSession -= Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS;
-						} while(secondsBeforeStartSession>0);
-					} catch (InterruptedException e) {
-						System.out.println("(startSessionIfPossible) attente impossible");
-					}
+					LeSaviezVousGenerator gen = new LeSaviezVousGenerator();
+					
+					do{
+						sleep(Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS*1000);
+						sendAll(ProtocoleCreator.create(Protocole.LE_SAVIEZ_VOUS,gen.get()));
+						secondsBeforeStartSession -= Session.SECONDS_FOR_DISPLAY_SAVIEZVOUS;
+					} while(secondsBeforeStartSession>0);
 					secondsBeforeStartSession=0;
 					
 					if(nbJoueurs<2){ // Un ou plusieurs joueurs ont quittés
@@ -219,6 +217,13 @@ public class Server{
 	
 	public Session getSession(){
 		return session;
+	}
+	
+	/** Cache le try catch */
+	public void sleep(int time){
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) { }
 	}
 
 

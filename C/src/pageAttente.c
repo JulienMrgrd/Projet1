@@ -41,17 +41,17 @@ int startPageAttente(char* pseudo){
 	gtk_misc_set_alignment(label,0,0);
 
 	gtk_widget_show_all (fenetre);
-	/*
+
 	if(username==NULL){
 		printf("Avant bienvenue\n");
 		char toDisplay[] = "Bienvenue ";
 		strcat(toDisplay, pseudo);
 		printf("Après init toDisplay\n");
-		gtk_label_set_text(GTK_WIDGET(gtk_builder_get_object (builder, "messageAttente")), toDisplay);
+		gtk_label_set_text(label, toDisplay);
 		printf("Après bienvenue\n");
 	}
-	username = *pseudo;
-	 */
+	username = pseudo;
+
 	gtk_main();
 	gdk_threads_leave();
 

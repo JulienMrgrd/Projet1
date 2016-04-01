@@ -13,5 +13,7 @@
 #define SOCKET_ERROR -1
 struct sockaddr_in server;
 
-int startPageJeu(char* usr);
+int startPageJeu(char* plateau, char* username);
 void destroyPageJeu();
+void addMessageServerPageJeu(char* message);
+void setPhase(char *phase);

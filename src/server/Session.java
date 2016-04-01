@@ -138,11 +138,7 @@ public class Session {
 		}
 		
 		System.out.println("Fin du tour n°"+nbTours);
-		try {
-			Thread.sleep(4000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		server.sleep(2000);
 		
 		updateActifs();
 		GameState state = shouldStop();
@@ -170,9 +166,8 @@ public class Session {
 
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
-		try {
-			Thread.sleep(5); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
-		} catch (InterruptedException e1) {}
+		server.sleep(3000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
+		
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
 		synchronized (this) {
@@ -193,11 +188,7 @@ public class Session {
 	private void startEncheres() {
 		System.out.println("startEncheres ("+SECONDS_ENCHERES+" sec)");
 		if(nbCoupsVainqueurReflexion!=null && vainqueurReflexion!=null) addEncheres(new Enchere(vainqueurReflexion, nbCoupsVainqueurReflexion));
-		try {
-			Thread.sleep((SECONDS_ENCHERES+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		server.sleep((SECONDS_ENCHERES+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
 		
 		System.out.print("Fin des enchères : ");
 		for(Enchere oneEnch : encheres){
@@ -318,7 +309,7 @@ public class Session {
 	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
 	public void updateActifs(){
 		synchronized (allPlaying) {
-			sendToAllPlaying("\n");
+			sendToAllPlaying("");
 		}
 	}
 	

@@ -22,5 +22,5 @@ public class StringUtils {
 	public static String underline(String str){
 		return "\u001B[4m"+str+AnsiColors.ANSI_RESET;
 	}
-
+	
 }
