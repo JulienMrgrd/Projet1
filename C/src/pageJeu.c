@@ -184,8 +184,8 @@ void setCouleurLabel(int i, int j){
 	}
 
 	gchar* coul;
-	if(isUnderline==1) coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%s</small></u></span>",tmp, couleur, lettre);
-	else coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%s</small></span>",tmp, couleur, lettre);
+	if(isUnderline==1) coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",tmp, couleur, lettre);
+	else coul = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",tmp, couleur, lettre);
 
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[i][j], TRUE);
@@ -197,17 +197,14 @@ char* getCouleur(char* couleur){
 	char* coul;
 	if(strstr(couleur, "cR")){
 		sprintf(couleur,"FF0000");
-		return coul;
 	}else if(strstr(couleur, "cA")){
 		sprintf(coul, "0000FF");
-		return coul;
 	}else if(strstr(couleur, "cJ")){
 		sprintf(coul, "E3FF00");
-		return coul;
-	}else if(strstr(couleur, "cV")){
+	}else { // cV
 		sprintf(coul, "00FF00");
-		return coul;
 	}
+	return coul;
 }
 
 void displayRobot(){
@@ -215,19 +212,19 @@ void displayRobot(){
 	gchar* tmp = NULL;
 	gchar* val;
 	char* couleur;
-	char* lettre="R";
+	char lettre= 'R';
 	int x, y;
-	int i=0;
-	for(i=0;i<5;i++){
+	int i;
+	for(i=0; i<5; i++){
 		printf("Debut for\n");
 		if(i==0){
 			x=xR;
 			y=yR;
-			couleur =strdup("FF0000");
+			couleur = strdup("FF0000");
 		}else if(i==1){
 			x=xA;
 			y=yA;
-			couleur =strdup("0000FF");
+			couleur = strdup("0000FF");
 		}else if(i==2){
 			x=xJ;
 			y=yJ;
@@ -239,12 +236,13 @@ void displayRobot(){
 		}else if(i==4){
 			x=xC;
 			y=yC;
-			lettre="C";
+			lettre='C';
 			couleur = strdup(getCouleur(cC));
 		}
 		printf("Apres if i == ??\n");
 
 		if(strstr(murLabel[x][y], "G")){
+			printf("Dans if G\n");
 			if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
 					&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
 				gdk_threads_enter();
@@ -255,17 +253,22 @@ void displayRobot(){
 				gtk_label_set_text(pLabel[x][y],"|");
 				gdk_threads_leave();
 			}
+						printf("Apres if G\n");
 		}else {
+					printf("Dans else G\n");
 			gdk_threads_enter();
 			gtk_label_set_text(pLabel[x][y],"  ");
 			gdk_threads_leave();
+						printf("apres else G\n");
 		}
 		printf("Apres 1er if\n");
 		tmp=g_strdup_printf("%s",gtk_label_get_text (pLabel[x][y]));
 		if(strstr(murLabel[x][y], "B")){
-			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%s</small></u></span>",tmp,couleur,lettre);
+			printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>\n",tmp,couleur,lettre);
+			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",tmp,couleur,lettre);
 		}else{
-			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%s</small></span>",tmp,couleur,lettre);
+			printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>\n",tmp,couleur,lettre);
+			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",tmp,couleur,lettre);
 		}
 		gdk_threads_enter();
 		gtk_label_set_use_markup(pLabel[x][y], TRUE);
@@ -292,11 +295,12 @@ void displayRobot(){
 		gtk_label_set_markup (pLabel[x][y],tmp);
 		gdk_threads_leave();
 	}
-
+	printf("Fin for display robot\n");
 }
 
 
 void display(){
+	printf("start display\n");
 	int i=0;
 	int j=0;
 	gchar* tmp = NULL;
@@ -356,6 +360,7 @@ void display(){
 			gdk_threads_leave();
 		}
 	}
+		printf("après for display\n");
 	gchar* xSouligne;
 	xSouligne="|<span face=\"Sans\"><small><small><small>    </small></small></small></span>";
 	gdk_threads_enter();
@@ -375,6 +380,7 @@ void display(){
 	gtk_label_set_use_markup(pLabel[8][7], TRUE);
 	gtk_label_set_markup(pLabel[8][7], secSouligne);
 	gdk_threads_leave();
+			printf("fin display\n");
 }
 
 
@@ -569,6 +575,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	addMurTableauBase();
 	addMurTableauPlateau(plateau);
 	display();
+	printf("after display !\n");
 
 	isClosed = 0;
 
@@ -611,7 +618,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	
 	gtk_widget_show_all (fenetre);
 
-	pthread_create(&temps, NULL, threadChrono, 300);
+//	pthread_create(&temps, NULL, threadChrono, 300);
 
 	printf("Before main \n");
 	gtk_main();

@@ -4,8 +4,7 @@ HEADDIR=include
 LIBDIR=objet
  
  
-# Les différentes options de compilations, soyons strictes !
-CFLAGS= -I$(HEADDIR) -w
+CFLAGS= -I$(HEADDIR) -w -g
 # Les différents FrameWorks et bibliothèques pour le linkage
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-2.0`
  

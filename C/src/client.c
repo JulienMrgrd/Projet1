@@ -56,7 +56,9 @@ void fctThreadEcoute(){
 		isProtInconnu = 0;
 		argCheck = 0;
 		sizeMessageServer=0;
+		printf("avant memset affich\n");
 		memset(affich, 0, sizeof affich);
+		printf("after memset affich\n");
 		memset(recvBuffer, 0, sizeof recvBuffer);
 		if((sizeMessageServer = recv(sock, recvBuffer, sizeof recvBuffer, 0)) <= 0){
 			puts("Serveur déconnecté ...\n");
@@ -137,6 +139,8 @@ void fctThreadEcoute(){
 				perror("pthread_create");
 				return EXIT_FAILURE;
 			}
+			printf("after session creation fenetre jeu\n");
+
 
 		} else if(!strcmp(prot,"VAINQUEUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
@@ -154,7 +158,9 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // enigme
 			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // bilan
 			sleep(1);
+			printf("before startReflex dans client\n");
 			startReflexion(argOne, split[2]);
+			printf("after startReflex dans client\n");
 
 		} else if(!strcmp(prot,"TUASTROUVE")){
 			sprintf(affich,"[serveur] : Tu es le premier à avoir trouvé !");
@@ -253,8 +259,10 @@ void fctThreadEcoute(){
 		}
 
 		argError: // goto
+		printf("after goto\n");
 		if(argCheck==0 && isProtInconnu==0) printf("Arguments de %s incomplets !!\n", prot);
 //		if(affich!=NULL && strlen(affich)>0) puts(affich);
+		printf("end while\n");
 	}
 
 	printf("Fin d'écoute du server\n");
