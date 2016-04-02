@@ -296,7 +296,7 @@ public class Session {
 		if(allPlaying != null){
 			List<Joueur> toRemove = new ArrayList<>(2); // Peu de joueurs se déconnectent
 			for(Joueur joueur : allPlaying){
-				if(joueur.estEnVie()) bilan += "("+ joueur.getPseudo()+","+joueur.getScore()+"),";
+				if(joueur.estEnVie()) bilan += "("+ joueur.getPseudo()+","+joueur.getScore()+")";
 				else toRemove.add(joueur);
 			}
 			for(Joueur joueur : toRemove){

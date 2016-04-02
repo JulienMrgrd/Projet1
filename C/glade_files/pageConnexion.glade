@@ -47,6 +47,7 @@
                       <object class="GtkEntry" id="userText">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="max_length">15</property>
                         <property name="invisible_char">●</property>
                         <property name="text">User</property>
                         <property name="primary_icon_activatable">False</property>

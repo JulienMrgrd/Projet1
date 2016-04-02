@@ -195,11 +195,11 @@ void setCouleurLabel(int i, int j){
 
 char* getCouleur(char* couleur){
 	char* coul;
-	if(strstr(couleur, "cR")){
+	if(!strcmp(couleur, "cR")){
 		sprintf(couleur,"FF0000");
-	}else if(strstr(couleur, "cA")){
+	}else if(!strcmp(couleur, "cA")){
 		sprintf(coul, "0000FF");
-	}else if(strstr(couleur, "cJ")){
+	}else if(!strcmp(couleur, "cJ")){
 		sprintf(coul, "E3FF00");
 	}else { // cV
 		sprintf(coul, "00FF00");
@@ -507,12 +507,6 @@ void addRobotCible(char* enigme){
 		strcat(cC, splitVirgule[10]);
 	}
 
-//	addMurTableau(xR,yR,"rR");
-//	addMurTableau(xA,yA,"rA");
-//	addMurTableau(xJ,yJ,"rJ");
-//	addMurTableau(xV,yV,"rV");
-//	addMurTableau(xC,yC,cC);
-
 }
 
 void threadChrono(int chrono){
@@ -531,8 +525,37 @@ void threadChrono(int chrono){
 }
 
 void affichageBilan(char *bilan){
+
+
 	printf("on entre dans affichage bilan\n");
 	printf("bilan ==== %s\n",bilan);
+
+	char** splitParentOuvr = splitWithChar(bilan, '(');
+	char** splitParentFerm;
+	char** splitVirgule;
+	char* tmp;
+	tmp=strdup("");
+	int j=0;
+	int i=0;
+
+	/*if(splitParentOuvr[0]!=NULL){
+		sprintf(tmp,"Vous etes dans le %se tour\n",splitParentOuvr[0]);
+	}
+	printf("on est la\n");
+	for (i=1; (splitParentOuvr[i] != NULL) ; i++) {
+		printf("on est ici\n");
+
+		if(strlen(splitParentOuvr[i])!=0){
+			printf("et la\n");
+			printf("splitParentOuvr == %s\n",splitParentOuvr[i]);
+			//splitParentFerm = splitWithChar(splitParentOuvr[i], ')');
+			//printf("splitParentFerm == %s\n",splitParentFerm[0]);
+			splitVirgule = splitWithChar(splitParentOuvr[0], ',');
+			printf("apres splitvirgule   \n");
+			//sprintf(tmp,"%sLe joueur %s a actuellement %s points\n",tmp,splitVirgule[0],splitVirgule[1]);
+		}
+	}
+*/
 	gchar* bil;
 	gdk_threads_enter();
 	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
@@ -546,6 +569,7 @@ void startReflexion(char* enigme, char *bilan){
 	printf("enigme === %s \n",enigme);
 	affichageBilan(bilan);
 	addRobotCible(enigme);
+	setPhase("REFLEXION");
 	printf("Before display robot\n");
 	displayRobot();
 	printf("fin startreflex\n");

@@ -18,7 +18,7 @@
           <object class="GtkVPaned" id="vpaned2">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="position">500</property>
+            <property name="position">300</property>
             <child>
               <object class="GtkVPaned" id="vpaned6">
                 <property name="visible">True</property>
@@ -50,7 +50,15 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkLabel" id="recapPartie">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">recapitulatif de la partie</property>
+              </object>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
             </child>
           </object>
           <packing>
@@ -74,15 +82,7 @@
                     <property name="can_focus">True</property>
                     <property name="position">30</property>
                     <child>
-                      <object class="GtkLabel" id="monScore">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label">Mon Socre :</property>
-                      </object>
-                      <packing>
-                        <property name="resize">False</property>
-                        <property name="shrink">True</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                     <child>
                       <object class="GtkVPaned" id="vpaned9">
@@ -159,22 +159,13 @@
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <child>
-                                          <object class="GtkLabel" id="recapPartie">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="label">Recapitulatif de la partie :</property>
-                                            <property name="wrap">True</property>
-                                            <property name="ellipsize">start</property>
-                                          </object>
-                                          <packing>
-                                            <property name="resize">False</property>
-                                            <property name="shrink">True</property>
-                                          </packing>
+                                          <placeholder/>
                                         </child>
                                         <child>
                                           <object class="GtkLabel" id="messageServeur">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
                                             <property name="label"> </property>
                                             <property name="ellipsize">end</property>
                                           </object>

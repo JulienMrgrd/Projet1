@@ -140,7 +140,7 @@ void fctThreadEcoute(){
 				return EXIT_FAILURE;
 			}
 			printf("after session creation fenetre jeu\n");
-
+			setPhase("REFLEXION");
 
 		} else if(!strcmp(prot,"VAINQUEUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
@@ -206,14 +206,14 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"BONNE")){
 			sprintf(affich,"[serveur] : La solution est bonne !");
 			addMessageServerPageJeu(affich);
-			sleep(2);
+			/*sleep(2);
 			destroyPageJeu();
 			if(	threadFenetreAttente==NULL ){
 				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
 					perror("pthread_create");
 					return EXIT_FAILURE;
 				}
-			}
+			}*/
 
 		} else if(!strcmp(prot,"MAUVAISE")){
 			if(argOne!=NULL){
@@ -226,7 +226,7 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"FINRESO")){
 			sprintf(affich,"[serveur] : Phase de resolution finie !");
 			addMessageServerPageJeu(affich);
-			sleep(2);
+		/*	sleep(2);
 			destroyPageJeu();
 			if(	threadFenetreAttente==NULL ){
 				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
@@ -234,7 +234,7 @@ void fctThreadEcoute(){
 					return EXIT_FAILURE;
 				}
 			}
-
+*/
 		} else if(!strcmp(prot,"TROPLONG")){
 			if(argOne!=NULL){
 				sprintf(affich,"[serveur] : Temps de resolution écoulé, au tour de %s" ,argOne);
@@ -242,14 +242,14 @@ void fctThreadEcoute(){
 				sprintf(affich,"[serveur] : Temps de resolution écoulé !");
 			}
 			addMessageServerPageJeu(affich);
-			sleep(2);
+			/*sleep(2);
 			destroyPageJeu();
 			if(	threadFenetreAttente==NULL ){
 				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
 					perror("pthread_create");
 					return EXIT_FAILURE;
 				}
-			}
+			}*/
 		} else if(!strcmp(prot,"CHAT")){
 			addMessageServerPageJeu(affich);
 
