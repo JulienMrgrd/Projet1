@@ -17,3 +17,4 @@ int startPageJeu(char* plateau, char* username);
 void destroyPageJeu();
 void addMessageServerPageJeu(char* message);
 void setPhase(char *phase);
+void threadChrono(int chrono);

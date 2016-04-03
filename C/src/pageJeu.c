@@ -8,6 +8,7 @@ static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
 static GtkLabel *labMsgServer = NULL;
 static GtkLabel *labPhase = NULL;
+static GtkLabel *labMeilleurProp = NULL;
 static GtkButton *buttonSoumission = NULL;
 static GError *error = NULL;
 static gchar *filename = NULL;
@@ -32,17 +33,17 @@ int solution(GtkWidget * p_wid, gpointer p_data){
 	sprintf(coups, "%s",  gtk_entry_get_text(entry));
 
 	if(phaseReflexion==1){
-		if(strcmp(coups, "")){
+		if(strcmp(coups, "")&& strcmp(name, "")){
 			sprintf(messageEnvoye, "TROUVE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
 		}
 	}else if(phaseEnchere==1){
-		if(strcmp(coups, "")){
+		if(strcmp(coups, "")&& strcmp(name, "")){
 			sprintf(messageEnvoye, "ENCHERE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
 		}
 	}else if(phaseResolution==1){
-		if(strcmp(name, "")){
+		if(strcmp(coups, "")&& strcmp(name, "")){
 			sprintf(messageEnvoye, "SOLUTION/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
 		}
@@ -60,6 +61,7 @@ void setPhase(char *phase){
 		phaseReflexion=0;
 		phaseResolution=0;
 		phaseEnchere=1;
+		pthread_create(&temps, NULL, threadChrono, 40);
 	}
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
 		gdk_threads_enter();
@@ -69,6 +71,7 @@ void setPhase(char *phase){
 		phaseEnchere=0;
 		phaseReflexion=0;
 		phaseResolution=1;
+		pthread_create(&temps, NULL, threadChrono, 60);
 	}
 	if(strstr(phase,"REFLEXION")){
 		gdk_threads_enter();
@@ -78,6 +81,11 @@ void setPhase(char *phase){
 		phaseResolution=0;
 		phaseReflexion=1;
 		phaseEnchere=0;
+		pthread_create(&temps, NULL, threadChrono, 300);
+
+		/*gdk_threads_enter();
+		gtk_label_set_text(labMeilleurProp, "");
+		gdk_threads_leave();*/
 	}
 }
 
@@ -90,12 +98,13 @@ int chat(GtkWidget * p_wid, gpointer p_data){
 	char message[140];
 
 	sprintf(message, "%s",  gtk_entry_get_text(entry));
-	if(strcmp(name, "")){
+	if(strcmp(name, "") && strcmp(message, "")){
 		sprintf(messageEnvoye, "CHAT/%s/%s\n",name,message);
 		sendToServer(messageEnvoye);
 	}
 
 	return 0;
+
 
 }
 
@@ -145,6 +154,8 @@ void addMurTableauBase(){
 	}
 	addMurTableau(7,8,"G");
 	addMurTableau(7,9,"B");
+	addMurTableau(8,7,"D");
+	addMurTableau(8,7,"B");
 	addMurTableau(8,9,"B");
 	addMurTableau(8,8,"D");
 }
@@ -196,7 +207,7 @@ void setCouleurLabel(int i, int j){
 char* getCouleur(char* couleur){
 	char* coul;
 	if(!strcmp(couleur, "cR")){
-		sprintf(couleur,"FF0000");
+		sprintf(coul,"FF0000");
 	}else if(!strcmp(couleur, "cA")){
 		sprintf(coul, "0000FF");
 	}else if(!strcmp(couleur, "cJ")){
@@ -368,17 +379,11 @@ void display(){
 	gtk_label_set_markup(pLabel[7][8], xSouligne);
 	gdk_threads_leave();
 
-	xSouligne="|<span face=\"Sans\"><u><small><small><small>360</small></small></small></u></span>";
-	gdk_threads_enter();
-	gtk_label_set_use_markup(pLabel[7][7], TRUE);
-	gtk_label_set_markup(pLabel[7][7], xSouligne);
-	gdk_threads_leave();
-
 	gchar* secSouligne;
-	secSouligne="<span face=\"Sans\"><u><small><small>S</small></small></u></span> |";
+	secSouligne="|<span face=\"Sans\"><u><small><small>sec</small></small></u></span>";
 	gdk_threads_enter();	
-	gtk_label_set_use_markup(pLabel[8][7], TRUE);
-	gtk_label_set_markup(pLabel[8][7], secSouligne);
+	gtk_label_set_use_markup(pLabel[7][7], TRUE);
+	gtk_label_set_markup(pLabel[7][7], secSouligne);
 	gdk_threads_leave();
 			printf("fin display\n");
 }
@@ -514,10 +519,15 @@ void threadChrono(int chrono){
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
 	gdk_threads_leave();
-	while(chrono>=0){
+	int phaseResol=phaseResolution;
+	int phaseEnch=phaseEnchere;
+	int phaseReflex=phaseReflexion;
+
+	while((chrono>=0) && (phaseReflex==phaseReflexion) && (phaseEnch==phaseEnchere)
+			&& (phaseResol==phaseResolution)){ //On teste si on change pas de phase
 		temps=g_strdup_printf("|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>",chrono);
 		gdk_threads_enter();
-		gtk_label_set_markup(pLabel[7][7], temps);
+		gtk_label_set_markup(pLabel[7][8], temps);
 		gdk_threads_leave();
 		sleep(1);
 		chrono--;
@@ -621,7 +631,10 @@ int startPageJeu(char* plateau, char* pseudo){
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 	labMsgServer = GTK_WIDGET(gtk_builder_get_object (builder, "messageServeur"));
 	labPhase = GTK_WIDGET(gtk_builder_get_object (builder, "phase"));
+	labMeilleurProp = GTK_WIDGET(gtk_builder_get_object (builder, "meilleurProposition"));
 	buttonSoumission = GTK_BUTTON(gtk_builder_get_object(builder, "soumission"));
+
+	gtk_misc_set_alignment(labMsgServer,0,0);
 
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
@@ -635,7 +648,6 @@ int startPageJeu(char* plateau, char* pseudo){
 		}
 	}
 
-	setPhase("Reflexion");
 
 	g_signal_connect (gtk_builder_get_object (builder, "soumission"), "clicked", G_CALLBACK (solution),(gpointer)(gtk_builder_get_object(builder, "proposition")));
 	g_signal_connect (gtk_builder_get_object (builder, "bouttonChat"), "clicked", G_CALLBACK (chat),(gpointer)(gtk_builder_get_object(builder, "messageChat")));
