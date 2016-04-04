@@ -25,7 +25,7 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
 	
 	sprintf(name, "%s",  gtk_entry_get_text(entry));
 	if(strcmp(name, "")){
-		sprintf(messageEnvoye, "CONNEX/%s/\n", name);
+		sprintf(messageEnvoye, "CONNEXION/%s/\n", name);
 		sendToServer(messageEnvoye);
 	}
 }

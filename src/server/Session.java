@@ -17,10 +17,11 @@ public class Session {
 
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 10;
-	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
+	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
 	public static final int SECONDS_REFLEXION = 300;
 	public static final int SECONDS_ENCHERES = 40;
 	public static final int SECONDS_RESOLUTION = 60;
+	public static final int TEMPS_RAFRAICHISSEMENT = 5; 
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
 	
 	private Server server;
@@ -170,9 +171,16 @@ public class Session {
 		
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
+		int temps = (SECONDS_REFLEXION+3)*1000; // Ajout de 3sec (lenteur réseau, ...)
 		synchronized (this) {
 			try {
-				this.wait((SECONDS_REFLEXION+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
+				while(temps>0){
+					this.wait(TEMPS_RAFRAICHISSEMENT*1000); 
+					temps -= TEMPS_RAFRAICHISSEMENT*1000;
+					
+					if(getNbActifs()>=2) updateActifs(); // Evite de ping l'unique joueur restant
+					else break;
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -219,9 +227,17 @@ public class Session {
 		nbCoups = encheres.get(indexEnch).getNbCoups();
 		
 		System.out.println("startResolution ("+SECONDS_RESOLUTION+" sec) avec "+actif);
+		
+		int temps = (SECONDS_RESOLUTION+3)*1000; // Ajout de 3sec (lenteur réseau, ...)
 		synchronized (this) {
 			try {
-				this.wait((SECONDS_RESOLUTION+3)*1000); // Ajout de 3sec (lenteur réseau, ...)
+				while(temps>0){
+					this.wait(TEMPS_RAFRAICHISSEMENT*1000); // Ajout de 3sec (lenteur réseau, ...)
+					temps -= TEMPS_RAFRAICHISSEMENT*1000;
+					
+					if(getNbActifs()>=2) updateActifs();
+					else break;
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -288,7 +304,7 @@ public class Session {
 	
 	private void sendVainqueur(Joueur joueur) {
 		System.out.println("Vainqueur : "+joueur.getPseudo());
-		sendToAllPlaying(ProtocoleCreator.create(Protocole.VAINQUEUR, joueur.getPseudo()));
+		sendToAllPlaying(ProtocoleCreator.create(Protocole.VAINQUEUR, bilan()));
 	}
 	
 	/** Affiche "bilan" de l'énoncé (le tour + les scores des joueurs) */

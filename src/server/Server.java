@@ -209,7 +209,7 @@ public class Server{
 		mapJoueurs.remove(pseudo);
 		session.removeJoueur(joueur);
 		nbJoueurs--;
-		sendAll(ProtocoleCreator.create(Protocole.SORTI, pseudo));
+		sendAll(ProtocoleCreator.create(Protocole.DECONNEXION, pseudo));
 		return true;
 	}
 

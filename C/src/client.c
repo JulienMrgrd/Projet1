@@ -126,7 +126,7 @@ void fctThreadEcoute(){
 			sprintf(affich,"[serveur] : Plus assez de joueurs. Partie annulée.",argOne);
 			addMessageServerPageAttente(affich);
 
-		} else if(!strcmp(prot,"SORTI")){
+		} else if(!strcmp(prot,"DECONNEXION")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
 			sprintf(affich,"[serveur] : Nous avons un rage quit de la part de %s",argOne);
 			addMessageServerPageAttente(affich);
@@ -145,6 +145,8 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
 			sprintf(affich,"[serveur] : Félicitation a %s, vainqueur de cette session !",argOne);
 			addMessageServerPageJeu(affich);
+			// displayVainqueur(argOne);
+			sleep(2);
 			destroyPageJeu();
 			if(	threadFenetreAttente==NULL ){
 				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
@@ -178,16 +180,16 @@ void fctThreadEcoute(){
 			addMessageServerPageJeu(affich);
 			setPhase("ENCHERE");
 
-		} else if(!strcmp(prot,"TUENCHERE")){
+		} else if(!strcmp(prot,"VALIDATION")){
 			meilleureProposition(username, NULL);
 			sprintf(affich,"[serveur] : Enchere acceptee !");
 			addMessageServerPageJeu(affich);
 
-		} else if(!strcmp(prot,"ECHECENCHERE")){
+		} else if(!strcmp(prot,"ECHEC")){
 			sprintf(affich,"[serveur] : Votre enchere est incoherente a cause de celle de %s qui a encherit en %s",argOne,split[2]);// ???? en X coups
 			addMessageServerPageJeu(affich);
 
-		} else if(!strcmp(prot,"ILENCHERE")){
+		} else if(!strcmp(prot,"NOUVELLEENCHERE")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
 			if((argCheck=checkOneArgument(split[2]))==0) goto argError;
 			sprintf(affich,"[serveur] : %s a effectué une enchere en %s coups.",argOne,split[2]);// ???? en X coups

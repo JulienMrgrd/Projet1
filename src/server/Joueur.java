@@ -102,7 +102,7 @@ public class Joueur extends Thread{
 			username = msgs[1];
 		} catch (ArrayIndexOutOfBoundsException exc){ }
 		
-		if(cmd.startsWith(Protocole.CONNEX.name())){ // CONNEX/user/
+		if(cmd.startsWith(Protocole.CONNEXION.name())){ // CONNEX/user/
 			
 			if(username==null){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
@@ -165,11 +165,11 @@ public class Joueur extends Thread{
 				if(nbCoups>0){
 					String pseudo = session.addEncheres(new Enchere(this, nbCoups));
 					if(pseudo!=null){
-						sendToJoueur( ProtocoleCreator.create(Protocole.ECHECENCHERE, pseudo) );
+						sendToJoueur( ProtocoleCreator.create(Protocole.ECHEC, pseudo) );
 					}
 					else {
-						sendToJoueur(ProtocoleCreator.create(Protocole.TUENCHERE));
-						String ilenchere = ProtocoleCreator.create(Protocole.ILENCHERE,this.getPseudo(),Integer.toString(nbCoups));
+						sendToJoueur(ProtocoleCreator.create(Protocole.VALIDATION));
+						String ilenchere = ProtocoleCreator.create(Protocole.NOUVELLEENCHERE,this.getPseudo(),Integer.toString(nbCoups));
 						server.sendToThemButThis(ilenchere, session.getAllPlaying(), this);
 					}
 				} else {
@@ -201,13 +201,14 @@ public class Joueur extends Thread{
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this)){
 				String message = null;
-				try{
-					message = msgs[2]; // msgs[2] = message
-					System.out.println(pseudo+" dit : "+message);
-				} catch (ArrayIndexOutOfBoundsException exc){}
+				for(int i=2; i<msg.length(); i++){
+					message += msgs[i]; // supprime les "/" contenu dans le message du client
+				}
+				
 				if(message==null){
 					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
 				} else {
+					System.out.println(pseudo+" dit : "+message);
 					server.sendAllButThis(message, this);
 				}
 			}

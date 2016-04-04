@@ -3,13 +3,13 @@ package other;
 public enum Protocole {
 	
 	// connexion
-	CONNEX,
+	CONNEXION,
 	BIENVENUE,
 	CONNECTE,
 	
 	// deconnexion
 	SORT,
-	SORTI,
+	DECONNEXION,
 	
 	// debut partie
 	SESSION,
@@ -24,9 +24,9 @@ public enum Protocole {
 	
 	// Phase d'enchere
 	ENCHERE,
-	TUENCHERE,
-	ECHECENCHERE,
-	ILENCHERE,
+	VALIDATION,
+	ECHEC,
+	NOUVELLEENCHERE,
 	FINENCHERE,
 	
 	// Phase de résolution
