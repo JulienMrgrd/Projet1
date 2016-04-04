@@ -76,6 +76,7 @@ public class Joueur extends Thread{
 			ecriture.print(msg);
 			ecriture.flush();
 			if(ecriture.checkError()){
+				System.out.println("(sendToJoueur) "+pseudo+" est parti...");
 				throw new IOException();
 			}
 		}
@@ -202,7 +203,7 @@ public class Joueur extends Thread{
 				String message = null;
 				try{
 					message = msgs[2]; // msgs[2] = message
-					System.out.println(pseudo+" propose sa solution : "+message);
+					System.out.println(pseudo+" dit : "+message);
 				} catch (ArrayIndexOutOfBoundsException exc){}
 				if(message==null){
 					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));

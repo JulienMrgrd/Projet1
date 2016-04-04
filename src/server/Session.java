@@ -18,7 +18,7 @@ public class Session {
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 10;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5; // TODO : Mettre les bons temps !
-	public static final int SECONDS_REFLEXION = 30;
+	public static final int SECONDS_REFLEXION = 300;
 	public static final int SECONDS_ENCHERES = 40;
 	public static final int SECONDS_RESOLUTION = 60;
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
@@ -180,9 +180,10 @@ public class Session {
 		if(vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null) {
 			System.out.println(vainqueurReflexion.getPseudo() + " a une solution en "+nbCoupsVainqueurReflexion+" coups !");
 		} else {
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINREFLEXION));
 			System.out.println("Temps terminé, aucune solution");
 		}
-		sendToAllPlaying(ProtocoleCreator.create(Protocole.FINREFLEXION));
+		
 	}
 	
 	private void startEncheres() {
@@ -309,7 +310,7 @@ public class Session {
 	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
 	public void updateActifs(){
 		synchronized (allPlaying) {
-			sendToAllPlaying("");
+			sendToAllPlaying(" ");
 		}
 	}
 	

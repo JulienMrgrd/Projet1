@@ -31,7 +31,8 @@ public class LeSaviezVousGenerator {
 			"L'excellent Emmanuel Chailloux a intégré l'UPMC en 2006",
 			"Le campus de Jussieu s’étend sur environ 13 hectares",
 			"Les travaux de désamientage de Jussieu ont commencés en 1996, et se sont terminés en 2011",
-			"L'incroyable Romain Demangeon s'occupe de 6 UEs différentes à l'UPMC"	 
+			"L'incroyable Romain Demangeon s'occupe de 6 UEs différentes à l'UPMC"
+			
 		};
 	}
 }

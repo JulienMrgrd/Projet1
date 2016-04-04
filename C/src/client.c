@@ -54,7 +54,7 @@ void fctThreadEcoute(){
 
 	while(1){
 		isProtInconnu = 0;
-		argCheck = 0;
+		argCheck = 1;
 		sizeMessageServer=0;
 		printf("avant memset affich\n");
 		memset(affich, 0, sizeof affich);
@@ -140,7 +140,6 @@ void fctThreadEcoute(){
 				return EXIT_FAILURE;
 			}
 			printf("after session creation fenetre jeu\n");
-			setPhase("REFLEXION");
 
 		} else if(!strcmp(prot,"VAINQUEUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
@@ -158,19 +157,20 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // enigme
 			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // bilan
 			sleep(1);
-			printf("before startReflex dans client\n");
 			startReflexion(argOne, split[2]);
-			printf("after startReflex dans client\n");
 
 		} else if(!strcmp(prot,"TUASTROUVE")){
 			sprintf(affich,"[serveur] : Tu es le premier à avoir trouvé !");
 			addMessageServerPageJeu(affich);
+			meilleureProposition(username, NULL);
 			setPhase("ENCHERE");
 
 		} else if(!strcmp(prot,"ILATROUVE")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
+			if((argCheck=checkOneArgument(split[2]))==0) goto argError;
 			sprintf(affich,"[serveur] : %s a trouve une solution en %s coups",argOne,split[2]); // ???? en X coups
 			addMessageServerPageJeu(affich);
+			meilleureProposition(argOne, split[2]);
 			setPhase("ENCHERE");
 
 		} else if(!strcmp(prot,"FINREFLEXION")){
@@ -179,7 +179,8 @@ void fctThreadEcoute(){
 			setPhase("ENCHERE");
 
 		} else if(!strcmp(prot,"TUENCHERE")){
-			sprintf(affich,"[serveur] : Enchere accepte !");
+			meilleureProposition(username, NULL);
+			sprintf(affich,"[serveur] : Enchere acceptee !");
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"ECHECENCHERE")){
@@ -187,11 +188,14 @@ void fctThreadEcoute(){
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"ILENCHERE")){
-			sprintf(affich,"[serveur] : %s a effectuer une enchere en %s coups.",argOne,split[2]);// ???? en X coups
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;
+			if((argCheck=checkOneArgument(split[2]))==0) goto argError;
+			sprintf(affich,"[serveur] : %s a effectué une enchere en %s coups.",argOne,split[2]);// ???? en X coups
+			meilleureProposition(argOne, split[2]);
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"FINENCHERE")){
-			if(argOne!=NULL){
+			if((argCheck=checkOneArgument(argOne))!=0 && (argCheck=checkOneArgument(split[2]))!=0 ){
 				sprintf(affich,"[serveur] : Les encheres sont finies, le meilleur est %s en %s coups.",argOne,split[2]); // ???? en X coups
 			} else{
 				sprintf(affich,"[serveur] : Les encheres sont finies, il n'y a aucun vainqueur !");
@@ -200,23 +204,17 @@ void fctThreadEcoute(){
 			setPhase("RESOLUTION");
 
 		} else if(!strcmp(prot,"SASOLUTION")){
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
+			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // solution
 			sprintf(affich,"[serveur] : La solution de %s est : %s",argOne,split[2]);
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"BONNE")){
 			sprintf(affich,"[serveur] : La solution est bonne !");
 			addMessageServerPageJeu(affich);
-			/*sleep(2);
-			destroyPageJeu();
-			if(	threadFenetreAttente==NULL ){
-				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
-					perror("pthread_create");
-					return EXIT_FAILURE;
-				}
-			}*/
 
 		} else if(!strcmp(prot,"MAUVAISE")){
-			if(argOne!=NULL){
+			if((argCheck=checkOneArgument(argOne))!=0){
 				sprintf(affich,"[serveur] : La solution est mauvaise, au tour de %s" ,argOne);
 			} else{
 				sprintf(affich,"[serveur] : La solution est mauvaise !");
@@ -226,30 +224,15 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"FINRESO")){
 			sprintf(affich,"[serveur] : Phase de resolution finie !");
 			addMessageServerPageJeu(affich);
-		/*	sleep(2);
-			destroyPageJeu();
-			if(	threadFenetreAttente==NULL ){
-				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
-					perror("pthread_create");
-					return EXIT_FAILURE;
-				}
-			}
-*/
+
 		} else if(!strcmp(prot,"TROPLONG")){
-			if(argOne!=NULL){
+			if((argCheck=checkOneArgument(argOne))!=0){
 				sprintf(affich,"[serveur] : Temps de resolution écoulé, au tour de %s" ,argOne);
 			} else{
 				sprintf(affich,"[serveur] : Temps de resolution écoulé !");
 			}
 			addMessageServerPageJeu(affich);
-			/*sleep(2);
-			destroyPageJeu();
-			if(	threadFenetreAttente==NULL ){
-				if(pthread_create(&threadFenetreAttente, NULL, fctThreadFenetreAttente, NULL)) {
-					perror("pthread_create");
-					return EXIT_FAILURE;
-				}
-			}*/
+
 		} else if(!strcmp(prot,"CHAT")){
 			addMessageServerPageJeu(affich);
 
@@ -259,10 +242,7 @@ void fctThreadEcoute(){
 		}
 
 		argError: // goto
-		printf("after goto\n");
 		if(argCheck==0 && isProtInconnu==0) printf("Arguments de %s incomplets !!\n", prot);
-//		if(affich!=NULL && strlen(affich)>0) puts(affich);
-		printf("end while\n");
 	}
 
 	printf("Fin d'écoute du server\n");

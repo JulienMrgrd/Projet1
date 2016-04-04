@@ -1,9 +1,6 @@
 #include"pageJeu.h"
 #include "utils.h"
 
-int sock; 
-char user[255];
-
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
 static GtkLabel *labMsgServer = NULL;
@@ -11,7 +8,6 @@ static GtkLabel *labPhase = NULL;
 static GtkLabel *labMeilleurProp = NULL;
 static GtkButton *buttonSoumission = NULL;
 static GError *error = NULL;
-static gchar *filename = NULL;
 static int isButtonXclicked=1;
 static int isClosed = 0;
 static GtkWidget *pTable;
@@ -19,43 +15,55 @@ static GtkLabel *pLabel[17][17];
 static char* murLabel[17][17];
 static pthread_t temps;
 static char* name;
-static int phaseReflexion=0;
+static int phaseReflexion=0; // Pase actuelle
 static int phaseResolution=0;
 static int phaseEnchere=0;
-static int xR,xA,xJ,xV,xC;
-static int yR,yA,yJ,yV,yC;
-static char* cC;
+static int xR,xB,xJ,xV,xC; // coord x des robots et cibles
+static int yR,yB,yJ,yV,yC; // coord y des robots cibles
+static char cC[2];  // couleur cible
+static int myCoup;
 
-int solution(GtkWidget * p_wid, gpointer p_data){
+int proposition(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
-	char* coups;
-	char messageEnvoye[70];
-	sprintf(coups, "%s",  gtk_entry_get_text(entry));
+	char* coups = gtk_entry_get_text(entry);
 
-	if(phaseReflexion==1){
-		if(strcmp(coups, "")&& strcmp(name, "")){
+	if(strcmp(coups, "") && strcmp(name, "")){
+
+		char messageEnvoye[70];
+
+		if(phaseReflexion==1){
 			sprintf(messageEnvoye, "TROUVE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
-		}
-	}else if(phaseEnchere==1){
-		if(strcmp(coups, "")&& strcmp(name, "")){
+			myCoup=atoi(coups);
+		}else if(phaseEnchere==1){
 			sprintf(messageEnvoye, "ENCHERE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
-		}
-	}else if(phaseResolution==1){
-		if(strcmp(coups, "")&& strcmp(name, "")){
+			myCoup=atoi(coups);
+		}else if(phaseResolution==1){
 			sprintf(messageEnvoye, "SOLUTION/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
 		}
+
+		gtk_entry_set_text(entry, "");
 	}
 	return 0;
+}
+
+void meilleureProposition(char* username, char* nbCoups){
+	char message[50] = "";
+	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s=%s", username, myCoup);
+	else sprintf(message, "Meilleure proposition : %s=%s", username, nbCoups);
+
+	gdk_threads_enter();
+	gtk_label_set_text(labMeilleurProp, message);
+	gdk_threads_leave();
 }
 
 void setPhase(char *phase){
 
 	if(strstr(phase,"ENCHERE") && phaseReflexion==1){
 		gdk_threads_enter();
-		gtk_label_set_text(labPhase, "phase Enchere");
+		gtk_label_set_text(labPhase, "Phase d'enchere");
 		gtk_button_set_label(buttonSoumission, "Encherir");
 		gdk_threads_leave();
 		phaseReflexion=0;
@@ -65,8 +73,8 @@ void setPhase(char *phase){
 	}
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
 		gdk_threads_enter();
-		gtk_label_set_text(labPhase, "phase Resolution");
-		gtk_button_set_label(buttonSoumission, "Proposer solution");
+		gtk_label_set_text(labPhase, "Phase de resolution");
+		gtk_button_set_label(buttonSoumission, "Proposer votre solution");
 		gdk_threads_leave();
 		phaseEnchere=0;
 		phaseReflexion=0;
@@ -75,8 +83,8 @@ void setPhase(char *phase){
 	}
 	if(strstr(phase,"REFLEXION")){
 		gdk_threads_enter();
-		gtk_label_set_text(labPhase, "phase Reflexion");
-		gtk_button_set_label(buttonSoumission, "Encherir");
+		gtk_label_set_text(labPhase, "Phase de reflexion");
+		gtk_button_set_label(buttonSoumission, "Proposer votre nombre de coups");
 		gdk_threads_leave();
 		phaseResolution=0;
 		phaseReflexion=1;
@@ -109,8 +117,7 @@ int chat(GtkWidget * p_wid, gpointer p_data){
 }
 
 void addMurTableau(int x, int y, char *mur){
-	if (strstr(murLabel[x][y], mur) != NULL) {
-	}else{
+	if (strstr(murLabel[x][y], mur) == NULL) {
 		if(!strcmp(mur,"H")){
 			strcat(murLabel[x][y+1],"B");
 		}else {
@@ -119,35 +126,19 @@ void addMurTableau(int x, int y, char *mur){
 	}
 }
 
-void addMurTableauCible(int x, int y, char *mur){
-	char *tmp;
-	tmp=strdup("c");
-	if(strstr(mur,"B")){
-		sprintf(tmp,"cA");
-		addMurTableau(x,y,tmp);
-	}else{
-		sprintf(tmp,"c%s",mur);
-		addMurTableau(x,y,tmp);
-	}
-}
-
 void addMurTableauBase(){
-	int i=0;
-	int j=0;
-	char *tmp;
-	tmp=strdup("");
+	int i;
+	int j;
 	for(i=0; i<16;i++){
 		for(j=15;j>=0;j--){
 			if(i==0){
 				addMurTableau(i,j,"G");
-			}
-			if(i==15){
+			} else if(i==15){
 				addMurTableau(i,j,"D");
 			}
 			if(j==0){
 				addMurTableau(i,j,"B");
-			}
-			if(j==15){
+			} else if(j==15){
 				addMurTableau(i,j,"H");
 			}
 		}
@@ -161,14 +152,14 @@ void addMurTableauBase(){
 }
 
 
-char* getCouleur(char* couleur){
-	char* coul;
+char* getCouleurCible(char* couleur){
+	char coul[8];
 	if(!strcmp(couleur, "cR")){
 		sprintf(coul,"FF0000");
 	}else if(!strcmp(couleur, "cA")){
 		sprintf(coul, "0000FF");
 	}else if(!strcmp(couleur, "cJ")){
-		sprintf(coul, "E3FF00");
+		sprintf(coul, "EFD807");
 	}else { // cV
 		sprintf(coul, "00FF00");
 	}
@@ -176,91 +167,68 @@ char* getCouleur(char* couleur){
 }
 
 void displayRobot(){
-	printf("Entre dans display Robot\n");
-	gchar* tmp = NULL;
-	gchar* val;
-	char* couleur;
-	char lettre= 'R';
+	char couleur[8] = "";
 	int x, y;
 	int i;
 	for(i=0; i<5; i++){
-		printf("Debut for\n");
 		if(i==0){
 			x=xR;
 			y=yR;
-			couleur = strdup("FF0000");
+			sprintf(couleur, "FF0000");
 		}else if(i==1){
-			x=xA;
-			y=yA;
-			couleur = strdup("0000FF");
+			x=xB;
+			y=yB;
+			sprintf(couleur, "0000FF");
 		}else if(i==2){
 			x=xJ;
 			y=yJ;
-			couleur = strdup("E3FF00");
+			sprintf(couleur, "EFD807");
 		}else if(i==3){
 			x=xV;
 			y=yV;
-			couleur = strdup("00FF00");
-		}else if(i==4){
+			sprintf(couleur, "00FF00");
+		} else {
 			x=xC;
 			y=yC;
-			lettre='C';
-			couleur = strdup(getCouleur(cC));
+			sprintf(couleur, getCouleurCible(cC));
 		}
-		printf("Apres if i == ??\n");
+		printf("couleur %s\n", couleur);
 
+		char res[100] = "";
 		if(strstr(murLabel[x][y], "G")){
-			printf("Dans if G\n");
 			if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
 					&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
-				gdk_threads_enter();
-				gtk_label_set_text(pLabel[x][y]," ");
-				gdk_threads_leave();
+				strcat(res, " ");
 			}else{
-				gdk_threads_enter();
-				gtk_label_set_text(pLabel[x][y],"|");
-				gdk_threads_leave();
+				strcat(res, "|");
 			}
-			printf("Apres if G\n");
 		}else {
-			printf("Dans else G\n");
-			gdk_threads_enter();
-			gtk_label_set_text(pLabel[x][y],"  ");
-			gdk_threads_leave();
-			printf("apres else G\n");
+			strcat(res, "  ");
 		}
-		printf("Apres 1er if\n");
-		tmp=g_strdup_printf("%s",gtk_label_get_text (pLabel[x][y]));
-		if(strstr(murLabel[x][y], "B")){
-			printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>\n",tmp,couleur,lettre);
-			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",tmp,couleur,lettre);
-		}else{
-			printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>\n",tmp,couleur,lettre);
-			val = g_strdup_printf("%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",tmp,couleur,lettre);
-		}
-		gdk_threads_enter();
-		gtk_label_set_use_markup(pLabel[x][y], TRUE);
-		gtk_label_set_markup(pLabel[x][y], val);
-		gdk_threads_leave();
 
-		gdk_threads_enter();
-		tmp=g_strdup_printf("%s",gtk_label_get_label (pLabel[x][y]));
-		gdk_threads_leave();
+		char lettre = 'R';
+		if(i==4) lettre='C';
+
+		if(strstr(murLabel[x][y], "B")){
+			sprintf(res, "%s<span foreground=\"#%s\" face=\"Sans\"><u><small>%c</small></u></span>",res, couleur,lettre);
+		}else{
+			sprintf(res, "%s<span foreground=\"#%s\" face=\"Sans\"><small>%c</small></span>",res,couleur,lettre);
+		}
+
 		if(strstr(murLabel[x][y], "D")){
 			if( (x!=15) && (y!=16) && (strstr(murLabel[x+1][y],"G")
 					&&  ((strstr(murLabel[x+1][y+1],"B")) || (strstr(murLabel[x+1][y],"B"))) )){
-				tmp=g_strdup_printf("%s ",tmp);
+				strcat(res, " ");
 			}else{
-				gdk_threads_enter();
-				tmp=strdup(gtk_label_get_text (pLabel[x][y]));
-				gdk_threads_leave();
-				tmp=g_strdup_printf("%s|",tmp);
+				strcat(res, "|");
 			}
 		}else {
-			tmp=g_strdup_printf("%s ",tmp);
+			strcat(res, "  ");
 		}
+
 		gdk_threads_enter();
-		gtk_label_set_markup (pLabel[x][y],tmp);
+		gtk_label_set_use_markup(pLabel[x][y], TRUE);
+		gtk_label_set_markup(pLabel[x][y], res);
 		gdk_threads_leave();
 	}
 	printf("Fin for display robot\n");
@@ -269,41 +237,11 @@ void displayRobot(){
 
 void displayPlateau(){
 	printf("start display\n");
-	int i=0;
-	int j=0;
-	char* res = "";
-
+	int i;
+	int j;
 	for(i=0; i<16; i++){
 		for(j=16; j>=0; j--){
-
-			if(strstr(murLabel[i][j], "G")){
-				if((i!=0)&&(j!=16)&& (strstr(murLabel[i-1][j],"D") &&  ((strstr(murLabel[i-1][j+1],"B")) || (strstr(murLabel[i-1][j],"B"))))
-						&& 	!strstr(murLabel[i][j], "B") && !strstr(murLabel[i][j+1], "B") ){
-					strcat(res, " ");
-				}else{
-					strcat(res, "|");
-				}
-			}else {
-				strcat(res, "  ");
-			}
-
-			if(strstr(murLabel[i][j], "B")) strcat(res, "_");
-			else strcat(res, " ");
-
-			if(strstr(murLabel[i][j], "D")){
-				if( (i!=15) && (j!=16) && (strstr(murLabel[i+1][j],"G")
-						&&  ((strstr(murLabel[i+1][j+1],"B")) || (strstr(murLabel[i+1][j],"B"))) )){
-					strcat(res, " ");
-				} else {
-					strcat(res, "|");
-				}
-			}else {
-				strcat(res, " ");
-			}
-
-			gdk_threads_enter();
-			gtk_label_set_text( pLabel[i][j], res);
-			gdk_threads_leave();
+			displayCase(i, j);
 		}
 	}
 	printf("après for display\n");
@@ -327,16 +265,14 @@ void resetRobot(){
 	printf("Entre dans reset Robot\n");
 	int x, y;
 	int i;
-	char* res = "";
 
 	for(i=0;i<5;i++){
-		printf("Debut for\n");
 		if(i==0){
 			x=xR;
 			y=yR;
 		}else if(i==1){
-			x=xA;
-			y=yA;
+			x=xB;
+			y=yB;
 		}else if(i==2){
 			x=xJ;
 			y=yJ;
@@ -347,37 +283,43 @@ void resetRobot(){
 			x=xC;
 			y=yC;
 		}
-		printf("Apres if i == ??\n");
+		displayCase(x, y);
 
-		if(strstr(murLabel[x][y], "G")){
-			if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
-					&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
-				strcat(res, " ");
-			}else{
-				strcat(res, "|");
-			}
-		}else {
-			strcat(res, "  ");
-		}
-
-		if(strstr(murLabel[i][j], "B")) strcat(res, "_");
-		else strcat(res, " ");
-
-		if(strstr(murLabel[i][j], "D")){
-			if( (i!=15) && (j!=16) && (strstr(murLabel[i+1][j],"G")
-					&&  ((strstr(murLabel[i+1][j+1],"B")) || (strstr(murLabel[i+1][j],"B"))) )){
-				strcat(res, " ");
-			} else {
-				strcat(res, "|");
-			}
-		}else {
-			strcat(res, " ");
-		}
-
-		gdk_threads_enter();
-		gtk_label_set_text( pLabel[i][j], res);
-		gdk_threads_leave();
 	}
+}
+
+void displayCase(int x, int y){
+	char res[5] = "";
+	if(strstr(murLabel[x][y], "G")){
+		if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
+				&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
+			strcat(res, " ");
+		}else{
+			strcat(res, "|");
+		}
+	}else {
+		strcat(res, "  ");
+	}
+
+	if(strstr(murLabel[x][y], "B")) strcat(res, "_");
+	else strcat(res, " ");
+
+
+	if(strstr(murLabel[x][y], "D")){
+		if( (x!=15) && (y!=16) && (strstr(murLabel[x+1][y],"G")
+				&&  ((strstr(murLabel[x+1][y+1],"B")) || (strstr(murLabel[x+1][y],"B"))) )){
+			strcat(res, " ");
+		} else {
+			strcat(res, "|");
+		}
+	}else {
+		strcat(res, "  ");
+	}
+
+
+	gdk_threads_enter();
+	gtk_label_set_text( pLabel[x][y], res);
+	gdk_threads_leave();
 }
 
 
@@ -414,15 +356,16 @@ void addRobotCible(char* enigme){
 
 	xR=atoi(splitVirgule[0]);
 	yR=atoi(splitVirgule[1]);
-	xA=atoi(splitVirgule[2]);
-	yA=atoi(splitVirgule[3]);
+	xB=atoi(splitVirgule[2]);
+	yB=atoi(splitVirgule[3]);
 	xJ=atoi(splitVirgule[4]);
 	yJ=atoi(splitVirgule[5]);
 	xV=atoi(splitVirgule[6]);
 	yV=atoi(splitVirgule[7]);
 	xC=atoi(splitVirgule[8]);
 	yC=atoi(splitVirgule[9]);
-	cC=strdup("c");
+
+	strcat(cC, "c");
 	if(strstr(splitVirgule[10],"B")){
 		strcat(cC, "A");
 	}else{
@@ -432,7 +375,7 @@ void addRobotCible(char* enigme){
 }
 
 void threadChrono(int chrono){
-	gchar* temps;
+	char temps[100];
 	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
 	gdk_threads_leave();
@@ -442,7 +385,7 @@ void threadChrono(int chrono){
 
 	while((chrono>=0) && (phaseReflex==phaseReflexion) && (phaseEnch==phaseEnchere)
 			&& (phaseResol==phaseResolution)){ //On teste si on change pas de phase
-		temps=g_strdup_printf("|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>",chrono);
+		sprintf(temps, "|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
 		gdk_threads_enter();
 		gtk_label_set_markup(pLabel[7][8], temps);
 		gdk_threads_leave();
@@ -452,8 +395,6 @@ void threadChrono(int chrono){
 }
 
 void affichageBilan(char *bilan){
-
-
 	printf("on entre dans affichage bilan\n");
 	printf("bilan ==== %s\n",bilan);
 
@@ -472,9 +413,7 @@ void startReflexion(char* enigme, char* bilan){
 	affichageBilan(bilan);
 	addRobotCible(enigme);
 	setPhase("REFLEXION");
-	printf("Before display robot\n");
 	displayRobot();
-	printf("fin startreflex\n");
 }
 
 int startPageJeu(char* plateau, char* pseudo){
@@ -486,12 +425,13 @@ int startPageJeu(char* plateau, char* pseudo){
 	printf("on entre dans StartPageJEu\n");
 	for(x=0;x<17;x++){
 		for(y=0;y<17;y++){
-			murLabel[x][y]=strdup("");
-			pLabel[x][y]=gtk_label_new("   ");
+			murLabel[x][y] = malloc(4 * sizeof(char));
+			murLabel[x][y] = strdup("");
+			pLabel[x][y] = gtk_label_new("   ");
 		}
 	}
 
-	printf("apreesStartPageJEu\n");
+	printf("apresStartPageJEu\n");
 	name = strdup("");
 	sprintf(name,"%s",pseudo);
 	printf("apres name\n");
@@ -500,7 +440,7 @@ int startPageJeu(char* plateau, char* pseudo){
 
 	addMurTableauBase();
 	addMurTableauPlateau(plateau);
-	display();
+	displayPlateau();
 	printf("after display !\n");
 
 	isClosed = 0;
@@ -510,7 +450,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	gdk_threads_enter();
 
 	builder = gtk_builder_new();
-	filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
+	gchar* filename =  g_build_filename ("glade_files/pageJeu.glade", NULL);
 
 	gtk_builder_add_from_file (builder, filename, &error);
 	g_free (filename);
@@ -541,12 +481,10 @@ int startPageJeu(char* plateau, char* pseudo){
 	}
 
 
-	g_signal_connect (gtk_builder_get_object (builder, "soumission"), "clicked", G_CALLBACK (solution),(gpointer)(gtk_builder_get_object(builder, "proposition")));
+	g_signal_connect (gtk_builder_get_object (builder, "soumission"), "clicked", G_CALLBACK (proposition),(gpointer)(gtk_builder_get_object(builder, "proposition")));
 	g_signal_connect (gtk_builder_get_object (builder, "bouttonChat"), "clicked", G_CALLBACK (chat),(gpointer)(gtk_builder_get_object(builder, "messageChat")));
 
 	gtk_widget_show_all (fenetre);
-
-	//	pthread_create(&temps, NULL, threadChrono, 300);
 
 	printf("Before main \n");
 	gtk_main();
@@ -568,25 +506,20 @@ void destroyPageJeu(){
 
 void addMessageServerPageJeu(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
+	printf("Ajouter message server\n");
 
-	printf("Avant ajouter message server\n");
 	gdk_threads_enter();
 	char* toDisplay = gtk_label_get_text(labMsgServer);
 	gdk_threads_leave();
-	printf("Avant setText\n");
 	if(toDisplay==NULL || !strcmp(toDisplay, "") ){
-		printf("getText vide\n");
 		gdk_threads_enter();
 		gtk_label_set_text(labMsgServer, message);
 		gdk_threads_leave();
 	} else {
-		printf("getText non vide\n");
-		char* res[strlen(toDisplay) + strlen(message) + 2];
+		char res[strlen(toDisplay) + strlen(message) + 2];
 		sprintf(res, "%s\n%s", toDisplay, message);
-		printf("Après cat toDisplay\n");
 		gdk_threads_enter();
 		gtk_label_set_text(labMsgServer, res);
 		gdk_threads_leave();
 	}
-	printf("Après ajouter message server\n");
 }

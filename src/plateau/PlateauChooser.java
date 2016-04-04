@@ -98,7 +98,6 @@ public class PlateauChooser {
 		plat[11][5].addMur(Mur.H);
 		plat[11][6].addMur(Mur.B);
 		plat[11][9].addMurInvisible(Mur.G);
-		plat[11][10].addMur(Mur.H);
 		plat[11][12].addMur(Mur.G);
 		plat[11][12].addMur(Mur.B);
 		plat[11][15].addMurInvisible(Mur.D);
