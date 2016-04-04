@@ -151,9 +151,9 @@ public class Joueur extends Thread{
 			}
 			
 		} else if(cmd.startsWith(Protocole.ENCHERE.name())){ // ENCHERE/user/coups/
-			System.out.println("Rentre dans encheres");
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this) && session.isInEnchere()){
+				System.out.println("Dans le if d'encheres");
 				int nbCoups = -1;
 				try{
 					nbCoups = Integer.parseInt(msgs[2]); // msgs[2] = nbCoups

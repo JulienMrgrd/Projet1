@@ -27,32 +27,32 @@ int proposition(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
 	char* coups = gtk_entry_get_text(entry);
 
-	if(strcmp(coups, "") && strcmp(name, "")){
-
+	if(strcmp(coups, "")){
 		char messageEnvoye[70];
 
-		if(phaseReflexion==1){
+		if(phaseReflexion==1 && isdigit(*coups)){
+			myCoup=atoi(coups);
 			sprintf(messageEnvoye, "TROUVE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
+		} else if(phaseEnchere==1 && isdigit(*coups)){
 			myCoup=atoi(coups);
-		}else if(phaseEnchere==1){
 			sprintf(messageEnvoye, "ENCHERE/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
-			myCoup=atoi(coups);
-		}else if(phaseResolution==1){
+		} else if(phaseResolution==1){
 			sprintf(messageEnvoye, "SOLUTION/%s/%s/\n",name,coups);
 			sendToServer(messageEnvoye);
 		}
 
 		gtk_entry_set_text(entry, "");
 	}
+	printf("end proposition\n");
 	return 0;
 }
 
 void meilleureProposition(char* username, char* nbCoups){
-	char message[50] = "";
-	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s=%s", username, myCoup);
-	else sprintf(message, "Meilleure proposition : %s=%s", username, nbCoups);
+	char message[60];
+	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
+	else sprintf(message, "Meilleure proposition : %s = %d", username, atoi(nbCoups));
 
 	gdk_threads_enter();
 	gtk_label_set_text(labMeilleurProp, message);
@@ -64,7 +64,7 @@ void setPhase(char *phase){
 	if(strstr(phase,"ENCHERE") && phaseReflexion==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase d'enchere");
-		gtk_button_set_label(buttonSoumission, "Encherir");
+		gtk_button_set_label(buttonSoumission, "Votre enchère");
 		gdk_threads_leave();
 		phaseReflexion=0;
 		phaseResolution=0;
@@ -74,7 +74,7 @@ void setPhase(char *phase){
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de resolution");
-		gtk_button_set_label(buttonSoumission, "Proposer votre solution");
+		gtk_button_set_label(buttonSoumission, "Votre solution");
 		gdk_threads_leave();
 		phaseEnchere=0;
 		phaseReflexion=0;
@@ -84,16 +84,13 @@ void setPhase(char *phase){
 	if(strstr(phase,"REFLEXION")){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de reflexion");
-		gtk_button_set_label(buttonSoumission, "Proposer votre nombre de coups");
+		gtk_button_set_label(buttonSoumission, "Votre nombre de coups");
 		gdk_threads_leave();
 		phaseResolution=0;
 		phaseReflexion=1;
 		phaseEnchere=0;
 		pthread_create(&temps, NULL, threadChrono, 300);
 
-		/*gdk_threads_enter();
-		gtk_label_set_text(labMeilleurProp, "");
-		gdk_threads_leave();*/
 	}
 }
 
@@ -432,8 +429,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	}
 
 	printf("apresStartPageJEu\n");
-	name = strdup("");
-	sprintf(name,"%s",pseudo);
+	name = pseudo;
 	printf("apres name\n");
 	if( !g_thread_supported()) g_thread_init( NULL );
 	gdk_threads_init();
@@ -508,15 +504,13 @@ void addMessageServerPageJeu(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	printf("Ajouter message server\n");
 
-	gdk_threads_enter();
 	char* toDisplay = gtk_label_get_text(labMsgServer);
-	gdk_threads_leave();
 	if(toDisplay==NULL || !strcmp(toDisplay, "") ){
 		gdk_threads_enter();
 		gtk_label_set_text(labMsgServer, message);
 		gdk_threads_leave();
 	} else {
-		char res[strlen(toDisplay) + strlen(message) + 2];
+		char res[strlen(toDisplay) + strlen(message) + 10];
 		sprintf(res, "%s\n%s", toDisplay, message);
 		gdk_threads_enter();
 		gtk_label_set_text(labMsgServer, res);

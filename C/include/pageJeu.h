@@ -1,5 +1,6 @@
 #include <stdio.h> //printf
 #include <string.h>    //strlen
+#include <ctype.h>
 #include <sys/socket.h>    //socket
 #include <arpa/inet.h> //inet_addr
 #include <gtk/gtk.h>

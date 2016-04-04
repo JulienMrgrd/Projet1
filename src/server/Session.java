@@ -167,14 +167,15 @@ public class Session {
 
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
-		server.sleep(3000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
+		server.sleep(1000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
 		
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
 		int temps = (SECONDS_REFLEXION+3)*1000; // Ajout de 3sec (lenteur réseau, ...)
 		synchronized (this) {
 			try {
-				while(temps>0){
+				while(temps>0 && vainqueurReflexion==null){
+					System.out.println("while "+temps+" vainqueur="+vainqueurReflexion);
 					this.wait(TEMPS_RAFRAICHISSEMENT*1000); 
 					temps -= TEMPS_RAFRAICHISSEMENT*1000;
 					
@@ -205,9 +206,10 @@ public class Session {
 		}
 		System.out.println(")");
 		
-		if(encheres.size()>0) sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, 
-				encheres.get(0).getJoueur().getPseudo(), Integer.toString(encheres.get(0).getNbCoups())));
-		else if (vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null){
+		if(encheres.size()>0){
+			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, 
+					encheres.get(0).getJoueur().getPseudo(), Integer.toString(encheres.get(0).getNbCoups())));
+		} else if (vainqueurReflexion!=null && nbCoupsVainqueurReflexion!=null){
 			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE, vainqueurReflexion.getPseudo(), nbCoupsVainqueurReflexion.toString()));
 		} else {
 			sendToAllPlaying(ProtocoleCreator.create(Protocole.FINENCHERE));
@@ -231,7 +233,7 @@ public class Session {
 		int temps = (SECONDS_RESOLUTION+3)*1000; // Ajout de 3sec (lenteur réseau, ...)
 		synchronized (this) {
 			try {
-				while(temps>0){
+				while(temps>0 && deplacement==null){
 					this.wait(TEMPS_RAFRAICHISSEMENT*1000); // Ajout de 3sec (lenteur réseau, ...)
 					temps -= TEMPS_RAFRAICHISSEMENT*1000;
 					

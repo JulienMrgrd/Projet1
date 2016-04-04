@@ -56,20 +56,14 @@ void fctThreadEcoute(){
 		isProtInconnu = 0;
 		argCheck = 1;
 		sizeMessageServer=0;
-		printf("avant memset affich\n");
 		memset(affich, 0, sizeof affich);
-		printf("after memset affich\n");
 		memset(recvBuffer, 0, sizeof recvBuffer);
 		if((sizeMessageServer = recv(sock, recvBuffer, sizeof recvBuffer, 0)) <= 0){
 			puts("Serveur déconnecté ...\n");
 			break;
 		} else {
+			if(sizeMessageServer < 3 || isNonPrintable(recvBuffer)) continue; // le cas des ping
 			printf("Message reçu : %s\n", recvBuffer);
-		}
-
-		if(sizeMessageServer==2){
-			printf("Message reçu vide\n");
-			continue;
 		}
 
 		char** split = splitWithChar(recvBuffer, '/');
@@ -79,6 +73,7 @@ void fctThreadEcoute(){
 
 		char* prot = split[0];
 		char* argOne = split[1];
+		char* argTwo = split[2];
 
 		if(!strcmp(prot,"BIENVENUE")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError; // Vérifie que les arguments sont !=NULL
@@ -86,7 +81,7 @@ void fctThreadEcoute(){
 				printf("J'ai déjà un username\n");
 				continue;
 			}
-			username = strdup(split[1]);
+			username = strdup(argOne);
 			printf("Bienvenue %s",username);
 			sprintf(affich,"Bienvenue %s",username);
 			destroyPageConnexion();
@@ -157,9 +152,11 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"TOUR")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // enigme
-			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // bilan
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError; // bilan
+			sprintf(affich,"[serveur] : Nouveau tour !");
+			addMessageServerPageJeu(affich);
 			sleep(1);
-			startReflexion(argOne, split[2]);
+			startReflexion(argOne, argTwo);
 
 		} else if(!strcmp(prot,"TUASTROUVE")){
 			sprintf(affich,"[serveur] : Tu es le premier à avoir trouvé !");
@@ -169,10 +166,10 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"ILATROUVE")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
-			if((argCheck=checkOneArgument(split[2]))==0) goto argError;
-			sprintf(affich,"[serveur] : %s a trouve une solution en %s coups",argOne,split[2]); // ???? en X coups
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError;
+			sprintf(affich,"[serveur] : %s a trouve une solution en %s coups",argOne,argTwo); // ???? en X coups
 			addMessageServerPageJeu(affich);
-			meilleureProposition(argOne, split[2]);
+			meilleureProposition(argOne, argTwo);
 			setPhase("ENCHERE");
 
 		} else if(!strcmp(prot,"FINREFLEXION")){
@@ -186,19 +183,19 @@ void fctThreadEcoute(){
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"ECHEC")){
-			sprintf(affich,"[serveur] : Votre enchere est incoherente a cause de celle de %s qui a encherit en %s",argOne,split[2]);// ???? en X coups
+			sprintf(affich,"[serveur] : Votre enchere est incoherente a cause de celle de %s qui a encherit en %s",argOne,argTwo);// ???? en X coups
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"NOUVELLEENCHERE")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
-			if((argCheck=checkOneArgument(split[2]))==0) goto argError;
-			sprintf(affich,"[serveur] : %s a effectué une enchere en %s coups.",argOne,split[2]);// ???? en X coups
-			meilleureProposition(argOne, split[2]);
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError;
+			sprintf(affich,"[serveur] : %s a effectué une enchere en %s coups.",argOne,argTwo);// ???? en X coups
+			meilleureProposition(argOne, argTwo);
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"FINENCHERE")){
-			if((argCheck=checkOneArgument(argOne))!=0 && (argCheck=checkOneArgument(split[2]))!=0 ){
-				sprintf(affich,"[serveur] : Les encheres sont finies, le meilleur est %s en %s coups.",argOne,split[2]); // ???? en X coups
+			if((argCheck=checkOneArgument(argOne))!=0 && (argCheck=checkOneArgument(argTwo))!=0 ){
+				sprintf(affich,"[serveur] : Les encheres sont finies, le meilleur est %s en %s coups.",argOne,argTwo); // ???? en X coups
 			} else{
 				sprintf(affich,"[serveur] : Les encheres sont finies, il n'y a aucun vainqueur !");
 			}
@@ -207,8 +204,8 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"SASOLUTION")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
-			if((argCheck=checkOneArgument(split[2]))==0) goto argError; // solution
-			sprintf(affich,"[serveur] : La solution de %s est : %s",argOne,split[2]);
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError; // solution
+			sprintf(affich,"[serveur] : La solution de %s est : %s",argOne,argTwo);
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"BONNE")){
@@ -236,6 +233,9 @@ void fctThreadEcoute(){
 			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"CHAT")){
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError; // message
+			sprintf(affich,"[%s] : %s",argOne, argTwo);
 			addMessageServerPageJeu(affich);
 
 		} else {
