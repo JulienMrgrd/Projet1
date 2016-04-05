@@ -71,7 +71,7 @@ public class Server{
 						while(nbJoueurs<2){ // Préconditions pour lancer une session
 							try {
 								sync.wait();
-								sleep(500); // Pour ne pas envoyer immédiatement envoyer START_TIME après BIENVENUE (problème TCP)
+								sleep(1000); // Pour ne pas envoyer immédiatement envoyer START_TIME après BIENVENUE (problème TCP)
 							} catch (InterruptedException e) {
 								System.out.println("(startSessionIfNeeded) wait impossible");
 							}
@@ -90,7 +90,7 @@ public class Server{
 					} while(secondsBeforeStartSession>0);
 					secondsBeforeStartSession=0;
 					
-					sleep(500);// Pour ne pas envoyer immédiatement envoyer SESSION après LE_SAVIEZ_VOUS (problème TCP)
+					sleep(1000);// Pour ne pas envoyer immédiatement envoyer SESSION après LE_SAVIEZ_VOUS (problème TCP)
 					
 					if(nbJoueurs<2){ // Un ou plusieurs joueurs ont quittés
 						sendAll(ProtocoleCreator.create(Protocole.START_CANCEL_SESSION));

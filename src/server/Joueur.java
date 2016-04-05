@@ -7,10 +7,13 @@ import java.net.Socket;
 
 import other.Protocole;
 import other.ProtocoleCreator;
+import utils.StringUtils;
+import utils.insultes.InsultesUtils;
 
 
 public class Joueur extends Thread{
 
+	private static final int MAX_INSULTES = 3;
 	private String pseudo;
 	private int score;
 	private PrintWriter ecriture;
@@ -19,6 +22,7 @@ public class Joueur extends Thread{
 	
 	private boolean hasQuit; // To stop listening and stop the thread
 	private boolean isWaiting;
+	private int nbInsulte;
 
 	public Joueur(Socket socket, Server server) {
 		score = 0;
@@ -71,7 +75,7 @@ public class Joueur extends Thread{
 
 	/** throws IOException si le client se déconnecte
 	 */
-	public void sendToJoueur(String msg) throws IOException{
+	public synchronized void sendToJoueur(String msg) throws IOException{
 		if(ecriture!=null){
 			ecriture.print(msg);
 			ecriture.flush();
@@ -111,7 +115,6 @@ public class Joueur extends Thread{
 			if(!server.addJoueur(this)){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.USERNAME_ALREADY_USED, username));
 			}
-			return;
 		}
 		
 		if( username==null || !username.equals(pseudo) ){
@@ -201,12 +204,34 @@ public class Joueur extends Thread{
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this)){
 				String message = "";
-				for(int i=2; i<msgs.length; i++){
-					message += msgs[i]; // supprime les "/" contenu dans le message du client
+				boolean containsInsulte = false;
+				for(int i=2; i<msgs.length; i++){ // On parcours le "message" eventuellement splité s'il contient "/"
+					
+					String[] messageVerifInsulte = msgs[i].split(" ");
+					for(int j=0; j<messageVerifInsulte.length; j++){
+						if(InsultesUtils.isAnInsulte(messageVerifInsulte[j])) {
+							containsInsulte=true;
+							message += StringUtils.repeat("*", messageVerifInsulte[j].length()); // replace par "******"
+						} else {
+							message += msgs[i]; // supprime les "/" contenu dans le message du client
+						}
+					}
 				}
 				
 				System.out.println(pseudo+" dit : "+message);
-				server.sendAllButThis(message, this);
+				session.sendToAllPlaying(msg);
+				
+				if(containsInsulte){
+					this.addInsulte();
+					server.sleep(500);
+					if(getNbInsulte()>3){
+						session.sendToAllPlaying(ProtocoleCreator.create(Protocole.BANNI, pseudo +" est expulsé pour insultes !"));
+					} else {
+						sendToJoueur(ProtocoleCreator.create(Protocole.BEFORE_BAN, "Encore "+(MAX_INSULTES-getNbInsulte())+" insultes et vous serez banni."));
+					}
+				}
+				
+				
 			}
 
 		} else {
@@ -238,6 +263,14 @@ public class Joueur extends Thread{
 	
 	public void setIsWaiting(boolean bool){
 		isWaiting = bool;
+	}
+	
+	public int getNbInsulte(){
+		return nbInsulte;
+	}
+	
+	public void addInsulte(){
+		nbInsulte++;
 	}
 
 

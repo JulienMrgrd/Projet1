@@ -62,7 +62,9 @@ void fctThreadEcoute(){
 			puts("Serveur déconnecté ...\n");
 			break;
 		} else {
-			if(strstr(recvBuffer, "PING")==1 || sizeMessageServer < 3 || isNonPrintable(recvBuffer)) continue; // le cas des ping
+			if(strstr(recvBuffer, "PING") || sizeMessageServer < 3 || isNonPrintable(recvBuffer)){
+				continue; // le cas des ping
+			}
 			printf("Message reçu : %s\n", recvBuffer);
 		}
 
@@ -195,6 +197,7 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"FINENCHERE")){
 			if((argCheck=checkOneArgument(argOne))!=0 && (argCheck=checkOneArgument(argTwo))!=0 ){
+				//auTourDe(argOne);
 				sprintf(affich,"[serveur] : Les encheres sont finies, le meilleur est %s en %s coups.",argOne,argTwo); // ???? en X coups
 			} else{
 				sprintf(affich,"[serveur] : Les encheres sont finies, il n'y a aucun vainqueur !");
@@ -214,6 +217,8 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"MAUVAISE")){
 			if((argCheck=checkOneArgument(argOne))!=0){
+				//auTourDe(argOne);
+				setPhase("RESOLUTION");
 				sprintf(affich,"[serveur] : La solution est mauvaise, au tour de %s" ,argOne);
 			} else {
 				sprintf(affich,"[serveur] : La solution est mauvaise !");
@@ -226,6 +231,8 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"TROPLONG")){
 			if((argCheck=checkOneArgument(argOne))!=0){
+				//auTourDe(argOne);
+				setPhase("RESOLUTION");
 				sprintf(affich,"[serveur] : Temps de resolution écoulé, au tour de %s" ,argOne);
 			} else{
 				sprintf(affich,"[serveur] : Temps de resolution écoulé !");
@@ -235,8 +242,18 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"CHAT")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
 			if((argCheck=checkOneArgument(argTwo))==0) goto argError; // message
-			sprintf(affich,"[%s] : %s",argOne, argTwo);
+
+			if(argOne==username) sprintf(affich,"%s", argTwo); // Si le message vient de moi
+			else sprintf(affich,"[%s] : %s", argOne, argTwo);
 			addMessageServerPageJeu(affich);
+
+		} else if(!strcmp(prot,"BEFORE_BAN")){
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // message
+			sprintf(affich,"[serveur] : %s" ,argOne);
+
+		} else if(!strcmp(prot,"BANNI")){
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // message
+			sprintf(affich,"[serveur] : %s" ,argOne);
 
 		} else {
 			isProtInconnu = 1;

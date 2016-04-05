@@ -2,11 +2,6 @@
 #include <string.h>
 #include "utils.h"
 
-char ** splitWithString(char *str, char* separator) {
-	// TODO:
-	return;
-}
-
 char **splitWithChar(char *str, char separator) {
 	char **res = NULL;
 	int  nbstr = 1;

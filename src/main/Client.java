@@ -76,9 +76,7 @@ public class Client{
 
 								if(str.startsWith(Protocole.SESSION.name())){
 									plateau = str.split("/")[1];
-								}
-
-								if(str.startsWith(Protocole.TOUR.name())){
+								} else if(str.startsWith(Protocole.TOUR.name())){
 									enigme = str.split("/")[1];
 									System.out.println();
 									PlateauUtils.display(PlateauUtils.getPlateauDeBase(), plateau, enigme);

@@ -167,7 +167,7 @@ public class Session {
 
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
-		server.sleep(500); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
+		server.sleep(1000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
 		
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
@@ -181,7 +181,7 @@ public class Session {
 					if(getNbActifs()>=2) updateActifs(); // Evite de ping l'unique joueur restant
 					else break;
 				}
-				server.sleep(500); // Pour éviter que le client PING et FINREFLEXION en même temps.
+				server.sleep(1000); // Pour éviter que le client PING et FINREFLEXION en même temps.
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -240,7 +240,7 @@ public class Session {
 					if(getNbActifs()>=2) updateActifs();
 					else break;
 				}
-				server.sleep(500); // Pour éviter que le client PING et BONNE,MAUVAISE,FINRESO en même temps.
+				server.sleep(1000); // Pour éviter que le client PING et BONNE,MAUVAISE,FINRESO en même temps.
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -255,7 +255,7 @@ public class Session {
 				System.out.println("Mauvaise solution");
 				if(indexEnch+1>=encheres.size()){
 					sendToAllPlaying(ProtocoleCreator.create(Protocole.MAUVAISE));
-					server.sleep(500);
+					server.sleep(1000);
 					sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
 					return;
 				} else {

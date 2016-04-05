@@ -47,7 +47,9 @@ public enum Protocole {
 	START_CANCEL_SESSION, // indique au client que la partie est annulée, faute de 2 joueurs
 	LE_SAVIEZ_VOUS,
 	CHAT,
-	PING
+	PING,
+	BEFORE_BAN,
+	BANNI
 	;
 	
 }
