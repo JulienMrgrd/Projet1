@@ -252,8 +252,11 @@ void fctThreadEcoute(){
 			sprintf(affich,"[serveur] : %s" ,argOne);
 
 		} else if(!strcmp(prot,"BANNI")){
-			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // message
-			sprintf(affich,"[serveur] : %s" ,argOne);
+			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
+			if((argCheck=checkOneArgument(argTwo))==0) goto argError;  // messageServer
+
+			if(user==username) quit();
+			else sprintf(affich,"[serveur] : %s" ,argTwo);
 
 		} else {
 			isProtInconnu = 1;

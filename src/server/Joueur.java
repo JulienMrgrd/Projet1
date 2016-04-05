@@ -225,7 +225,7 @@ public class Joueur extends Thread{
 					this.addInsulte();
 					server.sleep(500);
 					if(getNbInsulte()>3){
-						session.sendToAllPlaying(ProtocoleCreator.create(Protocole.BANNI, pseudo +" est expulsé pour insultes !"));
+						session.sendToAllPlaying(ProtocoleCreator.create(Protocole.BANNI, pseudo, pseudo +" est expulsé pour insultes !"));
 					} else {
 						sendToJoueur(ProtocoleCreator.create(Protocole.BEFORE_BAN, "Encore "+(MAX_INSULTES-getNbInsulte())+" insultes et vous serez banni."));
 					}

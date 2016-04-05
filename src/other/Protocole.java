@@ -48,8 +48,8 @@ public enum Protocole {
 	LE_SAVIEZ_VOUS,
 	CHAT,
 	PING,
-	BEFORE_BAN,
-	BANNI
+	BEFORE_BAN,  // (BEFORE_BAN/message) indique à user qu'il lui reste X insultes avant d'être banni
+	BANNI		// (BANNI/User/messageServer) indique à tous que user a été banni
 	;
 	
 }
