@@ -26,9 +26,7 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
 	sprintf(name, "%s",  gtk_entry_get_text(entry));
 	if(strcmp(name, "")){
 		if(strstr(name,"/")){
-			gdk_threads_enter();
-			changeLabelPageConnexion("Impossible de mettre des /");
-			gdk_threads_leave();
+			gtk_label_set_text(label, "Impossible de mettre des /");
 		}else{
 			sprintf(messageEnvoye, "CONNEXION/%s/\n", name);
 			sendToServer(messageEnvoye);

@@ -28,7 +28,7 @@ int proposition(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
 	char* coups = gtk_entry_get_text(entry);
 
-	if(strcmp(coups, "") && strcmp(name, "")){
+	if(strcmp(coups, "")){
 
 		char messageEnvoye[70];
 
@@ -77,7 +77,7 @@ void setPhase(char *phase){
 	if(strstr(phase,"ENCHERE") && phaseReflexion==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase d'enchere");
-		gtk_button_set_label(buttonSoumission, "Encherir");
+		gtk_button_set_label(buttonSoumission, "Votre enchère");
 		gdk_threads_leave();
 		phaseReflexion=0;
 		phaseResolution=0;
@@ -87,17 +87,17 @@ void setPhase(char *phase){
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de resolution");
-		gtk_button_set_label(buttonSoumission, "Proposer votre solution");
+		gtk_button_set_label(buttonSoumission, "Votre solution");
 		gdk_threads_leave();
 		phaseEnchere=0;
 		phaseReflexion=0;
 		phaseResolution=1;
 		pthread_create(&temps, NULL, threadChrono, 60);
 	}
-	if(strstr(phase,"REFLEXION")&&phaseReflexion==0){
+	if(strstr(phase,"REFLEXION") && phaseReflexion==0){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de reflexion");
-		gtk_button_set_label(buttonSoumission, "Proposer votre nombre de coups");
+		gtk_button_set_label(buttonSoumission, "Votre nombre de coups");
 		gdk_threads_leave();
 		phaseResolution=0;
 		phaseReflexion=1;
@@ -115,13 +115,13 @@ int chat(GtkWidget * p_wid, gpointer p_data){
 	char message[140];
 
 	sprintf(message, "%s",  gtk_entry_get_text(entry));
-	if(strcmp(name, "") && strcmp(message, "")){
+	if(strlen(message)!=0){
 		sprintf(messageEnvoye, "CHAT/%s/%s\n",name,message);
 		sendToServer(messageEnvoye);
 	}
+	gtk_entry_set_text(entry, "");
 
 	return 0;
-
 
 }
 
@@ -276,7 +276,7 @@ void displayPlateau(){
 	char* xSouligne = "|<span face=\"Sans\"><small><small><small>    </small></small></small></span>";
 	char* secSouligne = "|<span face=\"Sans\"><u><small><small>sec</small></small></u></span>";
 
-	gdk_threads_enter();	
+	gdk_threads_enter();
 	gtk_label_set_use_markup(pLabel[7][7], TRUE);
 	gtk_label_set_markup(pLabel[7][7], secSouligne);
 	gtk_label_set_use_markup(pLabel[7][8], TRUE);
@@ -319,8 +319,8 @@ void resetRobot(){
 
 /**
  * Affichage d'une case en fonction de ces coordonnées
- * @param x : coordonné en abscisse de la case (0 = tout à gauche)
- * @param y : coordonné en ordonnée de la case (0 = tout en bas)
+ * @param x : coordonnée en abscisse de la case (0 = tout à gauche)
+ * @param y : coordonnée en ordonnée de la case (0 = tout en bas)
  */
 void displayCase(int x, int y){
 	char res[5] = "";
@@ -331,12 +331,14 @@ void displayCase(int x, int y){
 		}else{
 			strcat(res, "|");
 		}
-	}else {
-		strcat(res, "  ");
+	}else if(y==0 || y==16){
+		strcat(res, ".");
+	}else{
+		strcat(res, " ");
 	}
 
 	if(strstr(murLabel[x][y], "B")) strcat(res, "_");
-	else strcat(res, " ");
+	else strcat(res, "  ");
 
 
 	if(strstr(murLabel[x][y], "D")){
@@ -346,8 +348,10 @@ void displayCase(int x, int y){
 		} else {
 			strcat(res, "|");
 		}
-	}else {
-		strcat(res, "  ");
+	}else if(y==0 || y==16){
+		strcat(res, ".");
+	}else{
+		strcat(res, " ");
 	}
 
 
@@ -432,12 +436,12 @@ void threadChrono(int chrono){
 			&& (phaseResol==phaseResolution)){ //On teste si on change pas de phase
 		if(chrono < 100){
 			if(chrono < 10){
-				sprintf(temps, "|    <span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+				sprintf(temps, "| <span face=\"Sans\"><small>%d</small></span>", chrono);
 			}else{
-				sprintf(temps, "|  <span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+				sprintf(temps, "| <span face=\"Sans\"><small><small>%d</small></small></span>", chrono);
 			}
 		}else{
-			sprintf(temps, "|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+			sprintf(temps, "|<span face=\"Sans\"><small><small><small>%d</small></small></small></span>", chrono);
 		}
 		gdk_threads_enter();
 		gtk_label_set_markup(pLabel[7][8], temps);
@@ -454,13 +458,17 @@ void threadChrono(int chrono){
 void affichageBilan(char *bilan){
 	printf("on entre dans affichage bilan\n");
 	printf("bilan ==== %s\n",bilan);
-	
+
 	char** splitParentOuvr = splitWithChar(bilan, '(');
 	char** splitParentFerm;
 	char** splitVirgule;
 	char bilanAffich[300] = "";
 	char tmp[50] = "";
-	sprintf(tmp,"Vous etes au tours %s\n",splitParentOuvr[0]);
+	if(!strcmp(splitParentOuvr[0],"1")){
+		sprintf(tmp,"Vous etes au tour %s\n",splitParentOuvr[0]);
+	}else {
+		sprintf(tmp,"Vous etes au tours %s\n",splitParentOuvr[0]);
+	}
 	strcat(bilanAffich,tmp);
 	int j;
 	int i;
@@ -469,7 +477,7 @@ void affichageBilan(char *bilan){
 			splitParentFerm = splitWithChar(splitParentOuvr[i], ')');
 			for(j=0; (splitParentFerm[j] != NULL) ; j++){
 				splitVirgule = splitWithChar(splitParentFerm[j], ',');
-				sprintf(tmp,"Le joueur %s a %s points\n",splitVirgule[0],splitVirgule[1]);
+				sprintf(tmp,"%s : %s points\n",splitVirgule[0],splitVirgule[1]);
 				strcat(bilanAffich,tmp);
 			}
 		}
@@ -589,7 +597,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	buttonSoumission = GTK_BUTTON(gtk_builder_get_object(builder, "soumission"));
 
 	gtk_misc_set_alignment(labMsgServer,0,0);
-	gtk_misc_set_alignment(labRecapPartie,0.5,0);
+	gtk_misc_set_alignment(labRecapPartie,0.2,0);
 
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
