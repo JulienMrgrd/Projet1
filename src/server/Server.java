@@ -71,13 +71,13 @@ public class Server{
 						while(nbJoueurs<2){ // Préconditions pour lancer une session
 							try {
 								sync.wait();
-								sleep(1000); // Pour ne pas envoyer immédiatement envoyer START_TIME après BIENVENUE (problème TCP)
 							} catch (InterruptedException e) {
 								System.out.println("(startSessionIfNeeded) wait impossible");
 							}
 						}
 					}
 					
+					sleep(2000); // Pour ne pas envoyer immédiatement envoyer START_TIME après BIENVENUE (problème TCP)
 					secondsBeforeStartSession = Session.SECONDS_BEFORE_START;
 					sendAll(ProtocoleCreator.create(Protocole.START_TIME_SESSION, Integer.toString(Session.SECONDS_BEFORE_START)));
 					System.out.println("Début de partie dans "+Session.SECONDS_BEFORE_START+" secondes");

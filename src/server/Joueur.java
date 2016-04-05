@@ -208,18 +208,20 @@ public class Joueur extends Thread{
 				for(int i=2; i<msgs.length; i++){ // On parcours le "message" eventuellement splité s'il contient "/"
 					
 					String[] messageVerifInsulte = msgs[i].split(" ");
-					for(int j=0; j<messageVerifInsulte.length; j++){
-						if(InsultesUtils.isAnInsulte(messageVerifInsulte[j])) {
+					for(String insulte : messageVerifInsulte){
+						if(InsultesUtils.isAnInsulte(insulte)) {
 							containsInsulte=true;
-							message += StringUtils.repeat("*", messageVerifInsulte[j].length()); // replace par "******"
+							message += StringUtils.repeat("*", insulte.length()); // replace par "******"
 						} else {
-							message += msgs[i]; // supprime les "/" contenu dans le message du client
+							message += insulte;
 						}
+						message += " ";
 					}
+					
 				}
 				
 				System.out.println(pseudo+" dit : "+message);
-				session.sendToAllPlaying(msg);
+				session.sendToAllPlaying(ProtocoleCreator.create(Protocole.CHAT, msgs[1], message)); // message eventuellement modifié
 				
 				if(containsInsulte){
 					this.addInsulte();
@@ -227,7 +229,7 @@ public class Joueur extends Thread{
 					if(getNbInsulte()>3){
 						session.sendToAllPlaying(ProtocoleCreator.create(Protocole.BANNI, pseudo, pseudo +" est expulsé pour insultes !"));
 					} else {
-						sendToJoueur(ProtocoleCreator.create(Protocole.BEFORE_BAN, "Encore "+(MAX_INSULTES-getNbInsulte())+" insultes et vous serez banni."));
+						sendToJoueur(ProtocoleCreator.create(Protocole.BEFORE_BAN, "Encore "+(MAX_INSULTES-getNbInsulte()+1)+" insultes et vous serez banni..."));
 					}
 				}
 				

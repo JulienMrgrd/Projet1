@@ -2,7 +2,12 @@
 
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
-static GtkLabel *label = NULL;
+
+static GtkWidget *text_view;
+static GtkTextBuffer *buffer;
+static GtkWidget *scrolled_window;
+static GtkTextIter iter;
+
 static GError *error = NULL;
 static gchar *filename = NULL;
 static int isButtonXclicked = 1;
@@ -41,20 +46,26 @@ int startPageAttente(char* pseudo){
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 	g_signal_connect (fenetre, "destroy", G_CALLBACK (destroy), NULL);
 
-	label = GTK_WIDGET(gtk_builder_get_object (builder, "messageAttente"));
-	gtk_misc_set_alignment(label,0,0);
+	buffer = gtk_text_buffer_new(NULL);
+    text_view = GTK_WIDGET(gtk_builder_get_object (builder, "textview"));
+	gtk_text_view_set_buffer (text_view, buffer);
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (text_view), GTK_WRAP_WORD);
+    scrolled_window = GTK_WIDGET(gtk_builder_get_object (builder, "scrolledwindow"));
+    gtk_text_buffer_get_start_iter(buffer, &iter);
 
-	gtk_widget_show_all (fenetre);
+//	gtk_misc_set_alignment(scrolled_window,0,0);
 
 	if(username==NULL){
 		printf("Avant bienvenue\n");
-		char* toDisplay[11 + strlen(pseudo)];
-		sprintf(toDisplay,"Bienvenue %s", pseudo);
-		printf("Après init toDisplay\n");
-		gtk_label_set_text(label, toDisplay);
+		char bienvenue[60] = "Bienvenue dans la partie ";
+		strcat(bienvenue, pseudo);
+		gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, bienvenue, -1, NULL, NULL, NULL, NULL,NULL);
+		gtk_text_buffer_get_end_iter(buffer,&iter);
 		printf("Après bienvenue\n");
 	}
 	username = pseudo;
+
+	gtk_widget_show_all (fenetre);
 
 	gtk_main();
 	gdk_threads_leave();
@@ -82,24 +93,12 @@ void addMessageServerPageAttente(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 
 	printf("Avant ajouter message attente\n");
-	gdk_threads_enter();
-	char* toDisplay = gtk_label_get_text(label);
-	gdk_threads_leave();
-	printf("Avant setText\n");
-	if(toDisplay==NULL || !strcmp(toDisplay, " ") ){
-		printf("getText vide\n");
-		gdk_threads_enter();
-		gtk_label_set_text(label, message);
-		gdk_threads_leave();
-	} else {
-		printf("getText non vide\n");
-		char* res[strlen(toDisplay) + strlen(message) + 2];
-		printf("Après instanc toDisplay\n");
-		sprintf(res, "%s\n%s", toDisplay, message);
-		printf("Après cat toDisplay\n");
-		gdk_threads_enter();
-		gtk_label_set_text(label, res);
-		gdk_threads_leave();
-	}
+	char newMessage[strlen(message)+1];
+	strcpy(newMessage, "\n");
+	strcat(newMessage, message);
+
+	gtk_text_buffer_insert(buffer, &iter, newMessage, -1);
+	gtk_text_buffer_get_end_iter(buffer,&iter);
 	printf("Après ajouter message attente\n");
+
 }

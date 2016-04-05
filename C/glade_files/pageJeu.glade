@@ -162,12 +162,17 @@
                                           <placeholder/>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel" id="messageServeur">
+                                          <object class="GtkScrolledWindow" id="scrolledwindow">
                                             <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
-                                            <property name="label"> </property>
-                                            <property name="ellipsize">end</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="hscrollbar_policy">automatic</property>
+                                            <property name="vscrollbar_policy">automatic</property>
+                                            <child>
+                                              <object class="GtkTextView" id="textview">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                              </object>
+                                            </child>
                                           </object>
                                           <packing>
                                             <property name="resize">True</property>

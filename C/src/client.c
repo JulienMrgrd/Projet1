@@ -115,7 +115,7 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"START_TIME_SESSION")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
-			sprintf(affich,"[serveur] : La partie commence dans %s sec...",argOne);
+			sprintf(affich,"[serveur] : La partie commence dans %s secondes...",argOne);
 			addMessageServerPageAttente(affich);
 
 		} else if(!strcmp(prot,"START_CANCEL_SESSION")){
@@ -255,8 +255,11 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
 			if((argCheck=checkOneArgument(argTwo))==0) goto argError;  // messageServer
 
-			if(argOne==username) quit();
-			else sprintf(affich,"[serveur] : %s" ,argTwo);
+			if(!strcmp(argOne,username)){
+				quit();
+				break;
+			
+			} else sprintf(affich,"[serveur] : %s" ,argTwo);
 
 		} else {
 			isProtInconnu = 1;

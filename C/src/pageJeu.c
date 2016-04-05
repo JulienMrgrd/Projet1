@@ -3,7 +3,12 @@
 
 static GtkWidget *fenetre = NULL;
 static GtkBuilder *builder = NULL;
-static GtkLabel *labMsgServer = NULL;
+
+static GtkWidget *text_view;
+static GtkTextBuffer *buffer;
+static GtkWidget *scrolled_window;
+static GtkTextIter iter;
+
 static GtkLabel *labPhase = NULL;
 static GtkLabel *labMeilleurProp = NULL;
 static GtkLabel *labRecapPartie = NULL;
@@ -63,7 +68,6 @@ void meilleureProposition(char* username, char* nbCoups){
 	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
 	else sprintf(message, "Meilleure proposition : %s = %d", username, atoi(nbCoups));
 
-	if(username==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
 	gdk_threads_enter();
 	gtk_label_set_text(labMeilleurProp, message);
 	gdk_threads_leave();
@@ -124,7 +128,7 @@ void setPhase(char *phase){
 		phaseReflexion=1;
 		phaseEnchere=0;
 		numChrono++;
-		pthread_create(&temps, NULL, threadChrono, 30);
+		pthread_create(&temps, NULL, threadChrono, 300);
 		auTourDe("");
 	}
 }
@@ -614,15 +618,20 @@ int startPageJeu(char* plateau, char* pseudo){
 		return code;
 	}
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
-	labMsgServer = GTK_WIDGET(gtk_builder_get_object (builder, "messageServeur"));
 	labPhase = GTK_WIDGET(gtk_builder_get_object (builder, "phase"));
 	labRecapPartie = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
 	labMeilleurProp = GTK_WIDGET(gtk_builder_get_object (builder, "meilleurProposition"));
 	buttonSoumission = GTK_BUTTON(gtk_builder_get_object(builder, "soumission"));
 
-	gtk_misc_set_alignment(labMsgServer,0,0);
+	buffer = gtk_text_buffer_new(NULL);
+	text_view = GTK_WIDGET(gtk_builder_get_object (builder, "textview"));
+	gtk_text_view_set_buffer (text_view, buffer);
+	gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (text_view), GTK_WRAP_WORD);
+	scrolled_window = GTK_WIDGET(gtk_builder_get_object (builder, "scrolledwindow"));
+	gtk_text_buffer_get_start_iter(buffer, &iter);
+
 	gtk_misc_set_alignment(labMeilleurProp,0,0);
-	gtk_misc_set_alignment(labRecapPartie,0.2,0);
+	gtk_misc_set_alignment(labRecapPartie,0.2,0.1);
 
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
@@ -671,16 +680,16 @@ void addMessageServerPageJeu(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	printf("Ajouter message server\n");
 
-	char* toDisplay = gtk_label_get_text(labMsgServer);
-	if(toDisplay==NULL || !strcmp(toDisplay, "") ){
-		gdk_threads_enter();
-		gtk_label_set_text(labMsgServer, message);
-		gdk_threads_leave();
+	printf("Avant ajouter message jeu\n");
+	char newMessage[strlen(message)+1];
+	if(buffer!=NULL && strlen(buffer)>0){
+		strcpy(newMessage, "\n");
+		strcat(newMessage, message);
 	} else {
-		char res[strlen(toDisplay) + strlen(message) + 10];
-		sprintf(res, "%s\n%s", toDisplay, message);
-		gdk_threads_enter();
-		gtk_label_set_text(labMsgServer, res);
-		gdk_threads_leave();
+		strcpy(newMessage, message);
 	}
+
+	gtk_text_buffer_insert(buffer, &iter, newMessage, -1);
+	gtk_text_buffer_get_end_iter(buffer,&iter);
+	printf("Après ajouter message jeu\n");
 }
