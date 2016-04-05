@@ -23,6 +23,12 @@ public class Server{
 	private Object sync;
 	private int secondsBeforeStartSession;
 	
+	/**
+	 * Constructeur du server
+	 * @param port : port sur lequelle sera rattaché le serveur
+	 * @throws UnknownHostException
+	 * @throws SocketException
+	 */
 	public Server(int port) throws UnknownHostException, SocketException {
 		this.port = port;
 		mapJoueurs = new HashMap<String, Joueur>();
@@ -104,6 +110,10 @@ public class Server{
 		}).start();
 	}
 
+	/**
+	 * Methode permettant l'envoie d'un message à tout les joueurs
+	 * @param message à envoyer aux joueurs
+	 */
 	public synchronized void sendAll(String message) {
 		List<Joueur> aSuppr = new ArrayList<>(mapJoueurs.size());
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
@@ -118,6 +128,11 @@ public class Server{
 		}
 	}
 	
+	/**
+	 * Envoyer un message à une liste de joueurs
+	 * @param message à envoyer aux joueurs
+	 * @param joueurs liste des joueurs à qui envoyer le message
+	 */
 	public void sendToThem(String message, List<Joueur> joueurs) {
 		if(joueurs == null) return;
 		List<Joueur> aSuppr = new ArrayList<>(joueurs.size());
@@ -135,6 +150,12 @@ public class Server{
 		}
 	}
 	
+	/**
+	 * Envoyer un message à une liste de joueurs à l'exception d'un joueur
+	 * @param message à envoyer aux joueurs
+	 * @param joueurs liste des joueurs à qui envoyer le message
+	 * @param toNotInclude joueur à qui il ne faut pas envoyer le message
+	 */
 	public synchronized void sendToThemButThis(String message, List<Joueur> joueurs, Joueur toNotInclude) {
 		if(joueurs == null) return;
 		List<Joueur> aSuppr = new ArrayList<>(joueurs.size());
@@ -153,6 +174,11 @@ public class Server{
 		}
 	}
 	
+	/**
+	 * Envoyer un message à tous les joueurs à l'exception d'un joueur
+	 * @param message à envoyer aux joueurs
+	 * @param toNotInclude joueur à qui il ne faut pas envoyer le message
+	 */
 	public synchronized void sendAllButThis(String message, Joueur toNotInclude) {
 		List<Joueur> aSuppr = new ArrayList<>(mapJoueurs.size());
 		for (Entry<String, Joueur> onejoueur : mapJoueurs.entrySet()){ // parcours de la table des connectés
@@ -169,6 +195,11 @@ public class Server{
 		}
 	}
 	
+	/**
+	 * Methode d'ajout d'un joueur
+	 * @param joueur à ajouter
+	 * @return vrai si on peux ajouter le joueur, faux sinon
+	 */
 	synchronized public boolean addJoueur(Joueur joueur) {
 		String pseudo = joueur.getPseudo();
 		if(containsJoueur(pseudo)) return false;
@@ -196,6 +227,11 @@ public class Server{
 		return true;
 	}
 	
+	/**
+	 * Methode permettant de savoir si un pseudo est déjà prit
+	 * @param pseudo a vérifier si déjà prit
+	 * @return vrai si le pseudo est déjà prit, faux sinon
+	 */
 	private boolean containsJoueur(String pseudo) {
 		for(String key : mapJoueurs.keySet()){
 			if(key.equalsIgnoreCase(pseudo)) return true;
@@ -203,6 +239,11 @@ public class Server{
 		return false;
 	}
 
+	/**
+	 * Methode permettant la suppression d'un joueur
+	 * @param joueur à supprimer
+	 * @return vrai si le joueur a pu être supprimer, faux sinon
+	 */
 	synchronized public boolean removeJoueur(Joueur joueur) {
 		String pseudo = joueur.getPseudo();
 		if( !this.mapJoueurs.containsKey(pseudo) ) return false;

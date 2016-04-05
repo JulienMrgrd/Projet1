@@ -13,6 +13,10 @@ public class PlateauChooser {
 		this.plat = plat;
 	}
 	
+	/**
+	 * Methode selectionnant le plateau a utiliser et ajout des murs du plateau sur le plateau de la session
+	 * @return le numéro du plateau selectionner
+	 */
 	public int applyRandomPlateau(){
 		int plateauAlea = 1 + new Random().nextInt(PlateauChooser.NB_PLATEAU);
 		chosenPlateau = plateauAlea;
@@ -260,10 +264,10 @@ public class PlateauChooser {
 		casesAvecDeuxMursContigus[16] = plat[13][9];
 	} // fin plateau 1
 	
-	public int getChosenPlateau(){
-		return chosenPlateau;
-	}
-	
+	/**
+	 * Methode retournant toutes les cases avec 2 murs contigus.
+	 * @return le tableau contenant tous les murs avec 2 murs contigus
+	 */
 	public Case[] getCasesAvecDeuxMursContigus(){
 		return casesAvecDeuxMursContigus;
 	}

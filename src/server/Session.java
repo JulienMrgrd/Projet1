@@ -15,6 +15,7 @@ import utils.StringUtils;
 
 public class Session {
 
+	//Variable globales pour pouvoir modifier rapidement les paramétres important d'une partie à un seul endroit
 	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 10;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
@@ -47,6 +48,11 @@ public class Session {
 	private Joueur actif;
 	private String deplacement;
 	
+	/**
+	 * Constructeur de la création d'une session
+	 * @param mapPseudo_Joueur map contenant tous les joueurs avec comme clé leur pseudo
+	 * @param server auquel est rattaché la session
+	 */
 	public Session(Map<String, Joueur> mapPseudo_Joueur, Server server) {
 		this.server = server;
 		this.mapPseudo_Joueur = mapPseudo_Joueur; // Passage par référence, pas par copie
@@ -57,6 +63,9 @@ public class Session {
 		isInEnchere = false;
 	}
 
+	/**
+	 * Méthode lançant la session
+	 */
 	public void startSession(){
 		System.out.println("Nouvelle partie");
 		plateau.init();
@@ -65,11 +74,17 @@ public class Session {
 		nextStep();
 	}
 
+	/**
+	 * Methode stoppant la session
+	 */
 	public void stopSession(){
 		System.out.println("Fin de la partie");
 		hasStarted = false;
 	}
 	
+	/**
+	 * Methode lançant un nouveau tour complet, jusqu'à ce qu'un joueur atteigne le score maximum ou que le nombre de joueur est inférieur à 2
+	 */
 	public void nextStep(){
 		resetAttributes();
 		nbTours ++;
@@ -98,6 +113,7 @@ public class Session {
 			for(Joueur j : allPlaying){
 				if(j.isWaiting()){
 					try {
+						//Envoie du protocole SESSION/plateau aux joueurs qui était en phase d'attente
 						j.sendToJoueur(ProtocoleCreator.create(Protocole.SESSION, plateau.plateau()));
 						j.setIsWaiting(false);
 					} catch (IOException e) {
@@ -149,12 +165,14 @@ public class Session {
 			nextStep(); // Ca repars pour un tour !
 			break;
 
+			//Si le score maximum est atteint arréter la session et signaler qui est le vainqueur
 		case MaxScoreReached:
 			System.out.println("case : Max score reached");
 			sendVainqueur(actif);
 			stopSession();
 			break;
 
+			//Si le nombre de joueur est inférieur à 2 arreter la partie et envoyer au joueur restant qu'il est le vainqueur
 		case NotEnoughPlayers:
 			System.out.println("case : not enough");
 			if(allPlaying.size()==1){
@@ -165,6 +183,9 @@ public class Session {
 		}
 	}
 
+	/**
+	 * Methode lançant la phase de reflexion
+	 */
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
 		server.sleep(1000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
@@ -195,6 +216,9 @@ public class Session {
 		
 	}
 	
+	/**
+	 * Methode lançant la phase d'enchere
+	 */
 	private void startEncheres() {
 		System.out.println("startEncheres ("+SECONDS_ENCHERES+" sec)");
 		if(nbCoupsVainqueurReflexion!=null && vainqueurReflexion!=null) addEncheres(new Enchere(vainqueurReflexion, nbCoupsVainqueurReflexion));
@@ -216,6 +240,9 @@ public class Session {
 		}
 	}
 	
+	/**
+	 * Methode lançant la phase de resolution
+	 */
 	private void startResolution() {
 		int nbCoups = 0;
 		if(encheres != null && encheres.size()>0){
@@ -234,10 +261,10 @@ public class Session {
 		synchronized (this) {
 			try {
 				while(temps>0 && deplacement==null){
-					this.wait(TEMPS_RAFRAICHISSEMENT*1000); // Ajout de 3sec (lenteur réseau, ...)
-					temps -= TEMPS_RAFRAICHISSEMENT*1000;
+					this.wait(TEMPS_RAFRAICHISSEMENT*1000); // rafraichissement toutes les secondes pour éviter de boucler en continu inutilement
+					temps -= TEMPS_RAFRAICHISSEMENT*1000;	
 					
-					if(getNbActifs()>=2) updateActifs();
+					if(getNbActifs()>=2) updateActifs(); //Vérification du nombre de joueur restant
 					else break;
 				}
 				server.sleep(1000); // Pour éviter que le client PING et BONNE,MAUVAISE,FINRESO en même temps.
@@ -245,7 +272,7 @@ public class Session {
 				e.printStackTrace();
 			}
 		}
-		if(deplacement!=null && (deplacement.length()/2)<=nbCoups){
+		if(deplacement!=null && (deplacement.length()/2)<=nbCoups){ //Vérification de la solution proposer
 			System.out.println("Deplacement correctement formé");
 			if(ResolutionUtils.isGoodSolution(deplacement, plateau)){
 				System.out.println(actif.getPseudo()+" gagne 1 point ! (nb Points = "+(actif.getScore()+1)+")");
@@ -283,6 +310,9 @@ public class Session {
 		}
 	}
 	
+	/**
+	 * Methode permettant de réinitialiser tous les attributs à chaque step
+	 */
 	private void resetAttributes(){
 		isInReflexion=false;
 		vainqueurReflexion=null;
@@ -297,6 +327,10 @@ public class Session {
 		deplacement=null;
 	}
 
+	/**
+	 * Methode permettant de vérifier si on peux continuer ou non
+	 * @return "CanContinue" si on peux continuer sinon "NotEnoughPlayers" ou "MaxScoreReached" si on ne peux plus continuer
+	 */
 	private GameState shouldStop(){
 		if(getNbActifs() <= 1) return GameState.NotEnoughPlayers;
 
@@ -307,6 +341,10 @@ public class Session {
 		return GameState.CanContinue;
 	}
 	
+	/**
+	 * Envoie à tous les joueurs le pseudo du vainqueur
+	 * @param joueur vainqueur de la partie
+	 */
 	private void sendVainqueur(Joueur joueur) {
 		System.out.println("Vainqueur : "+joueur.getPseudo());
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.VAINQUEUR, bilan()));
@@ -335,6 +373,10 @@ public class Session {
 		}
 	}
 	
+	/**
+	 * Methode permettant d'envoyer un message à tous les joueurs entrain de jouer
+	 * @param message à envoyer aux joueurs entrain de jouer
+	 */
 	public void sendToAllPlaying(String message) {
 		server.sendToThem(message, allPlaying);
 	}

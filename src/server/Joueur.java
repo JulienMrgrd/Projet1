@@ -24,6 +24,11 @@ public class Joueur extends Thread{
 	private boolean isWaiting;
 	private int nbInsulte;
 
+	/**
+	 * Constructeur d'un joueur
+	 * @param socket Socket sur laquelle sera rattaché le joueur
+	 * @param server Server avec lequelle communiquera le joueur
+	 */
 	public Joueur(Socket socket, Server server) {
 		score = 0;
 		this.server = server;
@@ -87,7 +92,7 @@ public class Joueur extends Thread{
 	}
 	
 	/**
-	 * 
+	 * Methode permettant la lecture de tous les messages reçu par le joueur et de les traiter
 	 */
 	private void readFromJoueur() throws IOException {
 		String msg = "";
@@ -242,6 +247,10 @@ public class Joueur extends Thread{
 
 	}
 	
+	/**
+	 * Methode permettant de tester si le joueur est toujours "en vie"
+	 * @return vrai si le joueur est toujours "en vie", faux sinon
+	 */
 	public boolean estEnVie(){
 		try{
 			sendToJoueur(Protocole.PING.name());

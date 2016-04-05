@@ -19,6 +19,10 @@ public class Plateau {
 		this.robots = robots;
 	}
 
+	/**
+	 * Initialisation des murs cerclant le plateau, plus choix du plateau a utiliser pour la session et initialisation
+	 * du tableau representant les 4 robots.
+	 */
 	public void init() {
 		for(int i=0; i<plat.length;i++){
 			for(int j=0; j<plat[i].length;j++){
@@ -42,6 +46,10 @@ public class Plateau {
 		updatePlateau(); // Ajoute obstacles, robots et cible
 	}
 	
+	
+	/**
+	 * Methode de mise a jour du plateau, ne modifiant pas les murs du plateaux mais plaçant les robots et la cible sur le plateau
+	 */
 	public void updatePlateau(){
 		if(chooser==null) init();
 		Case[] mursContigus = chooser.getCasesAvecDeuxMursContigus();
@@ -61,6 +69,10 @@ public class Plateau {
 		}
 	}
 	
+	/**
+	 * Methode permettant de récupérer une case aléatoire sur le plateau
+	 * @return case où on pourra eventuellement placer un robot
+	 */
 	private Case getRandomCaseForRobots() {
 		int xRand, yRand;
 		Random r = new Random();
@@ -72,6 +84,13 @@ public class Plateau {
 		return plat[xRand][yRand];
 	}
 
+	
+	/**
+	 * Methode permettant de savoir si 2 cases sont alignées et ne possédent aucun obbstacle entre les 2
+	 * @param one Case du robot a tester
+	 * @param two Case de la cible
+	 * @return true si il y a un obstacle entre les deux cases, faux sinon
+	 */
 	private boolean containsMursBetweenTwoAlignedCases(Case one, Case two){
 		if(one.getX()==two.getX() && one.getY()==two.getY()) return false; // meme case
 		else if(one.getX()==two.getX()){ // Si alignés en x
@@ -139,6 +158,9 @@ public class Plateau {
 		return enigme;
 	}
 	
+	/**
+	 * Methode permettant d'ajouter les murs centraux du plateau
+	 */
 	private void addMursCentre() {
 		plat[6][7].addMurDeBase(Mur.D);
 		plat[6][8].addMurDeBase(Mur.D);
@@ -156,19 +178,35 @@ public class Plateau {
 		plat[8][8].setCanContainsRobotsOrCible(false);
 	}
 
-	
+	/**
+	 * Methode retournant la case de la cible
+	 * @return la case de la cible
+	 */
 	public Case getCaseCible() {
 		return caseCible;
 	}
 	
+	/**
+	 * Methode retournant les cases des robots
+	 * @return les cases des robots
+	 */
 	public Case[] getCasesRobots(){
 		return caseRobots;
 	}
 
+	/**
+	 * Methode retournant le plateau
+	 * @return le plateau
+	 */
 	public Case[][] getPlat() {
 		return plat;
 	}
 	
+	/**
+	 * Methode retournant la case d'un robot
+	 * @param coul Couleur du robot voulu
+	 * @return la case du plateau où est situé le robot de Couleur "coul"
+	 */
 	public Case getCaseRobotByCouleur(Couleur coul) {
 		for(Case robotCouleur : caseRobots){
 			if(robotCouleur.getRobot()==coul) return robotCouleur;
@@ -176,6 +214,11 @@ public class Plateau {
 		return null;
 	}
 	
+	/**
+	 * Methode permettant de modifier la case du robot
+	 * @param oldRobot ancienne case du robot
+	 * @param newRobot nouvelle case du robot
+	 */
 	public void setCaseRobot(Case oldRobot, Case newRobot){
 		for(int i=0; i<caseRobots.length; i++){
 			if(caseRobots[i]==oldRobot){
@@ -187,6 +230,8 @@ public class Plateau {
 
 	/**
 	 * Déplace le robot dans cette direction
+	 * @param caseRobot : case ou se situe le robot avant le deplacement
+	 * @param direction : direction dans laquelle on souhaite deplacer le robot
 	 * @return la nouvelle case
 	 */
 	public Case setPositionRobot(Case caseRobot, Mur direction) {
