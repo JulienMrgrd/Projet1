@@ -6,6 +6,7 @@ static GtkBuilder *builder = NULL;
 static GtkLabel *labMsgServer = NULL;
 static GtkLabel *labPhase = NULL;
 static GtkLabel *labMeilleurProp = NULL;
+static GtkLabel *labRecapPartie = NULL;
 static GtkButton *buttonSoumission = NULL;
 static GError *error = NULL;
 static int isButtonXclicked=1;
@@ -27,7 +28,8 @@ int proposition(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
 	char* coups = gtk_entry_get_text(entry);
 
-	if(strcmp(coups, "")){
+	if(strcmp(coups, "") && strcmp(name, "")){
+
 		char messageEnvoye[70];
 
 		if(phaseReflexion==1 && isdigit(*coups)){
@@ -49,6 +51,12 @@ int proposition(GtkWidget * p_wid, gpointer p_data){
 	return 0;
 }
 
+/**
+ * Modifie le label "meilleurProposition" pour la phase d'enchere, pour permettre au joueur
+ * de connaitre la meilleure proposition
+ * @param username : nom du joueur ayant proposé la meilleure solution
+ * @param nbCoups : nombre de coups de la meilleure solution
+ */
 void meilleureProposition(char* username, char* nbCoups){
 	char message[60];
 	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
@@ -59,12 +67,17 @@ void meilleureProposition(char* username, char* nbCoups){
 	gdk_threads_leave();
 }
 
+/**
+ * Modification de la phase du jeu, modifie le labels "phase", le texte du bouton "soumission"
+ * et déclenche le chrono correspondant à la nouvelle phase
+ * @param phase : nom de la nouvelle phase où nous passons
+ */
 void setPhase(char *phase){
 
 	if(strstr(phase,"ENCHERE") && phaseReflexion==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase d'enchere");
-		gtk_button_set_label(buttonSoumission, "Votre enchère");
+		gtk_button_set_label(buttonSoumission, "Encherir");
 		gdk_threads_leave();
 		phaseReflexion=0;
 		phaseResolution=0;
@@ -74,17 +87,17 @@ void setPhase(char *phase){
 	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de resolution");
-		gtk_button_set_label(buttonSoumission, "Votre solution");
+		gtk_button_set_label(buttonSoumission, "Proposer votre solution");
 		gdk_threads_leave();
 		phaseEnchere=0;
 		phaseReflexion=0;
 		phaseResolution=1;
 		pthread_create(&temps, NULL, threadChrono, 60);
 	}
-	if(strstr(phase,"REFLEXION")){
+	if(strstr(phase,"REFLEXION")&&phaseReflexion==0){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de reflexion");
-		gtk_button_set_label(buttonSoumission, "Votre nombre de coups");
+		gtk_button_set_label(buttonSoumission, "Proposer votre nombre de coups");
 		gdk_threads_leave();
 		phaseResolution=0;
 		phaseReflexion=1;
@@ -93,7 +106,6 @@ void setPhase(char *phase){
 
 	}
 }
-
 
 int chat(GtkWidget * p_wid, gpointer p_data){
 
@@ -113,6 +125,12 @@ int chat(GtkWidget * p_wid, gpointer p_data){
 
 }
 
+/**
+ * Ajout des murs composant le plateau dans un tableau permettant le stockage de ceux-ci
+ * @param x : coordonnées en abscisse du mur a ajouter
+ * @param y : coordonnées en ordonnée du mur à ajouter
+ * @param mur : type de mur a ajouter dans le tableau (H: Haut, B: Bas, G: Gauche, D: Droit)
+ */
 void addMurTableau(int x, int y, char *mur){
 	if (strstr(murLabel[x][y], mur) == NULL) {
 		if(!strcmp(mur,"H")){
@@ -123,6 +141,10 @@ void addMurTableau(int x, int y, char *mur){
 	}
 }
 
+/**
+ * Ajout des murs de base composant tous les plateaux de Rasende-Roboter©
+ * mur entourant le plateau, plus le carré central
+ */
 void addMurTableauBase(){
 	int i;
 	int j;
@@ -148,7 +170,10 @@ void addMurTableauBase(){
 	addMurTableau(8,8,"D");
 }
 
-
+/**
+ * Retourne la valeur hexadecimal de la couleur de la cible a ajouter au plateau
+ * @param couleur : Couleur de la cible (cR: cible Rouge, cB: cible Bleu, cJ: cible Jaune, cV: cible Verte)
+ */
 char* getCouleurCible(char* couleur){
 	char coul[8];
 	if(!strcmp(couleur, "cR")){
@@ -163,6 +188,9 @@ char* getCouleurCible(char* couleur){
 	return coul;
 }
 
+/**
+ * Affichage des 4 robots et de la cible sur le plateau
+ */
 void displayRobot(){
 	char couleur[8] = "";
 	int x, y;
@@ -231,7 +259,9 @@ void displayRobot(){
 	printf("Fin for display robot\n");
 }
 
-
+/**
+ * Affichage du plateau avec tous ces murs, mais sans les robots
+ */
 void displayPlateau(){
 	printf("start display\n");
 	int i;
@@ -256,7 +286,9 @@ void displayPlateau(){
 	printf("fin display\n");
 }
 
-
+/**
+ * Suppression des donnees de tous les robots et effaçage des robots du plateau
+ */
 void resetRobot(){
 
 	printf("Entre dans reset Robot\n");
@@ -285,6 +317,11 @@ void resetRobot(){
 	}
 }
 
+/**
+ * Affichage d'une case en fonction de ces coordonnées
+ * @param x : coordonné en abscisse de la case (0 = tout à gauche)
+ * @param y : coordonné en ordonnée de la case (0 = tout en bas)
+ */
 void displayCase(int x, int y){
 	char res[5] = "";
 	if(strstr(murLabel[x][y], "G")){
@@ -319,7 +356,10 @@ void displayCase(int x, int y){
 	gdk_threads_leave();
 }
 
-
+/**
+ * Ajout de tous les murs composants le plateau dans le tableau composant tous les murs
+ * @param plateau : plateau de la session courante (sous la forme "(X,Y,{H,B,G,D})(X,Y,{H,B,G,D})...")
+ */
 void addMurTableauPlateau(char* plateau){
 
 	char** splitParentOuvr = splitWithChar(plateau, '(');
@@ -339,6 +379,10 @@ void addMurTableauPlateau(char* plateau){
 	}
 }
 
+/**
+ * Stockage des données des 4 robots et de la cible en fonction de l'enigme
+ * @param enigme : enigme du tour positionnant les robots et la cible (sous la forme "(xR,yR,xB,yB,xJ,yJ,xV,yV,xC,yC,C)" x et y étant des entiers)
+ */
 void addRobotCible(char* enigme){
 	printf("On entre dans addRobotCible \n");
 	printf("enigme avant addRobot == %s\n",enigme);
@@ -371,6 +415,10 @@ void addRobotCible(char* enigme){
 
 }
 
+/**
+ * Declenchement et affichage du chrono au centre du plateau en seconde
+ * @param chrono : Durée voulu pour chaque tour
+ */
 void threadChrono(int chrono){
 	char temps[100];
 	gdk_threads_enter();
@@ -382,7 +430,15 @@ void threadChrono(int chrono){
 
 	while((chrono>=0) && (phaseReflex==phaseReflexion) && (phaseEnch==phaseEnchere)
 			&& (phaseResol==phaseResolution)){ //On teste si on change pas de phase
-		sprintf(temps, "|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+		if(chrono < 100){
+			if(chrono < 10){
+				sprintf(temps, "|    <span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+			}else{
+				sprintf(temps, "|  <span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+			}
+		}else{
+			sprintf(temps, "|<span face=\"Sans\"><u><small><small><small>%d</small></small></small></u></span>", chrono);
+		}
 		gdk_threads_enter();
 		gtk_label_set_markup(pLabel[7][8], temps);
 		gdk_threads_leave();
@@ -391,16 +447,80 @@ void threadChrono(int chrono){
 	}
 }
 
+/**
+ * Modification du label "recapPartie" pour afficher la liste des joueurs et leur score
+ * @param bilan : bilan de la partie (sous la forme "n(user1, X)(user2, Y)...")
+ */
 void affichageBilan(char *bilan){
 	printf("on entre dans affichage bilan\n");
 	printf("bilan ==== %s\n",bilan);
-
+	
+	char** splitParentOuvr = splitWithChar(bilan, '(');
+	char** splitParentFerm;
+	char** splitVirgule;
+	char bilanAffich[300] = "";
+	char tmp[50] = "";
+	sprintf(tmp,"Vous etes au tours %s\n",splitParentOuvr[0]);
+	strcat(bilanAffich,tmp);
+	int j;
+	int i;
+	for (i=1; (splitParentOuvr[i] != NULL) ; i++) {
+		if(strlen(splitParentOuvr[i])!=0){
+			splitParentFerm = splitWithChar(splitParentOuvr[i], ')');
+			for(j=0; (splitParentFerm[j] != NULL) ; j++){
+				splitVirgule = splitWithChar(splitParentFerm[j], ',');
+				sprintf(tmp,"Le joueur %s a %s points\n",splitVirgule[0],splitVirgule[1]);
+				strcat(bilanAffich,tmp);
+			}
+		}
+	}
 	gdk_threads_enter();
-	GtkLabel *lab = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
-	gtk_label_set_text(lab, bilan);
+	gtk_label_set_text(labRecapPartie, bilanAffich);
 	gdk_threads_leave();
 }
 
+
+/**
+ * Modification du label "recapPartie" pour afficher le noms et le score du vainqueur d'une session
+ * @param bilan : bilan de la partie (sous la forme "n(user1, X)(user2, Y)...")
+ */
+void displayVainqueur(char *bilan){
+	printf("on entre dans affichage bilan\n");
+	printf("bilan ==== %s\n",bilan);
+
+	char** splitParentOuvr = splitWithChar(bilan, '(');
+	char** splitParentFerm;
+	char** splitVirgule;
+	int highScore=0;
+	char bestPlayer[16]="";
+	int j;
+	int i;
+	for (i=1; (splitParentOuvr[i] != NULL) ; i++) {
+		if(strlen(splitParentOuvr[i])!=0){
+			splitParentFerm = splitWithChar(splitParentOuvr[i], ')');
+			for(j=0; (splitParentFerm[j] != NULL) ; j++){
+				splitVirgule = splitWithChar(splitParentFerm[j], ',');
+				if(atoi(splitVirgule[1])>=highScore){
+					highScore=atoi(splitVirgule[1]);
+					sprintf(bestPlayer,"%s",splitVirgule[0]);
+				}
+			}
+		}
+	}
+	char msgVainqueur[100] = "";
+	sprintf(msgVainqueur,"Nous avons un vainqueur !!\n %s avec un score de %d\n",bestPlayer,highScore);
+
+	gdk_threads_enter();
+	gtk_label_set_text(labRecapPartie, msgVainqueur);
+	gdk_threads_leave();
+}
+
+
+/**
+ * Lancement de la phase de refelexion
+ * @param enigme : enigme du tour positionnant les robots et la cible (sous la forme "(xR,yR,xB,yB,xJ,yJ,xV,yV,xC,yC,C)" x et y étant des entiers)
+ * @param bilan : bilan de la partie (sous la forme "n(user1, X)(user2, Y)...")
+ */
 void startReflexion(char* enigme, char* bilan){
 	resetRobot();
 
@@ -413,6 +533,11 @@ void startReflexion(char* enigme, char* bilan){
 	displayRobot();
 }
 
+/**
+ * Lancement de l'affichage de la page de jeu, initialisation des labels et des tableau et récuperation des pointeurs de chaque éléments de l'affcihage à manipuler dans le futur
+ *  @param plateau : plateau de la session courante (sous la forme "(X,Y,{H,B,G,D})(X,Y,{H,B,G,D})...")
+ *  @param pseudo : pseudo de l'utilisateur jouant
+ */
 int startPageJeu(char* plateau, char* pseudo){
 
 	int i=0;
@@ -459,10 +584,12 @@ int startPageJeu(char* plateau, char* pseudo){
 	fenetre = GTK_WIDGET(gtk_builder_get_object (builder, "window1"));
 	labMsgServer = GTK_WIDGET(gtk_builder_get_object (builder, "messageServeur"));
 	labPhase = GTK_WIDGET(gtk_builder_get_object (builder, "phase"));
+	labRecapPartie = GTK_WIDGET(gtk_builder_get_object (builder, "recapPartie"));
 	labMeilleurProp = GTK_WIDGET(gtk_builder_get_object (builder, "meilleurProposition"));
 	buttonSoumission = GTK_BUTTON(gtk_builder_get_object(builder, "soumission"));
 
 	gtk_misc_set_alignment(labMsgServer,0,0);
+	gtk_misc_set_alignment(labRecapPartie,0.5,0);
 
 	pTable=gtk_table_new(48,20,FALSE);
 	gtk_container_add(GTK_CONTAINER(gtk_builder_get_object (builder, "vpaned13")), GTK_WIDGET(pTable));
@@ -490,6 +617,9 @@ int startPageJeu(char* plateau, char* pseudo){
 	return isButtonXclicked;
 }
 
+/**
+ * Destruction de la fenetre de jeu
+ */
 void destroyPageJeu(){
 	printf("Destruction de la fenetre de jeu\n");
 	isButtonXclicked=0;
@@ -500,6 +630,10 @@ void destroyPageJeu(){
 }
 
 
+/**
+ * Ajout et affichage du message reçu par le serveur dans le label "messageServeur"
+ * @param message : message a ajouter au label pour qu'il soit afficher
+ */
 void addMessageServerPageJeu(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	printf("Ajouter message server\n");

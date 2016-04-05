@@ -25,12 +25,20 @@ int connexion(GtkWidget * p_wid, gpointer p_data){
 	
 	sprintf(name, "%s",  gtk_entry_get_text(entry));
 	if(strcmp(name, "")){
-		sprintf(messageEnvoye, "CONNEXION/%s/\n", name);
-		sendToServer(messageEnvoye);
+		if(strstr(name,"/")){
+			gdk_threads_enter();
+			changeLabelPageConnexion("Impossible de mettre des /");
+			gdk_threads_leave();
+		}else{
+			sprintf(messageEnvoye, "CONNEXION/%s/\n", name);
+			sendToServer(messageEnvoye);
+		}
 	}
 }
 
-
+/**
+ * Lancement de l'affichage de la page de connexion, plus récupération des pointeurs sur les "widgets" et assignation de tache si necessaire
+ */
 int startPageConnexion(){
 	printf("Startpage connexion\n");
 	isClosed = 0;
@@ -76,6 +84,10 @@ void destroyPageConnexion(){
 	printf("Destroy reussi\n");
 }
 
+/**
+ * Affichage du message reçu par le serveur dans le label "user"
+ * @param message : message a afficher dans le label
+ */
 void changeLabelPageConnexion(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 	gdk_threads_enter();

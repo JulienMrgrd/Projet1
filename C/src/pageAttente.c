@@ -14,6 +14,10 @@ static void destroy( GtkWidget *widget, gpointer data ){
 	gtk_main_quit ();
 }
 
+
+/**
+ * Lancement de l'affichage de la page d'attente, plus récupération du pointeur sur le label "messageAttente"
+ */
 int startPageAttente(char* pseudo){
 	printf("Startpage Attente\n");
 	isClosed = 0;
@@ -70,6 +74,10 @@ void destroyPageAttente(){
 	printf("Destroy d'attente reussi\n");
 }
 
+/**
+ * Ajout et affichage du message reçu par le serveur dans le label "messageAttente"
+ * @param message : message a ajouter au label pour qu'il soit afficher
+ */
 void addMessageServerPageAttente(char* message){
 	if(isClosed==1) return; // la fenêtre a été fermée
 
