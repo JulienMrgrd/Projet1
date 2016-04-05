@@ -200,17 +200,13 @@ public class Joueur extends Thread{
 		} else if(cmd.startsWith(Protocole.CHAT.name())){ //CHAT/user/message 
 			Session session = server.getSession();
 			if(session.hasStarted() && session.isPlaying(this)){
-				String message = null;
-				for(int i=2; i<msg.length(); i++){
+				String message = "";
+				for(int i=2; i<msgs.length; i++){
 					message += msgs[i]; // supprime les "/" contenu dans le message du client
 				}
 				
-				if(message==null){
-					sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));
-				} else {
-					System.out.println(pseudo+" dit : "+message);
-					server.sendAllButThis(message, this);
-				}
+				System.out.println(pseudo+" dit : "+message);
+				server.sendAllButThis(message, this);
 			}
 
 		} else {
@@ -221,7 +217,7 @@ public class Joueur extends Thread{
 	
 	public boolean estEnVie(){
 		try{
-			sendToJoueur("");
+			sendToJoueur(Protocole.PING.name());
 			return true;
 		} catch (IOException e){
 			return false;

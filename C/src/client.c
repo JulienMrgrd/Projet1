@@ -62,7 +62,7 @@ void fctThreadEcoute(){
 			puts("Serveur déconnecté ...\n");
 			break;
 		} else {
-			if(sizeMessageServer < 3 || isNonPrintable(recvBuffer)) continue; // le cas des ping
+			if(strstr(recvBuffer, "PING")==1 || sizeMessageServer < 3 || isNonPrintable(recvBuffer)) continue; // le cas des ping
 			printf("Message reçu : %s\n", recvBuffer);
 		}
 
@@ -215,7 +215,7 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"MAUVAISE")){
 			if((argCheck=checkOneArgument(argOne))!=0){
 				sprintf(affich,"[serveur] : La solution est mauvaise, au tour de %s" ,argOne);
-			} else{
+			} else {
 				sprintf(affich,"[serveur] : La solution est mauvaise !");
 			}
 			addMessageServerPageJeu(affich);

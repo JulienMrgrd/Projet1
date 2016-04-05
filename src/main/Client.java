@@ -68,8 +68,8 @@ public class Client{
 								if(str==null){
 									serverHS();
 									return;
-								} else if(str.isEmpty()){
-									//									System.out.println("message vide du server");
+								} else if(str.isEmpty() || str.startsWith(Protocole.PING.name())){
+									// System.out.println("message vide du server");
 								} else {
 									System.out.println(str);
 								}

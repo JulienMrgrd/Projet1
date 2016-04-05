@@ -21,7 +21,7 @@ public class Session {
 	public static final int SECONDS_REFLEXION = 300;
 	public static final int SECONDS_ENCHERES = 40;
 	public static final int SECONDS_RESOLUTION = 60;
-	public static final int TEMPS_RAFRAICHISSEMENT = 5; 
+	public static final int TEMPS_RAFRAICHISSEMENT = 15; 
 	private final int STEP_REFLEXION=1, STEP_ENCHERES=2, STEP_RESOLUTION=3;
 	
 	private Server server;
@@ -139,7 +139,7 @@ public class Session {
 		}
 		
 		System.out.println("Fin du tour n°"+nbTours);
-		server.sleep(2000);
+		server.sleep(1000);
 		
 		updateActifs();
 		GameState state = shouldStop();
@@ -167,7 +167,7 @@ public class Session {
 
 	private void startReflexion() {
 		System.out.println("startReflexion ("+SECONDS_REFLEXION+" sec)");
-		server.sleep(1000); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
+		server.sleep(500); // Pour éviter que le client reçoive SESSION et TOUR en même temps.
 		
 		sendToAllPlaying(ProtocoleCreator.create(Protocole.TOUR, plateau.enigme(), bilan()));
 		
@@ -175,13 +175,13 @@ public class Session {
 		synchronized (this) {
 			try {
 				while(temps>0 && vainqueurReflexion==null){
-					System.out.println("while "+temps+" vainqueur="+vainqueurReflexion);
 					this.wait(TEMPS_RAFRAICHISSEMENT*1000); 
 					temps -= TEMPS_RAFRAICHISSEMENT*1000;
 					
 					if(getNbActifs()>=2) updateActifs(); // Evite de ping l'unique joueur restant
 					else break;
 				}
+				server.sleep(500); // Pour éviter que le client PING et FINREFLEXION en même temps.
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -240,6 +240,7 @@ public class Session {
 					if(getNbActifs()>=2) updateActifs();
 					else break;
 				}
+				server.sleep(500); // Pour éviter que le client PING et BONNE,MAUVAISE,FINRESO en même temps.
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -253,6 +254,8 @@ public class Session {
 			} else {
 				System.out.println("Mauvaise solution");
 				if(indexEnch+1>=encheres.size()){
+					sendToAllPlaying(ProtocoleCreator.create(Protocole.MAUVAISE));
+					server.sleep(500);
 					sendToAllPlaying(ProtocoleCreator.create(Protocole.FINRESO));
 					return;
 				} else {
@@ -328,7 +331,7 @@ public class Session {
 	/** Ping les joueurs, et met à jour map/allActifs si certains sont déconnectés */
 	public void updateActifs(){
 		synchronized (allPlaying) {
-			sendToAllPlaying(" ");
+			sendToAllPlaying(Protocole.PING.name());
 		}
 	}
 	
