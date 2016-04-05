@@ -197,7 +197,7 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"FINENCHERE")){
 			if((argCheck=checkOneArgument(argOne))!=0 && (argCheck=checkOneArgument(argTwo))!=0 ){
-				//auTourDe(argOne);
+				auTourDe(argOne);
 				sprintf(affich,"[serveur] : Les encheres sont finies, le meilleur est %s en %s coups.",argOne,argTwo); // ???? en X coups
 			} else{
 				sprintf(affich,"[serveur] : Les encheres sont finies, il n'y a aucun vainqueur !");
@@ -217,7 +217,7 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"MAUVAISE")){
 			if((argCheck=checkOneArgument(argOne))!=0){
-				//auTourDe(argOne);
+				auTourDe(argOne);
 				setPhase("RESOLUTION");
 				sprintf(affich,"[serveur] : La solution est mauvaise, au tour de %s" ,argOne);
 			} else {
@@ -231,7 +231,7 @@ void fctThreadEcoute(){
 
 		} else if(!strcmp(prot,"TROPLONG")){
 			if((argCheck=checkOneArgument(argOne))!=0){
-				//auTourDe(argOne);
+				auTourDe(argOne);
 				setPhase("RESOLUTION");
 				sprintf(affich,"[serveur] : Temps de resolution écoulé, au tour de %s" ,argOne);
 			} else{
@@ -255,7 +255,7 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
 			if((argCheck=checkOneArgument(argTwo))==0) goto argError;  // messageServer
 
-			if(user==username) quit();
+			if(argOne==username) quit();
 			else sprintf(affich,"[serveur] : %s" ,argTwo);
 
 		} else {

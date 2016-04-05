@@ -23,6 +23,7 @@ static int xR,xB,xJ,xV,xC; // coord x des robots et cibles
 static int yR,yB,yJ,yV,yC; // coord y des robots cibles
 static char cC[2];  // couleur cible
 static int myCoup;
+static int numChrono;
 
 int proposition(GtkWidget * p_wid, gpointer p_data){
 	GtkEntry* entry = (GtkEntry*)p_data;
@@ -62,10 +63,28 @@ void meilleureProposition(char* username, char* nbCoups){
 	if(nbCoups==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
 	else sprintf(message, "Meilleure proposition : %s = %d", username, atoi(nbCoups));
 
+	if(username==NULL) sprintf(message, "Meilleure proposition : %s = %d", username, myCoup);
 	gdk_threads_enter();
 	gtk_label_set_text(labMeilleurProp, message);
 	gdk_threads_leave();
 }
+
+
+void auTourDe(char *user){
+	char message[60];
+	if(strlen(user)!=0) {
+		sprintf(message, "Au tour de : %s",user);
+		gdk_threads_enter();
+		gtk_label_set_text(labMeilleurProp, message);
+		gdk_threads_leave();
+	}else{
+		sprintf(message, "");
+	}
+	gdk_threads_enter();
+	gtk_label_set_text(labMeilleurProp, message);
+	gdk_threads_leave();
+}
+
 
 /**
  * Modification de la phase du jeu, modifie le labels "phase", le texte du bouton "soumission"
@@ -74,7 +93,7 @@ void meilleureProposition(char* username, char* nbCoups){
  */
 void setPhase(char *phase){
 
-	if(strstr(phase,"ENCHERE") && phaseReflexion==1){
+	if(strstr(phase,"ENCHERE")){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase d'enchere");
 		gtk_button_set_label(buttonSoumission, "Votre enchère");
@@ -82,9 +101,10 @@ void setPhase(char *phase){
 		phaseReflexion=0;
 		phaseResolution=0;
 		phaseEnchere=1;
+		numChrono++;
 		pthread_create(&temps, NULL, threadChrono, 40);
 	}
-	if(strstr(phase,"RESOLUTION") && phaseEnchere==1){
+	if(strstr(phase,"RESOLUTION")){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de resolution");
 		gtk_button_set_label(buttonSoumission, "Votre solution");
@@ -92,9 +112,10 @@ void setPhase(char *phase){
 		phaseEnchere=0;
 		phaseReflexion=0;
 		phaseResolution=1;
+		numChrono++;
 		pthread_create(&temps, NULL, threadChrono, 60);
 	}
-	if(strstr(phase,"REFLEXION") && phaseReflexion==0){
+	if(strstr(phase,"REFLEXION")){
 		gdk_threads_enter();
 		gtk_label_set_text(labPhase, "Phase de reflexion");
 		gtk_button_set_label(buttonSoumission, "Votre nombre de coups");
@@ -102,8 +123,9 @@ void setPhase(char *phase){
 		phaseResolution=0;
 		phaseReflexion=1;
 		phaseEnchere=0;
-		pthread_create(&temps, NULL, threadChrono, 300);
-
+		numChrono++;
+		pthread_create(&temps, NULL, threadChrono, 30);
+		auTourDe("");
 	}
 }
 
@@ -431,12 +453,13 @@ void threadChrono(int chrono){
 	int phaseResol=phaseResolution;
 	int phaseEnch=phaseEnchere;
 	int phaseReflex=phaseReflexion;
+	int nbChrono=numChrono;
 
 	while((chrono>=0) && (phaseReflex==phaseReflexion) && (phaseEnch==phaseEnchere)
-			&& (phaseResol==phaseResolution)){ //On teste si on change pas de phase
+			&& (phaseResol==phaseResolution) && (nbChrono==numChrono)){ //On teste si on change pas de phase
 		if(chrono < 100){
 			if(chrono < 10){
-				sprintf(temps, "| <span face=\"Sans\"><small>%d</small></span>", chrono);
+				sprintf(temps, "|  <span face=\"Sans\"><small>%d</small></span>", chrono);
 			}else{
 				sprintf(temps, "| <span face=\"Sans\"><small><small>%d</small></small></span>", chrono);
 			}
@@ -552,6 +575,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	int j=0;
 	int x=0;
 	int y=0;
+	numChrono = 0;
 	printf("on entre dans StartPageJEu\n");
 	for(x=0;x<17;x++){
 		for(y=0;y<17;y++){
@@ -597,6 +621,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	buttonSoumission = GTK_BUTTON(gtk_builder_get_object(builder, "soumission"));
 
 	gtk_misc_set_alignment(labMsgServer,0,0);
+	gtk_misc_set_alignment(labMeilleurProp,0,0);
 	gtk_misc_set_alignment(labRecapPartie,0.2,0);
 
 	pTable=gtk_table_new(48,20,FALSE);
