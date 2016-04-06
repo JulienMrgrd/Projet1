@@ -16,7 +16,7 @@ import utils.StringUtils;
 public class Session {
 
 	//Variable globales pour pouvoir modifier rapidement les paramétres important d'une partie à un seul endroit
-	public static final int SCORE_MAX = 1;
+	public static final int SCORE_MAX = 10;
 	public static final int SECONDS_BEFORE_START = 30;
 	public static final int SECONDS_FOR_DISPLAY_SAVIEZVOUS = 5;
 	public static final int SECONDS_REFLEXION = 300;
