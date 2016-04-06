@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import other.GameState;
-import other.Protocole;
-import other.ProtocoleCreator;
 import plateau.Plateau;
+import protocole.Protocole;
+import protocole.ProtocoleCreator;
 import utils.EnchereUtils;
+import utils.GameState;
 import utils.ResolutionUtils;
 import utils.StringUtils;
 

@@ -1,4 +1,4 @@
-package other;
+package utils;
 
 public enum GameState {
 	MaxScoreReached,

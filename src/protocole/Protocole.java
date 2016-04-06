@@ -1,4 +1,4 @@
-package other;
+package protocole;
 
 public enum Protocole {
 	

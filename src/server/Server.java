@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import other.LeSaviezVousGenerator;
-import other.Protocole;
-import other.ProtocoleCreator;
+import protocole.Protocole;
+import protocole.ProtocoleCreator;
+import utils.LeSaviezVousGenerator;
 
 public class Server{
 	

@@ -350,7 +350,7 @@ void resetRobot(){
  * @param y : coordonnée en ordonnée de la case (0 = tout en bas)
  */
 void displayCase(int x, int y){
-	char res[10] = "";
+	char res[115] = "";
 	if(strstr(murLabel[x][y], "G")){
 		if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
 				&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
@@ -359,32 +359,54 @@ void displayCase(int x, int y){
 			strcat(res, "|");
 		}
 	}else if(y==0 || y==16){
-		strcat(res, ".");
+		strcat(res, "");
 	}else{
 		strcat(res, " ");
 	}
 
-	if(strstr(murLabel[x][y], "B")) strcat(res, "_");
-	else strcat(res, "  ");
-
-
-	if(strstr(murLabel[x][y], "D")){
-		if( (x!=15) && (y!=16) && (strstr(murLabel[x+1][y],"G")
-				&&  ((strstr(murLabel[x+1][y+1],"B")) || (strstr(murLabel[x+1][y],"B"))) )){
-			strcat(res, " ");
-		} else {
-			strcat(res, "|");
+	if(y==16){
+		if(x<10){
+			sprintf(res, "%s<span face=\"Sans\"><u><small>%d</small></u></span>",res,x);
+		}else{
+			sprintf(res, "%s<span face=\"Sans\"><u><small><small>%d</small></small></u></span>",res,x);
 		}
-	}else if(y==0 || y==16){
-		strcat(res, ".");
 	}else{
-		strcat(res, " ");
+		if(strstr(murLabel[x][y], "B")){
+			/*if(x==15){
+				strcat(res, "  _");
+			}else{*/
+				strcat(res, "_");
+			//}
+		}
+		else strcat(res, "  ");
 	}
 
+	if(x==15 && y < 16){
+		if(x>=10){
+			sprintf(res, "%s  |<span face=\"Sans\"><small><small>%d</small></small></span>",res,y);
+		}else{
+			sprintf(res, "%s|<span face=\"Sans\"><small>%d</small></span>",res,y);
+		}
+	}else{
+		if(strstr(murLabel[x][y], "D")){
+			if( (x!=15) && (y!=16) && (strstr(murLabel[x+1][y],"G")
+					&&  ((strstr(murLabel[x+1][y+1],"B")) || (strstr(murLabel[x+1][y],"B"))) )){
+				strcat(res, " ");
+			} else {
+				strcat(res, "|");
+			}
+		}else if(y==0 || y==16){
+			strcat(res, "");
+		}else{
+			strcat(res, " ");
+		}
+	}
 
 	gdk_threads_enter();
-	gtk_label_set_text( pLabel[x][y], res);
+	gtk_label_set_use_markup(pLabel[x][y], TRUE);
+	gtk_label_set_markup(pLabel[x][y], res);
 	gdk_threads_leave();
+
 }
 
 /**

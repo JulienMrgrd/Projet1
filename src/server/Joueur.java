@@ -5,8 +5,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import other.Protocole;
-import other.ProtocoleCreator;
+import protocole.Protocole;
+import protocole.ProtocoleCreator;
 import utils.StringUtils;
 import utils.insultes.InsultesUtils;
 
