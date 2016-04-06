@@ -74,7 +74,7 @@ public class Server{
 				while(true){
 					System.out.println("NbJoueurs="+nbJoueurs+" et sessionHasStarted="+session.hasStarted());
 					synchronized (sync) {
-						while(nbJoueurs<2){ // Préconditions pour lancer une session
+						while(getNbJoueurs()<2){ // Préconditions pour lancer une session
 							try {
 								sync.wait();
 							} catch (InterruptedException e) {

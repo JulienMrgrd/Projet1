@@ -383,7 +383,7 @@ public class Session {
 	
 	//==========  GETTERS // SETTERS =============//
 	
-	public void removeJoueur(Joueur joueur){
+	public synchronized void removeJoueur(Joueur joueur){
 		if(allPlaying.contains(joueur)) allPlaying.remove(joueur);
 	}
 	
@@ -405,7 +405,7 @@ public class Session {
 
 	public int getNbJoueurs(){ return mapPseudo_Joueur.size(); }
 	
-	public int getNbActifs(){ return allPlaying.size(); }
+	public synchronized int getNbActifs(){ return allPlaying.size(); }
 
 	public synchronized Joueur getVainqueurReflexion() {
 		return vainqueurReflexion;

@@ -89,7 +89,7 @@ public class Joueur extends Thread{
 	 */
 	public synchronized void sendToJoueur(String msg) throws IOException{
 		if(ecriture!=null){
-			ecriture.print(msg);
+			ecriture.println(msg);
 			ecriture.flush();
 			if(ecriture.checkError()){
 				System.out.println("(sendToJoueur) "+pseudo+" est parti...");
@@ -118,7 +118,7 @@ public class Joueur extends Thread{
 			username = msgs[1];
 		} catch (ArrayIndexOutOfBoundsException exc){ }
 		
-		if(cmd.startsWith(Protocole.CONNEXION.name())){ // CONNEX/user/
+		if(cmd.startsWith(Protocole.CONNEXION.name())){ // CONNEXION/user/
 			
 			if(username==null){
 				this.sendToJoueur(ProtocoleCreator.create(Protocole.BAD_PARAMETERS));

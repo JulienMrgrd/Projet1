@@ -341,6 +341,7 @@ void resetRobot(){
 		displayCase(x, y);
 
 	}
+	sprintf(cC, "");
 }
 
 /**
@@ -349,7 +350,7 @@ void resetRobot(){
  * @param y : coordonnée en ordonnée de la case (0 = tout en bas)
  */
 void displayCase(int x, int y){
-	char res[5] = "";
+	char res[10] = "";
 	if(strstr(murLabel[x][y], "G")){
 		if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
 				&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
@@ -630,7 +631,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	scrolled_window = GTK_WIDGET(gtk_builder_get_object (builder, "scrolledwindow"));
 	gtk_text_buffer_get_start_iter(buffer, &iter);
 
-	gtk_misc_set_alignment(labMeilleurProp,0,0);
+	gtk_misc_set_alignment(labMeilleurProp,0,0.5);
 	gtk_misc_set_alignment(labRecapPartie,0.2,0.1);
 
 	pTable=gtk_table_new(48,20,FALSE);
@@ -651,7 +652,6 @@ int startPageJeu(char* plateau, char* pseudo){
 
 	gtk_widget_show_all (fenetre);
 
-	printf("Before main \n");
 	gtk_main();
 	gdk_threads_leave();
 

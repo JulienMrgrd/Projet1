@@ -250,6 +250,7 @@ void fctThreadEcoute(){
 		} else if(!strcmp(prot,"BEFORE_BAN")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // message
 			sprintf(affich,"[serveur] : %s" ,argOne);
+			addMessageServerPageJeu(affich);
 
 		} else if(!strcmp(prot,"BANNI")){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;  // user
@@ -259,7 +260,10 @@ void fctThreadEcoute(){
 				quit();
 				break;
 			
-			} else sprintf(affich,"[serveur] : %s" ,argTwo);
+			} else {
+				sprintf(affich,"[serveur] : %s" ,argTwo);
+				addMessageServerPageJeu(affich);
+			}
 
 		} else {
 			isProtInconnu = 1;

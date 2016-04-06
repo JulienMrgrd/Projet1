@@ -10,8 +10,8 @@ public class ProtocoleCreator {
 					message += arg + "/";
 				}
 			}
-			return message+"\n";
+			return message;
 		}
-		return "\n";
+		return "";
 	}
 }
