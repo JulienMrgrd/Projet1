@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import other.Protocole;
+import protocole.Protocole;
 import utils.PlateauUtils;
 
 public class Client{  
