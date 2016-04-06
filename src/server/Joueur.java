@@ -22,7 +22,6 @@ public class Joueur extends Thread{
 	
 	private boolean hasQuit; // To stop listening and stop the thread
 	private boolean isWaiting;
-	private InsultesUtils insulte_utils;
 	private int nbInsulte;
 
 	/**
@@ -35,12 +34,6 @@ public class Joueur extends Thread{
 		this.server = server;
 		hasQuit = false;
 		
-		try {
-			insulte_utils = new InsultesUtils();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
 		try {
 			ecriture = new PrintWriter(socket.getOutputStream());
 		} catch (IOException e) {
@@ -74,7 +67,7 @@ public class Joueur extends Thread{
 	@Override
 	public void run() {
 		try {
-			while(hasQuit==false){
+			while(!hasQuit){
 				readFromJoueur();
 			}
 		} catch (IOException e) {
@@ -222,7 +215,7 @@ public class Joueur extends Thread{
 					
 					String[] messageVerifInsulte = msgs[i].split(" ");
 					for(String insulte : messageVerifInsulte){
-						if(insulte_utils!=null && insulte_utils.isAnInsulte(insulte)) {
+						if(InsultesUtils.isAnInsulte(insulte)) {
 							containsInsulte=true;
 							message += StringUtils.repeat("*", insulte.length()); // replace par "******"
 						} else {

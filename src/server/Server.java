@@ -98,7 +98,7 @@ public class Server{
 					
 					sleep(1000);// Pour ne pas envoyer immédiatement envoyer SESSION après LE_SAVIEZ_VOUS (problème TCP)
 					
-					if(nbJoueurs<2){ // Un ou plusieurs joueurs ont quittés
+					if(getNbJoueurs()<2){ // Un ou plusieurs joueurs ont quittés
 						sendAll(ProtocoleCreator.create(Protocole.START_CANCEL_SESSION));
 						continue;
 					}
@@ -200,7 +200,7 @@ public class Server{
 	 * @param joueur à ajouter
 	 * @return vrai si on peux ajouter le joueur, faux sinon
 	 */
-	synchronized public boolean addJoueur(Joueur joueur) {
+	public synchronized boolean addJoueur(Joueur joueur) {
 		String pseudo = joueur.getPseudo();
 		if(containsJoueur(pseudo)) return false;
 		mapJoueurs.put(pseudo, joueur);
@@ -244,7 +244,7 @@ public class Server{
 	 * @param joueur à supprimer
 	 * @return vrai si le joueur a pu être supprimer, faux sinon
 	 */
-	synchronized public boolean removeJoueur(Joueur joueur) {
+	public synchronized boolean removeJoueur(Joueur joueur) {
 		String pseudo = joueur.getPseudo();
 		if( !this.mapJoueurs.containsKey(pseudo) ) return false;
 		mapJoueurs.remove(pseudo);

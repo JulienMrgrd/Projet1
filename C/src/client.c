@@ -142,7 +142,7 @@ void fctThreadEcoute(){
 			if((argCheck=checkOneArgument(argOne))==0) goto argError;
 			sprintf(affich,"[serveur] : Félicitation a %s, vainqueur de cette session !",argOne);
 			addMessageServerPageJeu(affich);
-			// displayVainqueur(argOne);
+			displayVainqueur(argOne);
 			sleep(2);
 			destroyPageJeu();
 			if(	threadFenetreAttente==NULL ){

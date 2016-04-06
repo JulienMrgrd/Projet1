@@ -271,7 +271,11 @@ void displayRobot(){
 					&&  ((strstr(murLabel[x+1][y+1],"B")) || (strstr(murLabel[x+1][y],"B"))) )){
 				strcat(res, " ");
 			}else{
-				strcat(res, "|");
+				if(x==15){
+					sprintf(res, "%s<span><small>|%d</small></span>",res,x);
+				}else{
+					strcat(res, "|");
+				}
 			}
 		}else {
 			strcat(res, "  ");
@@ -350,18 +354,18 @@ void resetRobot(){
  * @param y : coordonnée en ordonnée de la case (0 = tout en bas)
  */
 void displayCase(int x, int y){
-	char res[115] = "";
+	char res[155] = "";
 	if(strstr(murLabel[x][y], "G")){
 		if((x!=0)&&(y!=16)&& (strstr(murLabel[x-1][y],"D") &&  ((strstr(murLabel[x-1][y+1],"B")) || (strstr(murLabel[x-1][y],"B"))))
 				&& 	!strstr(murLabel[x][y], "B") && !strstr(murLabel[x][y+1], "B") ){
-			strcat(res, " ");
+			strcat(res, "  ");
 		}else{
 			strcat(res, "|");
 		}
 	}else if(y==0 || y==16){
 		strcat(res, "");
 	}else{
-		strcat(res, " ");
+		strcat(res, "  ");
 	}
 
 	if(y==16){
@@ -372,18 +376,15 @@ void displayCase(int x, int y){
 		}
 	}else{
 		if(strstr(murLabel[x][y], "B")){
-			/*if(x==15){
-				strcat(res, "  _");
-			}else{*/
-				strcat(res, "_");
-			//}
+			sprintf(res,"%s<span face=\"Sans\"><u>  </u></span>",res);
+		}else{
+			sprintf(res,"%s<span face=\"Sans\">  </span>",res);
 		}
-		else strcat(res, "  ");
 	}
 
 	if(x==15 && y < 16){
 		if(x>=10){
-			sprintf(res, "%s  |<span face=\"Sans\"><small><small>%d</small></small></span>",res,y);
+			sprintf(res, "%s|<span face=\"Sans\"><small><small>%d</small></small></span>",res,y);
 		}else{
 			sprintf(res, "%s|<span face=\"Sans\"><small>%d</small></span>",res,y);
 		}
@@ -514,11 +515,7 @@ void affichageBilan(char *bilan){
 	char** splitVirgule;
 	char bilanAffich[300] = "";
 	char tmp[50] = "";
-	if(!strcmp(splitParentOuvr[0],"1")){
-		sprintf(tmp,"Vous etes au tour %s\n",splitParentOuvr[0]);
-	}else {
-		sprintf(tmp,"Vous etes au tours %s\n",splitParentOuvr[0]);
-	}
+	sprintf(tmp,"Vous etes au tour %s\n",splitParentOuvr[0]);
 	strcat(bilanAffich,tmp);
 	int j;
 	int i;
@@ -653,7 +650,7 @@ int startPageJeu(char* plateau, char* pseudo){
 	scrolled_window = GTK_WIDGET(gtk_builder_get_object (builder, "scrolledwindow"));
 	gtk_text_buffer_get_start_iter(buffer, &iter);
 
-	gtk_misc_set_alignment(labMeilleurProp,0,0.5);
+	gtk_misc_set_alignment(labMeilleurProp,0.5,0.5);
 	gtk_misc_set_alignment(labRecapPartie,0.2,0.1);
 
 	pTable=gtk_table_new(48,20,FALSE);
@@ -704,12 +701,8 @@ void addMessageServerPageJeu(char* message){
 
 	printf("Avant ajouter message jeu\n");
 	char newMessage[strlen(message)+1];
-	if(buffer!=NULL && strlen(buffer)>0){
-		strcpy(newMessage, "\n");
-		strcat(newMessage, message);
-	} else {
-		strcpy(newMessage, message);
-	}
+	strcpy(newMessage, "\n");
+	strcat(newMessage, message);
 
 	gtk_text_buffer_insert(buffer, &iter, newMessage, -1);
 	gtk_text_buffer_get_end_iter(buffer,&iter);

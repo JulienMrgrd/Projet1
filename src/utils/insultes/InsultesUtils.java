@@ -5,34 +5,36 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class InsultesUtils {
+public abstract class InsultesUtils {
 
-	String path = "./src/utils/insultes/dico_insultes_fr.txt";
-	BufferedReader br = null;
+	private static final String path = "./src/utils/insultes/dico_insultes_fr.txt";
 
-	public InsultesUtils() throws IOException {
+	public static boolean isAnInsulte(String mot) throws IOException{
+		BufferedReader br = null;
+		boolean trouve = false;
 		try{
 			br = new BufferedReader(new FileReader(path));
 		} catch(FileNotFoundException exc) { throw new FileNotFoundException("File not found" );  }
-	}
-
-	public boolean isAnInsulte(String mot) throws IOException{
-		if(br==null) throw new FileNotFoundException("File not found" );
-
+		
 		String line = null; 
 
 		try {
 			while ((line = br.readLine()) != null)
 			{
-				if ( line.equalsIgnoreCase(mot) ){
-					return true;
+				line = line.toLowerCase();
+				mot = mot.toLowerCase();
+				if ( line.equals(mot) ){
+					trouve = true;
+					break;
 				}
 			}
 		} catch(IOException ioe) { throw new IOException("Erreur IO" ); }
-		return false;
+		
+		close(br);
+		return trouve;
 	}
 
-	public void close(){
+	private static void close(BufferedReader br){
 		if(br!=null){
 			try {
 				br.close();
@@ -43,13 +45,14 @@ public class InsultesUtils {
 	}
 
 	public static void main(String[] args) throws IOException {
-		InsultesUtils ins_utils = new InsultesUtils();
-		System.out.println(ins_utils.isAnInsulte("pute"));
-		System.out.println(ins_utils.isAnInsulte("nique"));
-		System.out.println(ins_utils.isAnInsulte("con"));
-		System.out.println(ins_utils.isAnInsulte("connard"));
-		System.out.println(ins_utils.isAnInsulte("imbecile"));
-		System.out.println(ins_utils.isAnInsulte("put"));
+		System.out.println(InsultesUtils.isAnInsulte("puTe"));
+		System.out.println(InsultesUtils.isAnInsulte("pute"));
+		System.out.println(InsultesUtils.isAnInsulte("PUTE"));
+		System.out.println(InsultesUtils.isAnInsulte("nique"));
+		System.out.println(InsultesUtils.isAnInsulte("ta mère"));
+		System.out.println(InsultesUtils.isAnInsulte("connard"));
+		System.out.println(InsultesUtils.isAnInsulte("imbecile"));
+		System.out.println(InsultesUtils.isAnInsulte("put"));
 	}
 
 }

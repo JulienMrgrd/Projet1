@@ -53,7 +53,7 @@
               <object class="GtkLabel" id="recapPartie">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">recapitulatif de la partie</property>
+                <property name="label" translatable="yes">  </property>
               </object>
               <packing>
                 <property name="resize">True</property>
